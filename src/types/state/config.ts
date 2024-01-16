@@ -2,7 +2,7 @@ import { Device } from './device.ts';
 
 export interface Config {
   devices: Device[];
-  rooms: unknown[];
+  rooms: Device[];
   sourceLists: unknown;
   destinationLists: unknown;
   tieLines: unknown[];

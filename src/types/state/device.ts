@@ -1,13 +1,13 @@
-export class Device {
-  key: string = '';
+export interface Device {
+  key: string;
 
-  name: string = '';
+  name: string;
 
-  type: string = '';
+  type: string;
 
-  group: string = '';
+  group: string;
 
-  id: string = '';
+  id: string;
 
   properties: unknown;
 }
