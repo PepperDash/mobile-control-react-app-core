@@ -1,0 +1,15 @@
+{
+  "apiPath": "http://192.168.1.164:50002/mc/api",
+  "gatewayAppPath": "",
+  "enableDev": false,
+  "logoPath": "logo/PDT-logo-no-tag_blue-pdt-on-transp_1000px.png",
+  "loginMode": "room-list",
+  "iconSet": "GOOGLE",
+  "modes": {
+    "room-list": {
+      "listPageText": "Please select your room",
+      "loginHelpText": "Please select your room from the list, then enter the code shown on the display in the room. (Configurable message)",
+      "passcodePageText": "Please enter the code shown on this room's display"
+    }
+  }
+}

@@ -1,36 +1,44 @@
 {
   "name": "mobile-control-react-app-core",
+  "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "./dist/mobile-control-react-app-core.umd.cjs",
-  "module": "/.dist/mobile-control-react-app-core.js",
-  "types": "/dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/mobile-control-react-app-core.js",
-      "require": "./dist/mobile-control-react-app-core.umd.cjs"
-    }
-  },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.0.1",
+    "axios": "^1.6.5",
+    "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.1.0",
+    "react-router-dom": "^6.21.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.10.8",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
-    "vite-plugin-dts": "^3.7.0"
-  },
-  "dependencies": {
-    "@reduxjs/toolkit": "^2.0.1",
-    "lodash": "^4.17.21",
-    "react-redux": "^9.1.0",
-    "socket.io": "^4.7.3",
-    "socket.io-client": "^4.7.4"
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^26.2.2",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.30.0",
+    "prettier": "^2.6.2"
   }
 }

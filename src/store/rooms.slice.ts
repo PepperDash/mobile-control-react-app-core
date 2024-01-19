@@ -1,23 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { DeviceState } from '../state/state/index.ts'
 import * as _ from 'lodash'
+import { DeviceState, RoomState } from '../types/state/state/index.ts'
 
-const initialState: DevicesState = {
-    devices: {} 
+const initialState: RoomsState = {
+    rooms: {}
 }
 
-const devicesSlice = createSlice({
-    name: 'devices',
+const roomsSlice = createSlice({
+    name: 'rooms',
     initialState,
     reducers: {
-        setDeviceState(state, action:PayloadAction<DeviceState>) {
+        setRoomState(state, action:PayloadAction<DeviceState>) {
             const key = action.payload.key;
 
             // This method solves the issue of multiple layers of properties
             // and avoids doing a deep copy of the object
 
             // Get existing room state
-            const existingState = state.devices[key] ?? {};
+            const existingState = state.rooms[key] ?? {};
 
             // merge new state with existing
             const newState = _.merge(existingState, action.payload);
@@ -31,9 +31,9 @@ const devicesSlice = createSlice({
     },
 })
 
-interface DevicesState {
-    devices: Record<string, DeviceState>;
+interface RoomsState {
+    rooms: Record<string, RoomState>;
 }
 
-export const devicesActions = devicesSlice.actions;
-export const devicesReducer =  devicesSlice.reducer;
+export const roomsActions = roomsSlice.actions;
+export const roomsReducer =  roomsSlice.reducer;

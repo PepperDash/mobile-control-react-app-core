@@ -1,6 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppConfigState } from './rootReducer.ts'
-import { AppConfig } from '../classes/app-config.ts'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: AppConfigState = {
     config: {
@@ -8,9 +6,9 @@ const initialState: AppConfigState = {
         apiPath: '',
         gatewayAppPath: '',
         logoPath: '',
-        iconSet: 'HABANERO',
+        iconSet: 'GOOGLE',
         loginMode: '',
-        modes: {},
+        modes: {}, 
     }
 }
 
@@ -27,6 +25,23 @@ const appConfigSlice = createSlice({
 export interface AppConfigState {
     config: AppConfig;
 }
+
+/**
+ * @interface
+ * Contains configuration data for the MC application
+ */
+export interface AppConfig {
+    enableDev: boolean;
+    apiPath: string;
+    gatewayAppPath: string;
+    logoPath: string;
+    iconSet: IconType;
+    loginMode: string;
+    modes: { [key: string]: unknown };
+  }
+  
+export type IconType = 'GOOGLE' | 'HABANERO' | 'NEO';
+
 
 export const appConfigActions = appConfigSlice.actions;
 export const appConfigReducer =  appConfigSlice.reducer;

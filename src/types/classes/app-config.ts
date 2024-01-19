@@ -1,4 +1,4 @@
-import { IconType } from '../modules/mobile-control-common/components/iconTypes';
+import { IconType } from '../../store/appConfig.slice.ts';
 
 /**
  * @interface
@@ -11,5 +11,5 @@ export interface AppConfig {
   logoPath: string;
   iconSet: IconType;
   loginMode: string;
-  modes: { [key: string]: any };
+  modes: { [key: string]: unknown };
 }
