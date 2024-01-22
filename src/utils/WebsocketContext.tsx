@@ -1,17 +1,15 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { httpClient } from '../services/apiService.ts';
+import DisconnectedMessage from '../shared/disconnectedMessage/DisconnectedMessage.tsx';
 import { store } from '../store/index.ts';
 import { runtimeConfigActions } from '../store/runtimeConfig.slice.ts';
+import { useClientId, useRoomkey, useWsIsConnected } from '../store/runtimeSelectors.ts';
 
 interface WebsocketContextType {
-  ws: WebSocket | null;
-  setWs: (ws: WebSocket) => void;
   sendMessage: (type: string, payload: unknown) => void;
 }
 
 const WebsocketContext = createContext<WebsocketContextType>({
-  ws: null,
-  setWs: () => {},
   sendMessage: () => null,
 });
 
@@ -20,25 +18,28 @@ export function useWebsocketContext() {
 }
 
 export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
-  console.log('WebsocketProvider');
   /* STATE ***********************************************************/
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const isConnected = useWsIsConnected();
+  const roomKey = useRoomkey();
+  const clientId = useClientId();
 
   const qp = new URLSearchParams(window.location.search);
 
   const token = qp.get('token');  
 
+  // TODO: Figure out why we can't use the store here
   // const apiPath = useAppSelector((state) => state.appConfig.config.apiPath);
   const apiPath = 'http://192.168.1.164:50002/mc/api';
 
-  getRoomData(apiPath);
-
-  connectWebsocket(apiPath);
-
 
   /* FUNCTIONS *******************************************************/
-  async function getRoomData(apiPath: string) {
-    console.log('getRoomData');
+
+  /**
+   * Gets the room data from the api and stores it in the store
+   * @param apiPath base path to the api without the token
+   */
+  const getRoomData = useCallback(async (apiPath: string) => {
     await httpClient.get(`${apiPath}/ui/joinroom?token=${token}`)
       .then((res) => {
         if (res.status === 200 && res.data) {
@@ -48,47 +49,94 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       .catch((err) => {
         console.log(err);
       });
-  }
+  }, [token]);
 
-  function connectWebsocket(apiPath: string) {
-    console.log('apiPath', apiPath);
+
+  /**
+   * Connects to the websocket and returns the websocket object
+   * @param apiPath base path to the api without the token
+   */
+  const connectWebsocket = useCallback((apiPath: string) => {
     const wsPath = apiPath.replace('http', 'ws');
-    console.log('wsPath', wsPath);
-    const url = `${wsPath}/ui/join/?token=${token}`;
+    const url = `${wsPath}/ui/join/${token}`;
 
-   const ws = new WebSocket(url);
+   const newWs = new WebSocket(url);
 
-    setWs(ws);
+    setWs(newWs);
     
-    ws.onopen = () => {
+    newWs.onopen = () => {
       console.log('connected');
       store.dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
     };
 
-    ws.onerror = (err) => {
+    newWs.onerror = (err) => {
       console.log(err);
     }
 
-    ws.onclose = () => {
+    newWs.onclose = () => {
       console.log('disconnected');
       store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
     }
 
-    ws.onmessage = (e) => {
-      const message = JSON.parse(e.data);
-      console.log(message);
-    }
-  }
+    newWs.onmessage = (e) => {
+      try {
+        const message = JSON.parse(e.data);
+        console.log(message);
 
-  function sendMessage(type: string, payload: unknown) {
+        switch (message.type) {
+          case '/system/roomKey':
+            store.dispatch(runtimeConfigActions.setCurrentRoomKey(message.payload));
+            break;
+          case '/system/userCodeChanged':
+            store.dispatch(runtimeConfigActions.setUserCode(message.payload));
+            break;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    return newWs;
+  }, [token]);
+
+  const sendMessage = useCallback((type: string, content: unknown) => {
+    if (ws && isConnected) {
+      ws.send(JSON.stringify({ type, clientId,  content }));
+    }
+  }, [ws, isConnected, clientId]);
+
+  function reconnect() {
     if (ws) {
-      ws.send(JSON.stringify({ type, payload }));
+      ws.close();
     }
+    getRoomData(apiPath);
+    connectWebsocket(apiPath);
   }
 
+  //* EFFECTS *********************************************************/
+
+  useEffect(() => {
+    getRoomData(apiPath);
+    const newWs = connectWebsocket(apiPath);
+
+    // Cleanup first websocket in dev mode due to double render cycle
+    return () => {
+      if (newWs) {
+        newWs.close();
+      }
+    }
+    }, [apiPath, connectWebsocket, getRoomData]);
+
+  useEffect(() => {
+    if(roomKey) {
+      sendMessage(`/room/${roomKey}/status`, null);
+    }
+
+  }, [roomKey, sendMessage]);
+
+  //* RENDER **********************************************************/
   return (
-    <WebsocketContext.Provider value={{ ws, setWs, sendMessage }}>
-      {children}
+    <WebsocketContext.Provider value={{ sendMessage }}>     
+      {isConnected ? children : <DisconnectedMessage reconnect={reconnect} />}
     </WebsocketContext.Provider>
   );
 };

@@ -17,9 +17,12 @@ const initialState: RuntimeConfigState = {
         roomUuid: '',
         userAppUrl: '',
         config: undefined,
-        userCode: ''
+        userCode: '',
+        qrUrl: '',
     },
-}
+
+};
+
 
 const runtimeConfigSlice = createSlice({
     name: 'runtimeConfig',
@@ -40,7 +43,14 @@ const runtimeConfigSlice = createSlice({
         },
         setRoomData(state, action: PayloadAction<RoomData>) {
             state.roomData = action.payload;
-        }
+        },
+        setCurrentRoomKey(state, action: PayloadAction<string>) {
+            state.roomData.roomKey = action.payload;
+        },
+        setUserCode(state, action: PayloadAction<UserCode>) {
+            state.roomData.userCode = action.payload.userCode;
+            state.roomData.qrUrl = action.payload.qrUrl;
+        },
     }
 })
 
@@ -54,6 +64,11 @@ export interface RuntimeConfigState {
     disconnectionMessage: string;
     token: string;
     roomData: RoomData;
+}
+
+interface UserCode {
+    userCode: string;
+    qrUrl: string;
 }
 
 export const runtimeConfigActions = runtimeConfigSlice.actions;

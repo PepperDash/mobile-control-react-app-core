@@ -18,6 +18,7 @@ export async function initialize() {
             data: localConfig.default as AppConfig
         };
 
+        console.log('configRes', configRes);
 
         if(configRes.status == 200 && configRes.data) {
             const apiPath = configRes.data.apiPath;
@@ -35,4 +36,6 @@ export async function initialize() {
     catch (error) {
         console.log('Error getting config', error);
     }
+
+    return true;
 }

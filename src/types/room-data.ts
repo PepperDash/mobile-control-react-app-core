@@ -8,4 +8,5 @@ export interface RoomData {
   userCode: string;
   codeExpires?: Date;
   enableDebug?: boolean;
+  qrUrl?: string;
 }
