@@ -3,7 +3,7 @@ import { RoomData } from '../../types/index.ts';
 
 const initialState: RuntimeConfigState = {
     apiVersion: '',
-    serverIsRunningOnProcessorHardware: undefined,
+    serverIsRunningOnProcessorHardware: false,
     websocket: {
         isConnected: false,
     },
@@ -66,7 +66,7 @@ export interface RuntimeConfigState {
     roomData: RoomData;
 }
 
-interface UserCode {
+export interface UserCode {
     userCode: string;
     qrUrl: string;
 }

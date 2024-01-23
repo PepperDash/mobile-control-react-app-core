@@ -1,10 +1,15 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
-import { httpClient } from '../services/apiService.ts';
+import { httpClient, useInitialize } from '../services/apiService.ts';
 import DisconnectedMessage from '../shared/disconnectedMessage/DisconnectedMessage.tsx';
+import { devicesActions } from '../store/devices.slice.ts';
+import { useAppSelector } from '../store/hooks.ts';
 import { store } from '../store/index.ts';
 import { roomsActions } from '../store/rooms/rooms.slice.ts';
-import { runtimeConfigActions } from '../store/runtimeConfig/runtimeConfig.slice.ts';
+import { runtimeConfigActions, UserCode } from '../store/runtimeConfig/runtimeConfig.slice.ts';
 import { useClientId, useRoomkey, useWsIsConnected } from '../store/runtimeConfig/runtimeSelectors.ts';
+import { Message } from '../types/state/index.ts';
+import { DeviceState } from '../types/state/state/DeviceState.ts';
+import { RoomState } from '../types/state/state/RoomState.ts';
 
 interface WebsocketContextType {
   sendMessage: (type: string, payload: unknown) => void;
@@ -24,18 +29,14 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const isConnected = useWsIsConnected();
   const roomKey = useRoomkey();
   const clientId = useClientId();
+  const initialize = useInitialize();
+  const apiPath = useAppSelector((state) => state.appConfig.config.apiPath);
 
   const qp = new URLSearchParams(window.location.search);
 
   const token = qp.get('token');  
 
-  // TODO: Figure out why we can't use the store here
-  // const apiPath = useAppSelector((state) => state.appConfig.config.apiPath);
-  const apiPath = 'http://192.168.1.164:50002/mc/api';
-
-
   /* FUNCTIONS *******************************************************/
-
   /**
    * Gets the room data from the api and stores it in the store
    * @param apiPath base path to the api without the token
@@ -58,6 +59,8 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * @param apiPath base path to the api without the token
    */
   const connectWebsocket = useCallback((apiPath: string) => {
+
+
     const wsPath = apiPath.replace('http', 'ws');
     const url = `${wsPath}/ui/join/${token}`;
 
@@ -81,20 +84,24 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
     newWs.onmessage = (e) => {
       try {
-        const message = JSON.parse(e.data);
+        const message: Message = JSON.parse(e.data);
         console.log(message);
 
-        switch (message.type) {
-          case '/system/roomKey':
-            store.dispatch(runtimeConfigActions.setCurrentRoomKey(message.payload));
-            break;
-          case '/system/userCodeChanged':
-            store.dispatch(runtimeConfigActions.setUserCode(message.payload));
-            break;
-          case /room\/.*\/status/:
-            console.log('status update for room: ', message.payload.key);
-            store.dispatch(roomsActions.setRoomState(message.payload));
-            break;
+          if(message.type.startsWith('/system/')) { 
+          switch (message.type) {
+            case '/system/roomKey':
+              store.dispatch(runtimeConfigActions.setCurrentRoomKey(message.content as string));
+              break;
+            case '/system/userCodeChanged':
+              store.dispatch(runtimeConfigActions.setUserCode(message.content as UserCode));
+              break;
+          }
+        }
+        else if (message.type.startsWith('/room/')) {
+          store.dispatch(roomsActions.setRoomState(message.content as RoomState));
+        }
+        else if (message.type.startsWith('/device/')) {
+          store.dispatch(devicesActions.setDeviceState(message.content as DeviceState));
         }
       } catch (err) {
         console.log(err);
@@ -118,8 +125,15 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   }
 
   //* EFFECTS *********************************************************/
+  useEffect(() => {
+    initialize();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   useEffect(() => {
+    if (!apiPath) return;
+
     getRoomData(apiPath);
     const newWs = connectWebsocket(apiPath);
 

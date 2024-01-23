@@ -8,12 +8,16 @@ const RoomConfigurationDisplay = () => {
 
   const configData = useMemo(() => {
     return JSON.stringify(config);
+
+
   }, [config])
 
   return <>
-    Room Config for {roomKey}:
+    <div className='d-flex flex-column text-center'>
+      Room Config for {roomKey}:
 
-    <pre>{configData}</pre>
+      <pre className='text-wrap'>{configData}</pre>
+    </div>
   </>;
 }
 
