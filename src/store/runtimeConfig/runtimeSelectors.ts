@@ -1,4 +1,4 @@
-import { useAppSelector } from './hooks.ts';
+import { useAppSelector } from '../hooks.ts';
 
 export const useWsIsConnected = () => useAppSelector((state) => state.runtimeConfig.websocket.isConnected);
 

@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as localConfig from '../../_local-config/_config.local.json';
 import { appConfigActions } from '../store/appConfig.slice.ts';
 import store from '../store/rootReducer.ts';
-import { RuntimeConfigState, runtimeConfigActions } from '../store/runtimeConfig.slice.ts';
+import { RuntimeConfigState, runtimeConfigActions } from '../store/runtimeConfig/runtimeConfig.slice.ts';
 import { AppConfig } from '../types/classes/app-config.ts';
 
 export const httpClient = axios.create();

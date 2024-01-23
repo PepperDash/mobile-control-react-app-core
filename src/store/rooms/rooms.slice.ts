@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import * as _ from 'lodash'
-import { DeviceState, RoomState } from '../types/state/state/index.ts'
+import { RoomState } from '../../types/state/state/index.ts'
 
 const initialState: RoomsState = {
     rooms: {}
@@ -10,7 +10,7 @@ const roomsSlice = createSlice({
     name: 'rooms',
     initialState,
     reducers: {
-        setRoomState(state, action:PayloadAction<DeviceState>) {
+        setRoomState(state, action:PayloadAction<RoomState>) {
             const key = action.payload.key;
 
             // This method solves the issue of multiple layers of properties

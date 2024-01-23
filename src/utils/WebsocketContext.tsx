@@ -2,8 +2,9 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useState 
 import { httpClient } from '../services/apiService.ts';
 import DisconnectedMessage from '../shared/disconnectedMessage/DisconnectedMessage.tsx';
 import { store } from '../store/index.ts';
-import { runtimeConfigActions } from '../store/runtimeConfig.slice.ts';
-import { useClientId, useRoomkey, useWsIsConnected } from '../store/runtimeSelectors.ts';
+import { roomsActions } from '../store/rooms/rooms.slice.ts';
+import { runtimeConfigActions } from '../store/runtimeConfig/runtimeConfig.slice.ts';
+import { useClientId, useRoomkey, useWsIsConnected } from '../store/runtimeConfig/runtimeSelectors.ts';
 
 interface WebsocketContextType {
   sendMessage: (type: string, payload: unknown) => void;
@@ -89,6 +90,10 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
             break;
           case '/system/userCodeChanged':
             store.dispatch(runtimeConfigActions.setUserCode(message.payload));
+            break;
+          case /room\/.*\/status/:
+            console.log('status update for room: ', message.payload.key);
+            store.dispatch(roomsActions.setRoomState(message.payload));
             break;
         }
       } catch (err) {

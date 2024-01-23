@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RoomData } from '../types/index.ts';
+import { RoomData } from '../../types/index.ts';
 
 const initialState: RuntimeConfigState = {
     apiVersion: '',
