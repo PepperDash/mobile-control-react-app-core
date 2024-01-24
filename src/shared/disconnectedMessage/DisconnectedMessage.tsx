@@ -4,7 +4,7 @@ const DisconnectedMessage = ({reconnect}: { reconnect: () => void}) => {
 
     <div className="disconnected-message">
       <h1>Disconnected</h1>
-      <p>Reconnecting...</p>
+      {/* <p>Reconnecting...</p> */}
       <button onClick={reconnect}>Reconnect Manually</button>
     </div>
 

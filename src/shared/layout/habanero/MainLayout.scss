@@ -1,0 +1,46 @@
+$headerRowHeight: 3.75rem;
+$footerRowHeight: 10rem;
+$volumeColWidth: 7rem;
+
+.grid {
+  display: grid;
+  grid-template-columns:
+    [column1-start] 1fr
+    [column1-end column2-start] $volumeColWidth
+    [column2-end];
+  grid-template-rows:
+    [row1-start] $headerRowHeight
+    [row1-end row2-start] 1fr
+    [row2-end row3-start] $footerRowHeight
+    [row3-end];
+  grid-template-areas:
+    'header header header'
+    'content content volume'
+    'footer footer footer';
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.header {
+  grid-area: header;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.content {
+  grid-area: content;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.footer {
+  grid-area: footer;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.volume {
+  grid-area: volume;
+  overflow: hidden;
+}

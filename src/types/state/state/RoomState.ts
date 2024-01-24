@@ -1,5 +1,4 @@
 /* eslint-disable max-classes-per-file */
-import { Dictionary } from '../collections.ts';
 import { SourceListItem } from '../sourceListItem.ts';
 import { Volumes } from '../volume/volumes.ts';
 import { DeviceState } from './DeviceState.ts';
@@ -51,7 +50,7 @@ export class RoomConfiguration {
 
   environmentalDevices: EnvironmentalDeviceConfiguration[] = [];
 
-  sourceList: Dictionary<SourceListItem> = {};
+  sourceList: Record<string, SourceListItem> = {};
 
   defaultPresentationSourceKey: string = '';
 

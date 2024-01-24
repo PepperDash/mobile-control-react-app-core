@@ -8,8 +8,6 @@ import { roomsActions } from '../store/rooms/rooms.slice.ts';
 import { runtimeConfigActions, UserCode } from '../store/runtimeConfig/runtimeConfig.slice.ts';
 import { useClientId, useRoomkey, useWsIsConnected } from '../store/runtimeConfig/runtimeSelectors.ts';
 import { Message } from '../types/state/index.ts';
-import { DeviceState } from '../types/state/state/DeviceState.ts';
-import { RoomState } from '../types/state/state/RoomState.ts';
 
 interface WebsocketContextType {
   sendMessage: (type: string, payload: unknown) => void;
@@ -23,6 +21,12 @@ export function useWebsocketContext() {
   return useContext(WebsocketContext);
 }
 
+/**
+ * The context component that contains the websocket connection and provides the sendMessage function
+ * Must wrap all other components
+ * @param children 
+ * @returns 
+ */
 export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   /* STATE ***********************************************************/
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -98,10 +102,10 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           }
         }
         else if (message.type.startsWith('/room/')) {
-          store.dispatch(roomsActions.setRoomState(message.content as RoomState));
+          store.dispatch(roomsActions.setRoomState(message));
         }
         else if (message.type.startsWith('/device/')) {
-          store.dispatch(devicesActions.setDeviceState(message.content as DeviceState));
+          store.dispatch(devicesActions.setDeviceState(message));
         }
       } catch (err) {
         console.log(err);
