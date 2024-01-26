@@ -24,6 +24,7 @@ jobs:
           --package=@semantic-release/release-notes-generator \
           --package=@semantic-release/changelog \
           --package=@semantic-release/exec \
+          --package=conventional-changelog-conventionalcommits \
           --package=@semantic-release/npm \
           --package=@semantic-release/github \
           -- semantic-release
