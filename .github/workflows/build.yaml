@@ -23,6 +23,7 @@ jobs:
           --package=@semantic-release/commit-analyzer \
           --package=@semantic-release/release-notes-generator \
           --package=@semantic-release/changelog \
+          --package=@semantic-release/exec \
           --package=@semantic-release/npm \
           --package=@semantic-release/github \
           -- semantic-release
