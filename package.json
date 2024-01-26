@@ -38,6 +38,7 @@
     "sass": "^1.70.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
+    "vite-plugin-dts": "^3.7.2",
     "vite-plugin-linter": "^2.1.1",
     "vite-tsconfig-paths": "^4.3.1"
   },
@@ -65,7 +66,7 @@
     "type": "git",
     "url": "https://github.com/PepperDash/mobile-control-react-app-core"
   },
-  "bugs":{
+  "bugs": {
     "url": "https://github.com/PepperDash/mobile-control-react-app-core"
   },
   "homepage": "https://github.com/PepperDash/mobile-control-react-app-core#readme",
