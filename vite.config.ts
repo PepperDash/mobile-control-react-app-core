@@ -19,7 +19,7 @@ export default defineConfig((configEnv) => ({
   plugins: [
     dts({
       insertTypesEntry: true,
-      include: ['src/component/'],
+      include: ['src/lib/'],
     }),
     react(),
     tsConfigPaths(),
@@ -33,7 +33,7 @@ export default defineConfig((configEnv) => ({
       entry: path.join('src', 'lib/index.ts'),
       
       name: 'pepperdash/mobile-control-react-app-core',
-      formats: ['es', 'umd'],
+      formats: ['es'],
       fileName: (format) => `mobile-control-react-app-core.${format}.js`,
     },
     rollupOptions: {

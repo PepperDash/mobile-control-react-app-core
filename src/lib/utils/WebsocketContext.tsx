@@ -1,32 +1,22 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { httpClient, useInitialize } from '../services';
 import DisconnectedMessage from '../shared/disconnectedMessage/DisconnectedMessage';
 import { store } from '../store';
 import { devicesActions } from '../store/devices.slice';
 import { useAppSelector } from '../store/hooks';
 import { roomsActions } from '../store/rooms/rooms.slice';
-import { runtimeConfigActions, UserCode } from '../store/runtimeConfig/runtimeConfig.slice';
+import { UserCode, runtimeConfigActions } from '../store/runtimeConfig/runtimeConfig.slice';
 import { useClientId, useRoomKey, useWsIsConnected } from '../store/runtimeConfig/runtimeSelectors';
 import { Message } from '../types';
+import WebsocketContext from './useWebsocketContext';
 
-interface WebsocketContextType {
-  sendMessage: (type: string, payload: unknown) => void;
-}
-
-const WebsocketContext = createContext<WebsocketContextType>({
-  sendMessage: () => null,
-});
-
-export function useWebsocketContext() {
-  return useContext(WebsocketContext);
-}
 
 /**
  * The context component that contains the websocket connection and provides the sendMessage function
  * Must wrap all other components
  * @param children the child components.  First child should be a room buseness logic component
  */
-export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
+const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   /* STATE ***********************************************************/
   const [ws, setWs] = useState<WebSocket | null>(null);
   const isConnected = useWsIsConnected();
@@ -170,3 +160,5 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     </WebsocketContext.Provider>
   );
 };
+
+export default WebsocketProvider;

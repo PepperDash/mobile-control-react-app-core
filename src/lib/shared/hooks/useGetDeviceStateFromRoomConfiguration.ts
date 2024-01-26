@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { RoomConfiguration } from 'src/lib/types/state/state';
-import { useWebsocketContext } from 'src/lib/utils';
+import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
 
 /**

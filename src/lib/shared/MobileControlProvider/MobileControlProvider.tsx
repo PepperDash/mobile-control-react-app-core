@@ -1,6 +1,6 @@
 import { Provider } from "react-redux";
+import WebsocketProvider from 'src/lib/utils/WebsocketContext';
 import { store } from "../../store/index";
-import { WebsocketProvider } from "../../utils/WebsocketContext";
 
 /**
  * This needs to be wrapped around the entire app to provide the websocket context
