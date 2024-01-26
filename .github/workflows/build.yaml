@@ -18,7 +18,13 @@ jobs:
       - name: build
         run: npm run build
       - name: Deploy to npm
-        run: npx semantic-release
+        run: |
+          npx --package=@semantic-release \
+          --package=@semantic-release/commit-analyzer \
+          --package=@semantic-release/release-notes-generator \
+          --package=@semantic-release/npm \
+          --package=@semantic-release/github \
+          -- semantic-release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
