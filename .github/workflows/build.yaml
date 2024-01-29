@@ -11,8 +11,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@pepperdash'
       - name: install packages
         run: npm ci
       - name: build
@@ -29,7 +27,7 @@ jobs:
           --package=@semantic-release/github \
           -- semantic-release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
