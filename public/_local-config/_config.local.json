@@ -7,7 +7,7 @@
   "iconSet": "GOOGLE",
   "modes": {
     "room-list": {
-      "listPageText": "Please select your room",
+      "listPageText": "Please select a room.",
       "loginHelpText": "Please select your room from the list, then enter the code shown on the display in the room. (Configurable message)",
       "passcodePageText": "Please enter the code shown on this room's display"
     }

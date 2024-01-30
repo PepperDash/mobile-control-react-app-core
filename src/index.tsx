@@ -5,7 +5,8 @@ import {
   createBrowserRouter,
 } from 'react-router-dom';
 import App from './app/App';
-import ErrorBox from './lib/shared/layout/ErrorBox';
+import { ErrorBox } from './lib';
+
   
 const router = createBrowserRouter(
     [

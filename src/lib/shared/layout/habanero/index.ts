@@ -1,2 +1,2 @@
-export * from "./MainLayout"
-import "./MainLayout.scss"
+export * from "./MainLayout";
+

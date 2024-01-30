@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as localConfig from '../../../_local-config/_config.local.json';
+// import * as localConfig from '../../../_local-config/_config.local.json';
 import { appConfigActions } from '../store/appConfig.slice';
 import { useAppDispatch } from '../store/rootReducer';
 import { RuntimeConfigState, runtimeConfigActions } from '../store/runtimeConfig/runtimeConfig.slice';
@@ -16,13 +16,13 @@ export function useInitialize() {
         return async () => {
         try {
             // Get the local config and set it in the store
-            //const configRes = await httpClient.get<AppConfig>('./_local-config/_config.local.json')
+            const configRes = await httpClient.get<AppConfig>('./_local-config/_config.local.json')
 
             // temporary hardcoded config
-            const configRes = {
-                status: 200,
-                data: localConfig as AppConfig
-            };
+            // const configRes = {
+            //     status: 200,
+            //     data: localConfig as AppConfig
+            // };
 
             console.log('configRes', configRes);
 

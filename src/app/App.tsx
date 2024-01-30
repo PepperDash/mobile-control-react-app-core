@@ -1,6 +1,6 @@
 import RoomConfigurationDisplay from '../components/RoomConfigurationDisplay';
-import MobileControlProvider from '../lib/shared/MobileControlProvider/MobileControlProvider';
-import MainLayout from '../lib/shared/layout/habanero/MainLayout';
+import { MobileControlProvider } from '../lib/shared/MobileControlProvider/MobileControlProvider';
+import { MainLayout } from '../lib/shared/layout/habanero/MainLayout';
 
 function App() {
   return ( 

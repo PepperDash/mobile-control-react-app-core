@@ -1,5 +1,5 @@
 import React from 'react';
-import './MainLayout.scss';
+import classes from './MainLayout.module.scss';
 
 /**
  * The main layout, based on Habanero with a header, footer and content area with volume on the right side.
@@ -7,18 +7,16 @@ import './MainLayout.scss';
  * @param param0 
  * @returns 
  */
-const MainLayout = ({header, footer, content, volume}: MainLayoutProps) => {
+export const MainLayout = ({header, footer, content, volume}: MainLayoutProps) => {
   return (
-    <div className='grid'>
-      <div className='header'>{header}</div>
-      <div className='content'>{content}</div>
-      <div className='volume'>{volume}</div>
-      <div className='footer'>{footer}</div>
+    <div className={classes.grid}>
+      <div className={classes.header}>{header}</div>
+      <div className={classes.content}>{content}</div>
+      <div className={classes.volume}>{volume}</div>
+      <div className={classes.footer}>{footer}</div>
     </div>
     );
 }
-
-export default MainLayout;
 
 interface MainLayoutProps {
   header: React.ReactNode;
