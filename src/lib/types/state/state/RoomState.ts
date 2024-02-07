@@ -8,56 +8,33 @@ import { ShareState } from './ShareState';
 /** Base device state class */
 export interface RoomState extends DeviceState {
   activityMode?: number;
-
   advancedSharingActive?: boolean;
-
   configuration?: RoomConfiguration; // update with typed class later
-
-  isOn?: boolean;
-
-  isInCall?: boolean;
-
-  isWarmingUp?: boolean;
-
   isCoolingDown?: boolean;
-
+  isInCall?: boolean;
+  isOn?: boolean;
+  isWarmingUp?: boolean;
   selectedSourceKey?: string;
-
   share?: ShareState;
-
-  supportsAdvancedSharing?: boolean;
-
-  userCanChangeShareMode?: boolean;
-
   volumes?: Volumes;
 }
 
 export class RoomConfiguration {
-  hasVideoConferencing?: boolean;
-
-  videoCodecIsZoomRoom?: boolean;
-
-  hasAudioConferencing?: boolean;
-
-  hasEnvironmentalControls?: boolean;
-
-  videoCodecKey?: string;
-
   audioCodecKey?: string;
-
   defaultDisplayKey?: string;
-
-  displayKeys: string[] = [];
-
-  environmentalDevices: EnvironmentalDeviceConfiguration[] = [];
-
-  sourceList: Record<string, SourceListItem> = {};
-
   defaultPresentationSourceKey: string = '';
-
+  displayKeys: string[] = [];
+  environmentalDevices: EnvironmentalDeviceConfiguration[] = [];
+  hasAudioConferencing?: boolean;
+  hasEnvironmentalControls?: boolean;
+  hasVideoConferencing?: boolean;
   helpMessage?: string;
-
+  sourceList: Record<string, SourceListItem> = {};
+  supportsAdvancedSharing?: boolean;
   uiBehavior?: EssentialsRoomUiBehaviorConfiguration;
+  userCanChangeShareMode?: boolean;
+  videoCodecIsZoomRoom?: boolean;
+  videoCodecKey?: string;
 }
 
 export interface EssentialsRoomUiBehaviorConfiguration {
