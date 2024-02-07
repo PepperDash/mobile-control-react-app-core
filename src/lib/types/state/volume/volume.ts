@@ -1,56 +1,19 @@
-export class Volume {
-  /**
-   * Identifier for this level
-   */
-  key?: string;
+export interface Volume {
+  key: string;
 
-  /**
-   * Factor for fracLevel conversions.  Defaults to 65535
-   */
-  factor: number = 65535;
+  level: number;
 
-  /**
-   * @deprecated can't be used in NGRX state
-   */
-  get fracLevel() {
-    if (this.level) {
-      return this.level / this.factor;
-    }
+  muted: boolean;
 
-    return 0;
-  }
+  hasMute?: boolean;
 
-  /**
-   * For recalling the last level set or sent
-   * @deprecated
-   */
-  lastLevel: number = 0;
+  hasPrivacyMute?: boolean;
 
-  // get level() {
-  //   return this._level;
-  // }
-
-  // set level(val) {
-  //   this._level = val;
-  //   this.lastLevel = val;
-  //   // console.log('vol set ', this.fracLevel);
-  // }
-
-  // private _level: number = 0;
-
-  level?: number;
-
-  muted?: boolean = false;
-
-  hasMute?: boolean = true;
-
-  hasPrivacyMute?: boolean = false;
-
-  privacyMuted?: boolean;
+  privacyMuted: boolean;
 
   muteIconName?: string;
 
-  label?: string = 'Volume';
+  label: string;
 }
 
 export type VolumeCommand = 'level' | 'muteOn' | 'muteOff' | 'muteToggle' | 'privacyMuteToggle';

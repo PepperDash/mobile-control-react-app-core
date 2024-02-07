@@ -1,7 +1,7 @@
 {
   "apiPath": "http://192.168.1.164:50002/mc/api",
   "gatewayAppPath": "",
-  "enableDev": false,
+  "enableDev": true,
   "logoPath": "logo/PDT-logo-no-tag_blue-pdt-on-transp_1000px.png",
   "loginMode": "room-list",
   "iconSet": "GOOGLE",
