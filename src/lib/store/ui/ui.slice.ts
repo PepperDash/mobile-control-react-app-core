@@ -26,7 +26,18 @@ const uiSlice = createSlice({
     setIncomingCallModal(state, action: PayloadAction<boolean>) {
       state.modalVisibility['showIncomingCallModal'] = action.payload;
     },
-    
+    setPopoverState(state, action: PayloadAction<{popoverGroup: popoverGroup | string, popoverId: string, value: boolean}>) {
+      if (!state.popoverVisibility[action.payload.popoverGroup]) {
+        state.popoverVisibility[action.payload.popoverGroup] = {};
+      }
+
+      // close all other popovers in the group
+      Object.entries(state.popoverVisibility[action.payload.popoverGroup]).forEach(([key]) => {
+        state.popoverVisibility[action.payload.popoverGroup][key] = false;
+      });
+
+      state.popoverVisibility[action.payload.popoverGroup][action.payload.popoverId] = action.payload.value;
+    },
   }
 })
 
