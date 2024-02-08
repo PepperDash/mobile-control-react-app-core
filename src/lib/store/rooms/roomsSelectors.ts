@@ -10,6 +10,11 @@ export const useRoomState = (roomKey: string) =>
     state.rooms[roomKey] ? state.rooms[roomKey] : undefined
   );
 
+export const useRoomName = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey] ? state.rooms[roomKey]?.name : undefined
+  );
+
 export const useRoomMasterVolume = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.volumes?.master : undefined

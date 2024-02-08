@@ -18,12 +18,6 @@ export function useInitialize() {
             // Get the local config and set it in the store
             const configRes = await httpClient.get<AppConfig>('/_local-config/_config.local.json')
 
-            // temporary hardcoded config
-            // const configRes = {
-            //     status: 200,
-            //     data: localConfig as AppConfig
-            // };
-
             console.log('configRes', configRes);
 
             if(configRes.status == 200 && configRes.data) {
