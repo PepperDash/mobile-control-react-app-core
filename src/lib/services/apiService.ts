@@ -14,9 +14,18 @@ export const httpClient = axios.create();
 export function useInitialize() { 
     const dispatch = useAppDispatch();
         return async () => {
-        try {
+            try {
+            const basePath = location.pathname.split('/').filter((path) => path.length > 0);        
+
+            if (basePath.length > 5) {
+                basePath.length = 5;
+            } else {
+                basePath.length = 2;
+            }        
+    
+            const baseURL = `/${basePath.join('/')}`;
             // Get the local config and set it in the store
-            const configRes = await httpClient.get<AppConfig>('/_local-config/_config.local.json')
+            const configRes = await httpClient.get<AppConfig>('/_local-config/_config.local.json', {baseURL})
 
             console.log('configRes', configRes);
 
