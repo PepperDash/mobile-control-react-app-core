@@ -14,7 +14,7 @@ export interface DeviceState extends IKeyName {
   /**
    * The object type of the message for state messages
    */
-  messageType: string;
+  messageType?: string;
 
   /**
    * The event type of the message for stateless messages
