@@ -1,0 +1,77 @@
+import { DetailedHTMLProps, ReactNode, useState } from 'react';
+import classes from './IconButton.module.scss';
+
+/**
+ * This component wraps a native button element, removing native styling
+ * @property {JSX.Element} multiIcon - The icon to display
+ * @property {ReactNode} other - Additional content to display
+ * @property {boolean} vert - Whether to display the icon and other content vertically
+ * @property {string} className - Additional classes to apply to the button
+ * @property {string} iconClassName - Additional classes to apply to the icon
+ * @property {string} contentClassName - Additional classes to apply to the content
+ * @property {boolean} disabled - Whether the button is disabled
+ * @property {function} onPointerDown - Function to call when the button is pressed
+ * @property {function} onPointerUp - Function to call when the button is released
+ * @property {function} onPointerLeave - Function to call when the pointer leaves the button
+ * @property {object} otherProps - Additional props to apply to the button
+ */
+export const IconButton = ({
+  multiIcon: MultiIcon,
+  otherContent = null,
+  vert = false,
+  className,
+  iconClassName = '',
+  otherContentClassName = '',
+  disabled,
+  onPointerDown,
+  onPointerUp,
+  onPointerLeave,
+  ...otherProps
+}: IconButtonProps) => {
+  const [active, setActive] = useState(false);
+
+  return (
+    <button
+      type="button"
+      className={`${classes.iconbtn} ${vert ? classes.iconbtnvert : ''} ${className}`}
+      {...otherProps}
+      disabled={disabled}
+      onPointerDown={(e) => {
+        setActive(true);
+        onPointerDown?.(e);
+      }}
+      onPointerUp={(e) => {
+        setActive(false);
+        onPointerUp?.(e);
+      }}
+      onPointerLeave={(e) => {
+        setActive(false);
+        onPointerLeave?.(e);
+      }}
+    >
+      <MultiIcon
+        className={`${classes.iconbtn} ${iconClassName || classes.iconsm}`}
+        {...{ active, disabled }}
+      />
+      <div className={otherContentClassName}>{otherContent}</div>
+    </button>
+  );
+};
+
+export interface IconButtonProps
+  extends DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > {
+  iconClassName?: string;
+  otherContentClassName?: string;
+  multiIcon: (props: IconProps) => JSX.Element;
+  otherContent?: ReactNode;
+  vert?: boolean;
+}
+
+export interface IconProps {
+  active?: boolean;
+  disabled?: boolean;
+  className?: string;
+}

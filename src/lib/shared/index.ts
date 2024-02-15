@@ -6,7 +6,8 @@ export * from "./hooks/useGetDeviceStateFromRoomConfiguration"
 export * from "./layout/ErrorBox"
 // export * from "./layout/habanero/MainLayout/MainLayout"
 // export * from "./layout/habanero/TechLayout/TechLayout"
+export * from "./Buttons"
+export * from "./Icons"
 export * from "./layout/habanero"
-
 // export { ErrorBox, MainLayout, MobileControlProvider }
 
