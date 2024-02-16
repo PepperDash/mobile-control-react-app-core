@@ -3,7 +3,7 @@ import { NamedIconButton } from "../Buttons";
 import { iconsDictionary } from "./iconsDictionary";
 
 const IconLibrary = () => {
-  const [active, setActive] = useState<boolean>(false);
+  const [feedback, setFeedback] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const icons = iconsDictionary;
 
@@ -11,10 +11,10 @@ const IconLibrary = () => {
 
   return (
       <div className="icon-library">
-        <button onClick={() => setActive(!active)}>Active</button>
+        <button onClick={() => setFeedback(!feedback)}>Feedback</button>
         <button onClick={() => setDisabled(!disabled)}>Disabled</button>
         {keys.map((key) => {
-          return <NamedIconButton name={key} key={key} disabled={disabled} />;
+          return <NamedIconButton name={key} key={key} disabled={disabled} feedback={feedback} feedbackClassName='icon-feedback' />;
         })}
       </div>
   );

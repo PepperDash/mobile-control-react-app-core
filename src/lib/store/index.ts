@@ -10,6 +10,7 @@ export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 
 export * from './appConfig/appConfigSelectors';
+export * from './devices/devicesSelectors';
 export * from './rooms/roomsSelectors';
 export * from './runtimeConfig/runtimeSelectors';
 export * from './ui/uiSelectors';

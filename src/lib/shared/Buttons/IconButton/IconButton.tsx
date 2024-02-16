@@ -14,6 +14,8 @@ import classes from './IconButton.module.scss';
  * @property {function} onPointerUp - Function to call when the button is released
  * @property {function} onPointerLeave - Function to call when the pointer leaves the button
  * @property {object} otherProps - Additional props to apply to the button
+ * @property {boolean} feedback - Whether to display feedback state
+ * @property {string} feedbackClassName - Additional classes to apply to the feedback state
  */
 export const IconButton = ({
   multiIcon: MultiIcon,
@@ -23,6 +25,8 @@ export const IconButton = ({
   iconClassName = '',
   otherContentClassName = '',
   disabled,
+  feedback,
+  feedbackClassName,
   onPointerDown,
   onPointerUp,
   onPointerLeave,
@@ -30,10 +34,13 @@ export const IconButton = ({
 }: IconButtonProps) => {
   const [active, setActive] = useState(false);
 
+  const buttonFeedbackClass = !disabled && feedback ? feedbackClassName : '';
+  const showActive = !disabled && ( active || feedback );
+
   return (
     <button
       type="button"
-      className={`${classes.iconbtn} ${vert ? classes.iconbtnvert : ''} ${className}`}
+      className={`${classes.iconbtn} ${vert ? classes.iconbtnvert : ''} ${className} ${buttonFeedbackClass}`}
       {...otherProps}
       disabled={disabled}
       onPointerDown={(e) => {
@@ -50,8 +57,8 @@ export const IconButton = ({
       }}
     >
       <MultiIcon
-        className={`${classes.iconbtn} ${iconClassName || classes.iconsm}`}
-        {...{ active, disabled }}
+        className={`${iconClassName || classes.iconsm}`}
+        {...{ active: showActive, disabled }}
       />
       <div className={otherContentClassName}>{otherContent}</div>
     </button>
@@ -68,6 +75,8 @@ export interface IconButtonProps
   multiIcon: (props: IconProps) => JSX.Element;
   otherContent?: ReactNode;
   vert?: boolean;
+  feedback?: boolean;
+  feedbackClassName?: string;
 }
 
 export interface IconProps {

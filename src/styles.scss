@@ -63,6 +63,10 @@ button:focus-visible {
   flex-wrap: wrap;
 }
 
+.icon-feedback {
+  color: red;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

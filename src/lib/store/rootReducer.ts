@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { appConfigReducer } from './appConfig/appConfig.slice';
-import { devicesReducer } from './devices.slice';
+import { devicesReducer } from './devices/devices.slice';
 import { roomsReducer } from './rooms/rooms.slice';
 import { runtimeConfigReducer } from './runtimeConfig/runtimeConfig.slice';
 import { uiReducer } from './ui/ui.slice';

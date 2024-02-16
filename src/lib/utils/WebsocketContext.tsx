@@ -2,7 +2,7 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { httpClient, useInitialize } from "../services";
 import DisconnectedMessage from "../shared/disconnectedMessage/DisconnectedMessage";
 import { store, useAppConfig } from "../store";
-import { devicesActions } from "../store/devices.slice";
+import { devicesActions } from "../store/devices/devices.slice";
 import { roomsActions } from "../store/rooms/rooms.slice";
 import {
   UserCode,

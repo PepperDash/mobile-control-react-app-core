@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import { Message } from '../types';
-import { DeviceState } from '../types/state/state';
+import { Message } from '../../types';
+import { DeviceState } from '../../types/state/state';
 
 const initialState: Record<string, DeviceState>  = {
 }
