@@ -33,7 +33,7 @@ export default defineConfig((configEnv) => ({
       entry: path.join('src', 'lib/index.ts'),
       
       name: 'pepperdash/mobile-control-react-app-core',
-      formats: ['es'],
+      formats: ['es', "umd"],
       fileName: (format) => `mobile-control-react-app-core.${format}.js`,
     },
     rollupOptions: {

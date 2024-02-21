@@ -1,0 +1,21 @@
+.iconbtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.iconbtnvert {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* This hits an SVG inside the btn */
+.iconbtn:hover svg  {
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+.iconsm {
+  width: 4rem;
+  height: 4rem;
+}

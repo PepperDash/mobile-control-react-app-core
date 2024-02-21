@@ -1,5 +1,6 @@
-export * from "./services/index"
-export * from "./shared/index"
-export * from "./store/index"
-export * from "./utils/index"
+export * from "./services"
+export * from "./shared"
+export * from "./store"
+export * from "./types"
+export * from "./utils"
 

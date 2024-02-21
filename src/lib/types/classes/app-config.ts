@@ -1,4 +1,4 @@
-import { IconType } from 'src/lib/store/appConfig.slice';
+import { IconType } from 'src/lib/store/appConfig/appConfig.slice';
 
 /**
  * @interface

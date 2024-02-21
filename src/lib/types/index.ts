@@ -1,4 +1,4 @@
-export * from './classes/index';
-export * from './interfaces/index';
-export * from './state/index';
+export * from './classes';
+export * from './interfaces';
+export * from './state';
 

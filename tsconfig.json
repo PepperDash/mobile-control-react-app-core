@@ -45,9 +45,6 @@
      "esModuleInterop": true ,
      "declarationMap": true,
     "baseUrl": ".",
-     "paths": {
-      "react-vite-library": [ "src/lib/index.ts" ]
-    },
     "typeRoots": [
       "node_modules/@types",
       "src/lib/index.d.ts"

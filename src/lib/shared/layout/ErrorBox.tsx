@@ -1,4 +1,4 @@
-const ErrorBox = () => {
+export const ErrorBox = () => {
   return (
     <div className="m-2 p-2 bg-danger rounded d-flex align-items-center">
       <span className="fs-5 text-white">
@@ -8,4 +8,3 @@ const ErrorBox = () => {
   );
 };
 
-export default ErrorBox;

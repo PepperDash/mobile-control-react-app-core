@@ -1,6 +1,6 @@
-import RoomConfigurationDisplay from '../components/RoomConfigurationDisplay';
-import MobileControlProvider from '../lib/shared/MobileControlProvider/MobileControlProvider';
-import MainLayout from '../lib/shared/layout/habanero/MainLayout';
+import IconLibrary from 'src/lib/shared/Icons/IconLibrary';
+import { MobileControlProvider } from '../lib/shared/MobileControlProvider/MobileControlProvider';
+import { MainLayout } from '../lib/shared/layout/habanero/MainLayout/MainLayout';
 
 function App() {
   return ( 
@@ -9,7 +9,7 @@ function App() {
         {/* <RoomBusinessLogic> */}
        <MainLayout 
         header={<div>Logo and Header Stuff</div>}
-        content={<RoomConfigurationDisplay />}
+        content={<IconLibrary />}
         footer={<div>I'm a Footer.  Put stuff here</div>}
         volume={<div>Volume Controls Here</div>}
       />   
