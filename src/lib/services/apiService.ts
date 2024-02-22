@@ -17,7 +17,7 @@ export function useInitialize() {
             try {
             const basePath = location.pathname.split('/').filter((path) => path.length > 0);        
 
-            if (basePath.length > 5) {
+            if (basePath.length >= 5) {
                 basePath.length = 5;
             } else {
                 basePath.length = 2;
