@@ -9,6 +9,7 @@ import { IconMultiElipses } from './MultiStateIcons/IconMultiElipses';
 import { IconMultiFlag } from './MultiStateIcons/IconMultiFlag';
 import { IconMultiGear } from './MultiStateIcons/IconMultiGear';
 import { IconMultiGlass } from './MultiStateIcons/IconMultiGlass';
+import { IconMultiHdmi } from './MultiStateIcons/IconMultiHdmi';
 import { IconMultiLaptop } from './MultiStateIcons/IconMultiLaptop';
 import { IconMultiLeftArrow } from './MultiStateIcons/IconMultiLeftArrow';
 import { IconMultiLight } from './MultiStateIcons/IconMultiLight';
@@ -39,6 +40,7 @@ export type IconNames =
   | "Flag"
   | "Gear"
   | "Glass"
+  | "Hdmi"
   | "Laptop"
   | "LeftArrow"
   | "Light"
@@ -73,6 +75,7 @@ export const iconsDictionary: Record<
   Flag: IconMultiFlag,
   Gear: IconMultiGear,
   Glass: IconMultiGlass,
+  Hdmi: IconMultiHdmi,
   Laptop: IconMultiLaptop,
   LeftArrow: IconMultiLeftArrow,
   Light: IconMultiLight,
