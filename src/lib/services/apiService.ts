@@ -1,5 +1,4 @@
 import axios from 'axios';
-// import * as localConfig from '../../../_local-config/_config.local.json';
 import { useAppDispatch } from '../store';
 import { appConfigActions } from '../store/appConfig/appConfig.slice';
 import { RuntimeConfigState, runtimeConfigActions } from '../store/runtimeConfig/runtimeConfig.slice';
