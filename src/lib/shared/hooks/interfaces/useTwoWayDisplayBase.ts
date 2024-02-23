@@ -1,20 +1,36 @@
-import { useGetDevice } from 'src/lib/store';
-import { DisplayState } from 'src/lib/types';
-import { IHasPowerWithFeedbackProps, useIHasPowerControl } from './useIHasPowerControl';
+import { useGetDevice } from "src/lib/store";
+import { DisplayState } from "src/lib/types";
+import {
+  IHasPowerWithFeedbackProps,
+  useIHasPowerControl,
+} from "./useIHasPowerControl";
 
-export function useTwoWayDisplayBase(key: string): TwoWayDisplayBaseReturn {
-    const state = useGetDevice(key) as DisplayState;
 
-    const powerControl = useIHasPowerControl(key);
+export function useTwoWayDisplayBase(
+  key: string
+): TwoWayDisplayBaseReturn | undefined {
+  const displayState = useGetDevice(key) as DisplayState | undefined;
+  const powerControl = useIHasPowerControl(key);
 
-    return { state, powerControl };
+  // bail if state is undefined
+  if (!displayState) return undefined;
+
+  const powerOnFb =
+    (displayState.powerState || displayState.isWarming) &&
+    !displayState.isCooling;
+  const powerOffFb =
+    (!displayState.powerState || displayState.isCooling) &&
+    !displayState.isWarming;
+
+  return {
+    displayState,
+    powerControl,
+    powerFb: { powerOnFb, powerOffFb },
+  };
 }
 
 interface TwoWayDisplayBaseReturn {
-  state: DisplayState;
+  displayState: DisplayState;
   powerControl: IHasPowerWithFeedbackProps;
+  powerFb: { powerOnFb: boolean; powerOffFb: boolean };
 }
-
-
-
-

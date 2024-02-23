@@ -1,4 +1,4 @@
-import { DisplayState } from 'src/lib/types/state/state';
+import { DisplayState } from "src/lib/types/state/state";
 import { useAppSelector } from "../hooks";
 
 export const useRoomConfiguration = (roomKey: string) =>
@@ -67,6 +67,11 @@ export const useRoomShareState = (roomKey: string) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.share : undefined
   );
 
+/**
+ * Get the display states for the room
+ * @param roomKey
+ * @returns the display states for the room's displays
+ */
 export const useGetRoomDisplays = (roomKey: string) =>
   useAppSelector((state) => {
     const keys = state.rooms[roomKey]?.configuration?.displayKeys;
@@ -77,5 +82,12 @@ export const useGetRoomDisplays = (roomKey: string) =>
       keys.includes(device.key)
     );
 
-    return displays as DisplayState[] || undefined;
+    return (displays as DisplayState[]) || undefined;
   });
+
+export const useGetZoomRoomControllerKey = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.zoomRoomControllerKey
+      : undefined
+  );

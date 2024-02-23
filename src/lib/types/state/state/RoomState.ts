@@ -35,6 +35,8 @@ export class RoomConfiguration {
   userCanChangeShareMode?: boolean;
   videoCodecIsZoomRoom?: boolean;
   videoCodecKey?: string;
+  touchpanelKeys?: string[];
+  zoomRoomControllerKey?: string;
 }
 
 export interface EssentialsRoomUiBehaviorConfiguration {

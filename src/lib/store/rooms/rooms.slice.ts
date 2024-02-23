@@ -33,9 +33,9 @@ const roomsSlice = createSlice({
 
             // overlay the incoming state properties onto the existing item
             // or create new item
-            return {
-                ...state, [key]: newState,
-            } 
+            state[key] = newState;
+
+            return state;
         }
     },
 })

@@ -20,6 +20,10 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(d);
     });
 
+    config.touchpanelKeys?.forEach((d) => {
+      deviceKeys.push(d);
+    });
+
     config.environmentalDevices.forEach((d) => {
       deviceKeys.push(d);
     });
