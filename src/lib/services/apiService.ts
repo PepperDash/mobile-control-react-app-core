@@ -26,7 +26,7 @@ export function useInitialize() {
             // Get the local config and set it in the store
             const configRes = await httpClient.get<AppConfig>('/_local-config/_config.local.json', {baseURL})
 
-            console.log('configRes', configRes);
+            // console.log('configRes', configRes);
 
             if(configRes.status == 200 && configRes.data) {
 
@@ -37,14 +37,14 @@ export function useInitialize() {
                 // Get the runtime version info an set it in the store
                 const versionRes = await httpClient.get<RuntimeConfigState>(`${apiPath}/version`);
                 if (versionRes.status == 200 && versionRes.data) {
-                    console.log('versionRes', versionRes.data);
+                    // console.log('versionRes', versionRes.data);
                     dispatch(runtimeConfigActions.setRuntimeConfig(versionRes.data));
                 }
             }
 
         }
         catch (error) {
-            console.log('Error getting config', error);
+            console.error('Error getting config', error);
         }
 
         return true;

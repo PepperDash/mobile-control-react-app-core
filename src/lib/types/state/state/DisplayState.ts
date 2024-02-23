@@ -18,5 +18,5 @@ export interface DisplayState extends DeviceState {
 
   volume?: Volume;
 
-  inputKeys: string[];
+  inputKeys?: string[];
 }

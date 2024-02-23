@@ -32,8 +32,7 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(config.videoCodecKey);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [key, value] of Object.entries(config.sourceList)) {
+    for (const value of Object.values(config.sourceList)) {
       deviceKeys.push(value.sourceKey);
     }
 

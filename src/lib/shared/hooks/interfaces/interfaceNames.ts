@@ -1,0 +1,1 @@
+export type InterfaceNames = "IHasPowerControl" | "IRoutingFeedback" | "IRunDirectRouteAction" | "IRunRouteAction" | "IRouting";

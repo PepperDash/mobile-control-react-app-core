@@ -7,6 +7,7 @@ export * from './environment/lightingScene';
 export * from './message';
 export * from './message-handler';
 export * from './sourceListItem';
+export * from './state';
 export * from './volume/volume';
 export * from './volume/volumes';
 

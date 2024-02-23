@@ -1,3 +1,4 @@
+import { DisplayState } from 'src/lib/types/state/state';
 import { useAppSelector } from "../hooks";
 
 export const useRoomConfiguration = (roomKey: string) =>
@@ -65,3 +66,16 @@ export const useRoomShareState = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.share : undefined
   );
+
+export const useGetRoomDisplays = (roomKey: string) =>
+  useAppSelector((state) => {
+    const keys = state.rooms[roomKey]?.configuration?.displayKeys;
+
+    if (!keys) return undefined;
+
+    const displays = Object.values(state.devices).filter((device) =>
+      keys.includes(device.key)
+    );
+
+    return displays as DisplayState[] || undefined;
+  });
