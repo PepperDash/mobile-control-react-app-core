@@ -29,7 +29,7 @@ const roomsSlice = createSlice({
             const existingState = state[key] ?? {};
 
             // merge new state with existing
-            const newState = merge(existingState, content);
+            const newState = _.merge(existingState, content);
 
             // overlay the incoming state properties onto the existing item
             // or create new item

@@ -13,7 +13,7 @@ import {
   useRoomKey,
   useWsIsConnected,
 } from "../store/runtimeConfig/runtimeSelectors";
-import { Message } from "../types";
+import { Message, SimpleContent } from "../types";
 import sessionStorageKeys from "../types/classes/session-storage-keys";
 import { loadValue, saveValue } from "./joinParamsService";
 import WebsocketContext from "./useWebsocketContext";
@@ -56,6 +56,9 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     [token]
   );
 
+  /**
+   * Sends a message to the server
+   */
   const sendMessage = useCallback(
     (type: string, content: unknown) => {
       if (clientRef.current && isConnected) {
@@ -64,6 +67,17 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     },
     [isConnected, clientId]
   );
+
+  /**
+   * Helper function to send a simple message with a boolean, number, or string value
+   * @param type 
+   * @param value 
+   */
+  const sendSimpleMessage = 
+    (type: string, value: boolean | number | string ) => {
+      sendMessage(type, { value } as SimpleContent);
+    };
+
 
   //* EFFECTS *********************************************************/
   useEffect(() => {
@@ -188,7 +202,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
   //* RENDER **********************************************************/
   return (
-    <WebsocketContext.Provider value={{ sendMessage }}>
+    <WebsocketContext.Provider value={{ sendMessage, sendSimpleMessage }}>
       {isConnected ? children : <DisconnectedMessage />}
     </WebsocketContext.Provider>
   );

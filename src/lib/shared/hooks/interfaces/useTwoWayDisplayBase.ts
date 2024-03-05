@@ -9,7 +9,7 @@ import {
 export function useTwoWayDisplayBase(
   key: string
 ): TwoWayDisplayBaseReturn | undefined {
-  const displayState = useGetDevice(key) as DisplayState | undefined;
+  const displayState = useGetDevice<DisplayState>(key);
   const powerControl = useIHasPowerControl(key);
 
   // bail if state is undefined

@@ -20,5 +20,6 @@ export const useGetAllDevices = () => {
  * @param deviceKey 
  * @returns DeviceState or undefined
  */
-export const useGetDevice = (deviceKey: string) => 
-  useAppSelector((state) => state.devices[deviceKey] ? state.devices[deviceKey] : undefined);
+export function useGetDevice<T>(deviceKey: string): T | undefined {
+  return useAppSelector((state) => state.devices[deviceKey] ? state.devices[deviceKey] : undefined) as T | undefined;
+}

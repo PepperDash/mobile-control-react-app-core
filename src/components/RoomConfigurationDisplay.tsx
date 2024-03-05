@@ -1,5 +1,5 @@
 import {
-  useGetAllDeviceStateFromRoomConfiguration
+  useGetAllDeviceStateFromRoomConfiguration, useINumeric
 } from "src/lib/shared";
 import { useRoomConfiguration } from "src/lib/store/rooms/roomsSelectors";
 import { useRoomKey } from "src/lib/store/runtimeConfig/runtimeSelectors";
@@ -7,6 +7,7 @@ import { useRoomKey } from "src/lib/store/runtimeConfig/runtimeSelectors";
 const RoomConfigurationDisplay = () => {
   const roomKey = useRoomKey();
   const config = useRoomConfiguration(roomKey);
+  const numericKey = useINumeric(roomKey);
 
   useGetAllDeviceStateFromRoomConfiguration({ config });
 
@@ -19,6 +20,7 @@ const RoomConfigurationDisplay = () => {
       <div className="w-100 h-100 d-flex flex-column text-center overflow-auto">
         Room Config for {roomKey}:
         <pre className="text-wrap overflow-auto">{configData}</pre>
+        <button {...numericKey.digit0}>0</button>
       </div>
     </>
   );
