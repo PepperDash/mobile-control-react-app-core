@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
 import { SourceListItem } from '../sourceListItem';
-import { Volumes } from '../volume/volumes';
+import { Volume } from '../volume/volume';
 import { DeviceState } from './DeviceState';
 import { ShareState } from './ShareState';
 
@@ -16,7 +16,7 @@ export interface RoomState extends DeviceState {
   isWarmingUp?: boolean;
   selectedSourceKey?: string;
   share?: ShareState;
-  volumes?: Volumes;
+  volumes : Record<string, Volume>;
 }
 
 export class RoomConfiguration {
@@ -50,3 +50,6 @@ export class EnvironmentalDeviceConfiguration {
 }
 
 export type EnvironmentalDeviceTypes = 'Lighting' | 'Shade' | 'ShadeController';
+
+export type RoomVolumeType = 'master' | string;
+

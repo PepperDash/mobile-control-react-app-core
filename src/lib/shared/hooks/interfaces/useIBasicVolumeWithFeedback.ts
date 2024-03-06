@@ -1,28 +1,26 @@
-import { useGetDevice } from "src/lib/store";
 import { Volume } from "src/lib/types";
 import { useWebsocketContext } from "src/lib/utils/useWebsocketContext";
 import { useButtonHeldHeartbeat } from "../useHeldButtonAction";
 import { PressHoldReleaseReturn } from "../usePressHoldRelease";
 
 export function useIBasicVolumeWithFeedback(
-  key: string
+  path: string, volumeState: Volume | undefined
 ): IBasicVolumeWithFeedbackProps | undefined {
   const { sendMessage, sendSimpleMessage } = useWebsocketContext();
-  const volumeState = useGetDevice<Volume>(key);
 
-  const volumeUp = useButtonHeldHeartbeat(`/device/${key}`, "volumeUp");
-  const volumeDown = useButtonHeldHeartbeat(`/device/${key}`, "volumeDown");
+  const volumeUp = useButtonHeldHeartbeat(`${path}`, "volumeUp");
+  const volumeDown = useButtonHeldHeartbeat(`${path}`, "volumeDown");
 
   if (!volumeState) return undefined;
 
   const setLevel = (value: number) =>
-    sendSimpleMessage(`/device/${key}/level`, value);
+    sendSimpleMessage(`${path}/level`, value);
 
-  const muteToggle = () => sendMessage(`/device/${key}/muteToggle`, null);
+  const muteToggle = () => sendMessage(`${path}/muteToggle`, null);
 
-  const muteOn = () => sendMessage(`/device/${key}/muteOn`, null);
+  const muteOn = () => sendMessage(`${path}/muteOn`, null);
 
-  const muteOff = () => sendMessage(`/device/${key}/muteOff`, null);
+  const muteOff = () => sendMessage(`${path}/muteOff`, null);
 
   return {
     volumeState,

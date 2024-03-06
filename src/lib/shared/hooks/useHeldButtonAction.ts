@@ -19,16 +19,17 @@ import { usePressHoldRelease } from './usePressHoldRelease';
  * <button {...digit0}>0</button>
  */
 export function useButtonHeldHeartbeat(path: string, command: string) {
+  const repeatIntervalMs = 250;
   const { sendMessage } = useWebsocketContext();
   const held = useRef<NodeJS.Timeout | null>(null);
 
   function onPress() {
-    sendMessage(`${path}/${command}`, 'true');
+    sendMessage(`${path}/${command}`, { value: 'pressed' });
 
     if(!held.current) {
       held.current = setInterval(() => {
-        sendMessage(`${path}/${command}`, 'held' );
-      }, 100);
+        sendMessage(`${path}/${command}`, { value: 'held' } );
+      }, repeatIntervalMs);
     }
   }
 
@@ -37,7 +38,7 @@ export function useButtonHeldHeartbeat(path: string, command: string) {
       clearInterval(held.current);
       held.current = null;
     }
-    sendMessage(`${path}/${command}`,  'false');
+    sendMessage(`${path}/${command}`, { value:  'released' });
   }
 
 

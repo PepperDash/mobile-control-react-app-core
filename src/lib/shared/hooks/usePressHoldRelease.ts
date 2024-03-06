@@ -29,7 +29,7 @@ export function usePressHoldRelease({
     }
   }
 
-  function onMouseLeave() {
+  function onPointerLeave() {
     if(pressed.current) {
       onPointerUp();
     }
@@ -38,7 +38,7 @@ export function usePressHoldRelease({
   return {
     onPointerDown,
     onPointerUp,
-    onMouseLeave
+    onPointerLeave
   };
 }
 

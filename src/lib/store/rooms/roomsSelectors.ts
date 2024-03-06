@@ -1,3 +1,4 @@
+import { RoomVolumeType, Volume } from 'src/lib/types';
 import { DisplayState } from "src/lib/types/state/state";
 import { useAppSelector } from "../hooks";
 
@@ -16,9 +17,10 @@ export const useRoomName = (roomKey: string) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.name : undefined
   );
 
-export const useRoomMasterVolume = (roomKey: string) =>
-  useAppSelector((state) =>
-    state.rooms[roomKey] ? state.rooms[roomKey]?.volumes?.master : undefined
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const useRoomVolume = (roomKey: string, volumeKey: RoomVolumeType) =>
+  useAppSelector((state ) =>
+    state.rooms[roomKey] ? state.rooms[roomKey]?.volumes[volumeKey] as Volume : undefined
   );
 
 export const useRoomSourceList = (roomKey: string) =>
