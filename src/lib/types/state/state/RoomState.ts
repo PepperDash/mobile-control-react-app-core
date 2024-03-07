@@ -19,17 +19,17 @@ export interface RoomState extends DeviceState {
   volumes : Record<string, Volume>;
 }
 
-export class RoomConfiguration {
+export interface RoomConfiguration {
   audioCodecKey?: string;
   defaultDisplayKey?: string;
-  defaultPresentationSourceKey: string = '';
-  displayKeys: string[] = [];
-  environmentalDevices: EnvironmentalDeviceConfiguration[] = [];
+  defaultPresentationSourceKey: string;
+  destinations: Record<DestinationTypes, string>;
+  environmentalDevices: EnvironmentalDeviceConfiguration[];
   hasAudioConferencing?: boolean;
   hasEnvironmentalControls?: boolean;
   hasVideoConferencing?: boolean;
   helpMessage?: string;
-  sourceList: Record<string, SourceListItem> = {};
+  sourceList: Record<string, SourceListItem>;
   supportsAdvancedSharing?: boolean;
   uiBehavior?: EssentialsRoomUiBehaviorConfiguration;
   userCanChangeShareMode?: boolean;
@@ -52,4 +52,7 @@ export class EnvironmentalDeviceConfiguration {
 export type EnvironmentalDeviceTypes = 'Lighting' | 'Shade' | 'ShadeController';
 
 export type RoomVolumeType = 'master' | string;
+
+export type DestinationTypes =   "defaultDisplay" | "leftDisplay" | "centerDisplay" | "rightDisplay" | "programAudio" | "codecContent";
+
 

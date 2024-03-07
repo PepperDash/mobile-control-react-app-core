@@ -4,8 +4,9 @@
  */
 import { Volume } from '../volume/volume';
 import { DeviceState } from './DeviceState';
+import { IHasCurrentSourceInfoChangeState } from './IHasCurrentSourceInfoChangeState';
 
-export interface DisplayState extends DeviceState {
+export interface DisplayState extends DeviceState, IHasCurrentSourceInfoChangeState {
   hasFeedback: boolean;
 
   powerState: boolean;

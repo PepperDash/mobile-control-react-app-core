@@ -16,7 +16,8 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
 
     const deviceKeys = [];
 
-    config.displayKeys.forEach((d) => {
+   
+    Object.values(config.destinations).forEach((d) => {
       deviceKeys.push(d);
     });
 
@@ -37,7 +38,9 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
     }
 
     for (const value of Object.values(config.sourceList)) {
-      deviceKeys.push(value.sourceKey);
+      // if the source has a source key, add it to the list of device keys
+      if(value.sourceKey && value.sourceKey !== "$off")
+        deviceKeys.push(value.sourceKey);
     }
 
     deviceKeys.forEach((dk) => {

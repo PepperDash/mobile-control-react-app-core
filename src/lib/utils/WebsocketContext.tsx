@@ -13,7 +13,7 @@ import {
   useRoomKey,
   useWsIsConnected,
 } from "../store/runtimeConfig/runtimeSelectors";
-import { Message, SimpleContent } from "../types";
+import { Message } from "../types";
 import sessionStorageKeys from "../types/classes/session-storage-keys";
 import { loadValue, saveValue } from "./joinParamsService";
 import WebsocketContext from "./useWebsocketContext";
@@ -75,7 +75,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    */
   const sendSimpleMessage = 
     (type: string, value: boolean | number | string ) => {
-      sendMessage(type, { value } as SimpleContent);
+      sendMessage(type, { value });
     };
 
 

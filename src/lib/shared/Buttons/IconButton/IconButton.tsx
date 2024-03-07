@@ -56,10 +56,10 @@ export const IconButton = ({
         onPointerLeave?.(e);
       }}
     >
-      <MultiIcon
+      {MultiIcon && <MultiIcon
         className={`${iconClassName || classes.iconsm}`}
         {...{ active: showActive, disabled }}
-      />
+      />}
       <div className={otherContentClassName}>{otherContent}</div>
     </button>
   );

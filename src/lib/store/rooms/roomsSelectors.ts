@@ -30,10 +30,24 @@ export const useRoomSourceList = (roomKey: string) =>
       : undefined
   );
 
-export const useRoomDestinationKeys = (roomKey: string) =>
+export const useRoomDestinations = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey]
-      ? state.rooms[roomKey]?.configuration?.displayKeys
+      ? state.rooms[roomKey]?.configuration?.destinations
+      : undefined
+  );
+
+export const useRoomProgramAudioDestinationKey = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.destinations["programAudio"]
+      : undefined
+  );
+
+export const useRoomCodecContentDestinationKey = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.destinations["codecContent"]
       : undefined
   );
 
@@ -71,18 +85,31 @@ export const useRoomShareState = (roomKey: string) =>
 
 /**
  * Get the display states for the room
+ * Exludes the programAudio and codecContent destinations
  * @param roomKey
  * @returns the display states for the room's displays
  */
-export const useGetRoomDisplays = (roomKey: string) =>
+export const useGetRoomDisplayStates = (roomKey: string) =>
   useAppSelector((state) => {
-    const keys = state.rooms[roomKey]?.configuration?.displayKeys;
+    const destinations = Object.entries(state.rooms[roomKey]?.configuration?.destinations ?? {});
 
-    if (!keys) return undefined;
+    if(!destinations) return undefined;
 
-    const displays = Object.values(state.devices).filter((device) =>
-      keys.includes(device.key)
+    const displayKeys = destinations.filter(([key]) => key !== "programAudio" && key !== "codecContent");
+
+    console.log("displayKeys", displayKeys);
+
+    // filter state.devices to only include the values in displayKeys
+
+    const devices = Object.values(state.devices);
+
+    const displays = devices.filter((device) =>
+      Object.values(displayKeys).includes(device.key)
     );
+
+    // const displays = Object.entries(state.devices).filter(([key,]) =>
+    //   displayKeys.includes(key)
+    // );
 
     return (displays as DisplayState[]) || undefined;
   });

@@ -5,7 +5,11 @@ export function NamedIconButton({
   name,
   ...otherProps
 }: NamedIconButtonProps) {
-  return <IconButton multiIcon={iconsDictionary[name]} {...otherProps} />;
+  const multiIcon = iconsDictionary[name] ?? null;
+
+  if(!multiIcon) console.error(`Icon ${name} not found in dictionary`);
+
+  return <IconButton multiIcon={multiIcon} {...otherProps} />;
 }
 
 type NamedIconButtonProps = Omit<IconButtonProps, 'multiIcon'> & {

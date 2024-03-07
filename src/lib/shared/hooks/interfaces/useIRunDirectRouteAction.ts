@@ -17,5 +17,8 @@ interface IRunDirectRouteActionProps {
 interface DirectRoute {
     sourceKey: string;
     destinationKey: string;
+    signalType: SignalType;
 }
+
+export type SignalType = "Audio" | "Video" | "AudioVideo" | "UsbOutput" | "UsbInput";
 
