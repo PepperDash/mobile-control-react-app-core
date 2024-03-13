@@ -17,5 +17,6 @@ export * from './ScheduleEvent';
 export * from './ScheduleState';
 export * from './ShadeState';
 export * from './ShareState';
+export * from './SwitchedOutputState';
 export * from './TunerState';
 
