@@ -3,9 +3,6 @@ import { DeviceState } from './DeviceState';
 import { ShadeState } from './ShadeState';
 
 export interface EnvironmentState extends DeviceState {
-  key: string;
-
-  name: string;
 
   lightingScenes: LightingScene[];
 

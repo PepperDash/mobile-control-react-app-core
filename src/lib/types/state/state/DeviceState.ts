@@ -1,4 +1,5 @@
-import { IKeyName } from '../../interfaces/iKeyName';
+import { InterfaceNames } from 'src/lib/shared';
+import { IKeyName } from '../../interfaces/IKeyName';
 import { CommMonitorState } from './CommMonitorState';
 
 /** Base device state class */
@@ -27,7 +28,7 @@ export interface DeviceState extends IKeyName {
   /**
    * The interfaces implmented on this instance of the device
    */
-  interfaces: string[];
+  interfaces: InterfaceNames[];
 
   commMonitor?: CommMonitorState;
 }
