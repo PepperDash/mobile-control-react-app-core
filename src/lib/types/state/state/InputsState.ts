@@ -1,11 +1,8 @@
-import { IKeyName } from '../../interfaces';
+import { ISelectableItem } from '../../interfaces/ISelectableItem';
 
 export interface InputsState {
   currentInputKey?: string;
 
-  inputs: Record<string, Input>;
+  inputs: Record<string, ISelectableItem>;
 }
 
-export interface Input extends IKeyName {
-  isSelected: boolean;
-}

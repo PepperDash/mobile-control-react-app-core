@@ -7,8 +7,6 @@ export function useIHasInputs(key: string): IHasInputsReturn | undefined {
   const { sendMessage } = useWebsocketContext();
   const device = useGetDevice<InputsState>(key);
 
-  console.log('device', device);
-
   if (!device) return undefined;
 
   const setInput = (inputKey: string) => {

@@ -49,7 +49,7 @@ export class EnvironmentalDeviceConfiguration {
   deviceType?: EnvironmentalDeviceTypes;
 }
 
-export type EnvironmentalDeviceTypes = 'Lighting' | 'Shade' | 'ShadeController';
+export type EnvironmentalDeviceTypes = 'Lighting' | 'Shade' | 'ShadeController' | 'Relay';
 
 export type RoomVolumeType = 'master' | string;
 

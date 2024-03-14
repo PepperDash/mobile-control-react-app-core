@@ -1,6 +1,7 @@
 export * from './CameraState';
 export * from './CamerasState';
-export * from './CommMonitorState';
+export * from './CommunicationMonitorState';
+export * from './DeviceInfoState';
 export * from './DeviceState';
 export * from './DisplayState';
 export * from './EnvironmentState';
@@ -17,6 +18,7 @@ export * from './ScheduleEvent';
 export * from './ScheduleState';
 export * from './ShadeState';
 export * from './ShareState';
+export * from './SurroundSoundModeState';
 export * from './SwitchedOutputState';
 export * from './TunerState';
 

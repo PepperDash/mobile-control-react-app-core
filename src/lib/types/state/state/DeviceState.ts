@@ -1,6 +1,6 @@
 import { InterfaceNames } from 'src/lib/shared';
 import { IKeyName } from '../../interfaces/IKeyName';
-import { CommMonitorState } from './CommMonitorState';
+import { CommunicationMonitorState } from './CommunicationMonitorState';
 
 /** Base device state class */
 export interface DeviceState extends IKeyName {
@@ -30,5 +30,5 @@ export interface DeviceState extends IKeyName {
    */
   interfaces: InterfaceNames[];
 
-  commMonitor?: CommMonitorState;
+  commMonitor?: CommunicationMonitorState;
 }

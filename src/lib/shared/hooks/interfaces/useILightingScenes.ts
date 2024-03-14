@@ -1,5 +1,5 @@
 import { useGetDevice } from 'src/lib/store';
-import { LightingState } from 'src/lib/types';
+import { LightingScene, LightingState } from 'src/lib/types';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
 export function useILightingScenes(key: string): ILightingScenesReturn | undefined {
@@ -8,8 +8,8 @@ export function useILightingScenes(key: string): ILightingScenesReturn | undefin
 
   if (!device) return undefined;
 
-  const setScene = (scene: string) => {
-    sendMessage(`/device/${key}/scene`, scene);
+  const setScene = (scene: LightingScene) => {
+    sendMessage(`/device/${key}/selectScene`, scene);
   };
 
   return { lightingState: device, selectScene: setScene };
@@ -17,5 +17,5 @@ export function useILightingScenes(key: string): ILightingScenesReturn | undefin
 
 export interface ILightingScenesReturn {
   lightingState: LightingState;
-  selectScene: (scene: string) => void;
+  selectScene: (scene: LightingScene) => void;
 }

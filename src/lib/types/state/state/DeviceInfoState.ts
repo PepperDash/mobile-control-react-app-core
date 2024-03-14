@@ -1,4 +1,8 @@
 export interface DeviceInfoState {
+    deviceInfo: DeviceInfo;
+}
+
+export interface DeviceInfo {
     HostName: string;
 
     IpAddress: string;
