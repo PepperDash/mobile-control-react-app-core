@@ -1,10 +1,11 @@
 import { useGetDevice } from "src/lib/store";
 import { DisplayState } from "src/lib/types";
-import { IHasInputsReturn, useIHasInputs } from './useIHasInputs';
+import { IHasInputsState } from 'src/lib/types/state/state/IHasInputsState';
 import {
   IHasPowerWithFeedbackProps,
   useIHasPowerControl,
 } from "./useIHasPowerControl";
+import { IHasSelectableItemsReturn, useIHasSelectableItems } from './useIHasSelectableItems';
 
 
 export function useTwoWayDisplayBase(
@@ -12,7 +13,7 @@ export function useTwoWayDisplayBase(
 ): TwoWayDisplayBaseReturn | undefined {
   const displayState = useGetDevice<DisplayState>(key);
   const powerControl = useIHasPowerControl(key);
-  const inputControl = useIHasInputs(key);
+  const inputControl = useIHasSelectableItems<IHasInputsState>(key);
 
   // bail if state is undefined
   if (!displayState) return undefined;
@@ -35,6 +36,6 @@ export function useTwoWayDisplayBase(
 interface TwoWayDisplayBaseReturn {
   displayState: DisplayState;
   powerControl: IHasPowerWithFeedbackProps;
-  inputControl: IHasInputsReturn;
+  inputControl: IHasSelectableItemsReturn<IHasInputsState>;
   powerFb: { powerOnFb: boolean; powerOffFb: boolean };
 }
