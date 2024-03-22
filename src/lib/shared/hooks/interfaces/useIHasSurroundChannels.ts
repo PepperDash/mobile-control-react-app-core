@@ -1,29 +1,34 @@
-import { IHasSurroundChannelsState, useGetDevice } from 'src/lib';
+import { LevelControlsState, Volume, useGetDevice } from 'src/lib';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
 
 export function useIHasSurroundChannels(key: string): IHasSurroundChannelsReturn | undefined {
   const { sendMessage } = useWebsocketContext();
 
-  const surroundChannels = useGetDevice<IHasSurroundChannelsState>(key);
+  const surroundChannelState = useGetDevice<LevelControlsState>(key);
 
   const setDefaultChannelLevels = () => {
     sendMessage(`/device/${key}/setDefaultChannelLevels`, null);
   }
 
   const getFullStatus = () => {
-    if(surroundChannels?.surroundChannels === undefined) return;
-    const channelKeys = Object.keys(surroundChannels?.surroundChannels);
+    if(surroundChannelState?.levelControls === undefined) return;
+    const channelKeys = Object.keys(surroundChannelState?.levelControls);
     channelKeys.forEach((channel) => {
       sendMessage(`/device/${key}/${channel}/fullStatus`, null);
     });
   }
 
-  return { surroundChannels, setDefaultChannelLevels, getFullStatus };
+  if(!surroundChannelState) return undefined;
+
+  const levelControls = surroundChannelState.levelControls;
+
+  return { levelControls, setDefaultChannelLevels, getFullStatus };
 }
 
 export interface IHasSurroundChannelsReturn {
-  surroundChannels: IHasSurroundChannelsState | undefined;
+  // surroundChannelState: LevelControlsState | undefined;
+  levelControls: Record<string, Volume>;
   setDefaultChannelLevels: () => void;
   getFullStatus: () => void;
 }

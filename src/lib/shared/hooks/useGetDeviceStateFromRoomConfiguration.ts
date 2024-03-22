@@ -26,7 +26,7 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
     });
 
     config.environmentalDevices.forEach((d) => {
-      deviceKeys.push(d);
+      deviceKeys.push(d.deviceKey);
     });
 
     if (config.audioCodecKey) {

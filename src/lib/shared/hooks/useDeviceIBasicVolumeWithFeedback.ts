@@ -1,5 +1,5 @@
 import { useGetDevice } from 'src/lib/store';
-import { Volume } from 'src/lib/types';
+import { IBasicVolumeWithFeedbackState } from 'src/lib/types/state/state/IBasicVolumeWithFeedbackState';
 import { useIBasicVolumeWithFeedback } from './interfaces/useIBasicVolumeWithFeedback';
 
 /**
@@ -8,10 +8,10 @@ import { useIBasicVolumeWithFeedback } from './interfaces/useIBasicVolumeWithFee
  * @returns 
  */
 export function useDeviceIBasicVolumeWithFeedback(deviceKey: string ) {
-  const volumeState = useGetDevice<Volume>(deviceKey);
+  const volumeState = useGetDevice<IBasicVolumeWithFeedbackState>(deviceKey);
 
   const path = `/device/${deviceKey}`;
 
-  return useIBasicVolumeWithFeedback(path, volumeState);
+  return useIBasicVolumeWithFeedback(path, volumeState?.volume);
 }
 

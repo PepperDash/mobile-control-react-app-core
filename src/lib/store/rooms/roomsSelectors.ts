@@ -1,11 +1,11 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RoomVolumeType, Volume } from 'src/lib/types';
-import { DisplayState } from "src/lib/types/state/state";
+import { DisplayState, RoomConfiguration } from "src/lib/types/state/state";
 import { useGetAllDevices } from '../devices/devicesSelectors';
 import { useAppSelector } from "../hooks";
 import store, { RootState } from '../rootReducer';
 
-export const useRoomConfiguration = (roomKey: string) =>
+export const useRoomConfiguration: (roomKey: string) => RoomConfiguration | undefined = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.configuration : undefined
   );
@@ -37,6 +37,13 @@ export const useRoomDestinations = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey]
       ? state.rooms[roomKey]?.configuration?.destinations
+      : undefined
+  );
+
+export const useRoomEnvironmentalDevices = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.environmentalDevices
       : undefined
   );
 

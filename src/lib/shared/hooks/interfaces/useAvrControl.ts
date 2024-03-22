@@ -3,7 +3,7 @@ import { PowerState } from 'src/lib/types';
 import { IHasInputsState } from 'src/lib/types/state/state/IHasInputsState';
 import { IHasSurroundSoundModesState } from 'src/lib/types/state/state/IHasSurroundSoundModesState';
 import { useDeviceIBasicVolumeWithFeedback } from '../useDeviceIBasicVolumeWithFeedback';
-import { IBasicVolumeWithFeedbackProps } from './useIBasicVolumeWithFeedback';
+import { IBasicVolumeWithFeedbackReturn } from './useIBasicVolumeWithFeedback';
 import { IHasPowerWithFeedbackProps, useIHasPowerControl } from './useIHasPowerControl';
 import { IHasSelectableItemsReturn, useIHasSelectableItems } from './useIHasSelectableItems';
 import { IHasSurroundChannelsReturn, useIHasSurroundChannels } from './useIHasSurroundChannels';
@@ -34,6 +34,6 @@ interface AvrReturn {
     inputControl: IHasSelectableItemsReturn<IHasInputsState>;
     surroundSoundModes: IHasSelectableItemsReturn<IHasSurroundSoundModesState>;
     surroundChannels: IHasSurroundChannelsReturn;
-    mainVolumeControl: IBasicVolumeWithFeedbackProps;
+    mainVolumeControl: IBasicVolumeWithFeedbackReturn;
 }
 
