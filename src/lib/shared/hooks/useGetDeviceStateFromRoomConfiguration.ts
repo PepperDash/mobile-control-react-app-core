@@ -37,6 +37,16 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(config.videoCodecKey);
     }
 
+    if (config.matrixRoutingKey) {
+      deviceKeys.push(config.matrixRoutingKey);
+    }
+
+    if (config.endpointKeys) {
+      config.endpointKeys.forEach((ek) => {
+        deviceKeys.push(ek);
+      });
+    }
+
     for (const value of Object.values(config.sourceList)) {
       // if the source has a source key, add it to the list of device keys
       if(value.sourceKey && value.sourceKey !== "$off")

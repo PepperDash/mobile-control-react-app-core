@@ -31,4 +31,14 @@ export interface DeviceState extends IKeyName {
   interfaces: InterfaceNames[];
 
   commMonitor?: CommunicationMonitorState;
+
+  /**
+   * For future use
+   */
+  state: unknown;
+
+  /**
+   * For future use
+   */
+  // configuration: unknown;
 }

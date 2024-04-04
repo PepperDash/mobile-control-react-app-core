@@ -6,7 +6,7 @@ import { DeviceState } from './DeviceState';
 import { ShareState } from './ShareState';
 
 /** Base device state class */
-export interface RoomState extends DeviceState {
+export interface RoomState extends DeviceState{
   activityMode?: number;
   advancedSharingActive?: boolean;
   configuration?: RoomConfiguration; // update with typed class later
@@ -37,6 +37,9 @@ export interface RoomConfiguration {
   videoCodecKey?: string;
   touchpanelKeys?: string[];
   zoomRoomControllerKey?: string;
+  matrixRoutingKey?: string;
+  endpointKeys?: string[];
+  shutdownPromptSeconds: number;
 }
 
 export interface EssentialsRoomUiBehaviorConfiguration {

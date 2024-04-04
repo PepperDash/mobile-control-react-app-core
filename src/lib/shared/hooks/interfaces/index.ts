@@ -13,6 +13,7 @@ export * from "./useILevelControls";
 export * from "./useILightingScenes";
 export * from "./useIMatrixRouting";
 export * from "./useINumeric";
+export * from "./useIRoomEventSchedule";
 export * from "./useIRunDirectRouteAction";
 export * from "./useIRunRouteAction";
 export * from "./useISetTopBoxcontrols";
