@@ -1,5 +1,6 @@
 export * from "./interfaceNames";
 export * from "./useAvrControl";
+export * from "./useEndpoint";
 export * from "./useIBasicVolumeWithFeedback";
 export * from "./useIChannelMessenger";
 export * from "./useIColor";

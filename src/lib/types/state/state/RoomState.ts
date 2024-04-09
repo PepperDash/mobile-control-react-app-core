@@ -3,6 +3,7 @@
 import { SourceListItem } from '../sourceListItem';
 import { Volume } from '../volume/volume';
 import { DeviceState } from './DeviceState';
+import { ScheduleEvent } from './ScheduleEvent';
 import { ShareState } from './ShareState';
 
 /** Base device state class */
@@ -17,6 +18,7 @@ export interface RoomState extends DeviceState{
   selectedSourceKey?: string;
   share?: ShareState;
   volumes : Record<string, Volume>;
+  scheduleEvents: ScheduleEvent[];
 }
 
 export interface RoomConfiguration {

@@ -1,17 +1,17 @@
-import { ScheduleEvent, ScheduleState, useGetDevice } from 'src/lib';
+import { ScheduleEvent, ScheduleState, useRoomState } from 'src/lib';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
 export function useIRoomEventSchedule(key: string): IRoomEventScheduleReturn | undefined {
     const { sendMessage } = useWebsocketContext();
-    const device = useGetDevice<ScheduleState>(key);
+    const roomEventScheduleState = useRoomState(key) as ScheduleState | undefined;
 
-    if (!device) return undefined;
+    if (!roomEventScheduleState) return undefined;
 
     const save = (events: ScheduleEvent[]) => {
         sendMessage(`/room/${key}/saveScheduledEvents`, events);
     };
 
-    return { roomEventScheduleState: device, save };
+    return { roomEventScheduleState, save };
 }
 
 export interface IRoomEventScheduleReturn {

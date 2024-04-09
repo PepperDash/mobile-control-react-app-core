@@ -24,4 +24,5 @@ export * from './ShareState';
 export * from './SurroundSoundModeState';
 export * from './SwitchedOutputState';
 export * from './TunerState';
+export * from './endpointState';
 
