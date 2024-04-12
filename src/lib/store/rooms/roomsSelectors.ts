@@ -40,6 +40,13 @@ export const useRoomDestinations = (roomKey: string) =>
       : undefined
   );
 
+export const useRoomDestinationList = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.destinationList
+      : undefined
+  );
+
 export const useRoomEnvironmentalDevices = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey]
@@ -49,15 +56,15 @@ export const useRoomEnvironmentalDevices = (roomKey: string) =>
 
 export const useRoomProgramAudioDestinationKey = (roomKey: string) =>
   useAppSelector((state) =>
-    state.rooms[roomKey]
-      ? state.rooms[roomKey]?.configuration?.destinations["programAudio"]
-      : undefined
+    state.rooms[roomKey]?.configuration?.destinationList["programAudio"]
+      ? state.rooms[roomKey]?.configuration?.destinationList["programAudio"]?.sinkKey
+      : state.rooms[roomKey]?.configuration?.destinationList["defaultDisplay"]?.sinkKey || ""
   );
 
 export const useRoomCodecContentDestinationKey = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey]
-      ? state.rooms[roomKey]?.configuration?.destinations["codecContent"]
+      ? state.rooms[roomKey]?.configuration?.destinationList["codecContent"]?.sinkKey
       : undefined
   );
 

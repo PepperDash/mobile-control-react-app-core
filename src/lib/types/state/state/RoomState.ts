@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
+import { DestinationListItem } from '../DestinationListItem';
 import { SourceListItem } from '../sourceListItem';
 import { Volume } from '../volume/volume';
 import { DeviceState } from './DeviceState';
@@ -26,6 +27,7 @@ export interface RoomConfiguration {
   defaultDisplayKey?: string;
   defaultPresentationSourceKey: string;
   destinations: Record<DestinationTypes, string>;
+  destinationList: Record<string, DestinationListItem>;
   environmentalDevices: EnvironmentalDeviceConfiguration[];
   hasAudioConferencing?: boolean;
   hasEnvironmentalControls?: boolean;
