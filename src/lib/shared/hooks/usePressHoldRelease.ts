@@ -1,51 +1,54 @@
-// import { useRef } from 'react';
+import { useRef } from 'react';
 
-// export function usePressHoldRelease({
-//   onPress,
-//   onRelease,
-//   onHold,
-//   holdTimeMs = 500,
-// }: PressHoldReleaseParams) {
-//   const holdTimer = useRef<number | null>(null);
-//   const pressed = useRef(false);
+export function usePressHoldRelease({
+  onPress,
+  onRelease,
+  onHold,
+  holdTimeMs = 500,
+}: PressHoldReleaseParams) {
+  const holdTimer = useRef<NodeJS.Timeout | null>(null);
+  const pressed = useRef(false);
 
-//   function onPointerDown() {
-//     pressed.current = true;
-//     onPress?.();
+  function onPointerDown() {
 
-//     // TODO: Figure out why this is yelling at me
-//     holdTimer.current = setTimeout(() => {
-//       onHold?.();
-//       holdTimer.current = null;
-//     }, holdTimeMs);
-//   }
+    pressed.current = true;
+    onPress?.();
 
-//   function onPointerUp() {
-//     pressed.current = false;
-//     onRelease?.();
-//     if (holdTimer.current) {
-//       clearTimeout(holdTimer.current);
-//       holdTimer.current = null;
-//     }
-//   }
+    holdTimer.current = setTimeout(() => {
+      onHold?.();
+      holdTimer.current = null;
+    }, holdTimeMs);
+  }
 
-//   function onMouseLeave() {
-//     if(pressed.current) {
-//       onPointerUp();
-//     }
-//   }
+  function onPointerUp() {
+    pressed.current = false;
+    onRelease?.();
+    if (holdTimer.current) {
+      clearTimeout(holdTimer.current);
+      holdTimer.current = null;
+    }
+  }
 
-//   return {
-//     onPointerDown,
-//     onPointerUp,
-//     onMouseLeave
-//   };
-// }
+  function onPointerLeave() {
+    if(pressed.current) {
+      onPointerUp();
+    }
+  }
 
-// interface PressHoldReleaseParams {
-//   onPress?: () => void;
-//   onRelease?: () => void;
-//   onHold?: () => void;
-//   /** Defaults to 500ms */
-//   holdTimeMs?: number;
-// }
+  return {
+    onPointerDown,
+    onPointerUp,
+    onPointerLeave
+  };
+}
+
+interface PressHoldReleaseParams {
+  onPress?: () => void;
+  onRelease?: () => void;
+  onHold?: () => void;
+  /** Defaults to 500ms */
+  holdTimeMs?: number;
+}
+
+export type PressHoldReleaseReturn =  ReturnType<typeof usePressHoldRelease>;
+

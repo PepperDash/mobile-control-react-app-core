@@ -1,7 +1,11 @@
-import { DisplayState } from "src/lib/types/state/state";
+import { createSelector } from '@reduxjs/toolkit';
+import { RoomVolumeType, Volume } from 'src/lib/types';
+import { DisplayState, RoomConfiguration } from "src/lib/types/state/state";
+import { useGetAllDevices } from '../devices/devicesSelectors';
 import { useAppSelector } from "../hooks";
+import store, { RootState } from '../rootReducer';
 
-export const useRoomConfiguration = (roomKey: string) =>
+export const useRoomConfiguration: (roomKey: string) => RoomConfiguration | undefined = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.configuration : undefined
   );
@@ -16,9 +20,10 @@ export const useRoomName = (roomKey: string) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.name : undefined
   );
 
-export const useRoomMasterVolume = (roomKey: string) =>
-  useAppSelector((state) =>
-    state.rooms[roomKey] ? state.rooms[roomKey]?.volumes?.master : undefined
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const useRoomVolume = (roomKey: string, volumeKey: RoomVolumeType) =>
+  useAppSelector((state ) =>
+    state.rooms[roomKey] ? state.rooms[roomKey]?.volumes[volumeKey] as Volume : undefined
   );
 
 export const useRoomSourceList = (roomKey: string) =>
@@ -28,10 +33,38 @@ export const useRoomSourceList = (roomKey: string) =>
       : undefined
   );
 
-export const useRoomDestinationKeys = (roomKey: string) =>
+export const useRoomDestinations = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey]
-      ? state.rooms[roomKey]?.configuration?.displayKeys
+      ? state.rooms[roomKey]?.configuration?.destinations
+      : undefined
+  );
+
+export const useRoomDestinationList = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.destinationList
+      : undefined
+  );
+
+export const useRoomEnvironmentalDevices = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.environmentalDevices
+      : undefined
+  );
+
+export const useRoomProgramAudioDestinationKey = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]?.configuration?.destinationList["programAudio"]
+      ? state.rooms[roomKey]?.configuration?.destinationList["programAudio"]?.sinkKey
+      : state.rooms[roomKey]?.configuration?.destinationList["defaultDisplay"]?.sinkKey || ""
+  );
+
+export const useRoomCodecContentDestinationKey = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.destinationList["codecContent"]?.sinkKey
       : undefined
   );
 
@@ -69,21 +102,31 @@ export const useRoomShareState = (roomKey: string) =>
 
 /**
  * Get the display states for the room
+ * Exludes the programAudio and codecContent destinations
  * @param roomKey
  * @returns the display states for the room's displays
  */
-export const useGetRoomDisplays = (roomKey: string) =>
-  useAppSelector((state) => {
-    const keys = state.rooms[roomKey]?.configuration?.displayKeys;
+export const useGetRoomDisplayStates = (roomKey: string) => {
+  return createSelector(
+    [
+      (_state, roomKey: string) => roomKey,
+      useGetAllDevices,
+      (state: RootState) => state.rooms[roomKey]?.configuration?.destinations,     
+    ],
+    (roomKey, deviceStates, destinations) => {
+      console.log("roomKey", roomKey);
+      console.log("devices", deviceStates);
+      console.log("destinations", destinations);
+      if (!destinations) return undefined;
 
-    if (!keys) return undefined;
+      const displayKeys = Object.entries(destinations).filter(([key]) => key !== "programAudio" && key !== "codecContent").map(([,value]) => value);
+    
+      const displayStates = Object.values(deviceStates).filter((device) => Object.values(displayKeys).includes(device.key));
 
-    const displays = Object.values(state.devices).filter((device) =>
-      keys.includes(device.key)
-    );
-
-    return (displays as DisplayState[]) || undefined;
-  });
+      return displayStates as DisplayState[];
+    }
+  )(store.getState(), roomKey);
+};
 
 export const useGetZoomRoomControllerKey = (roomKey: string) =>
   useAppSelector((state) =>

@@ -1,3 +1,4 @@
+import { IconNames } from 'src/lib/shared/Icons/iconsDictionary';
 import { Device } from './device';
 
 export interface SourceListItem {
@@ -5,7 +6,7 @@ export interface SourceListItem {
 
   disableRoutedSharing: boolean;
 
-  key: string;
+  // key: string;
 
   sourceKey: string;
 
@@ -13,9 +14,11 @@ export interface SourceListItem {
 
   type: string;
 
-  icon: string;
+  icon: IconNames;
 
   sourceDevice: Device;
+
+  name: string;
 
   preferredName: string;
 
@@ -25,3 +28,5 @@ export interface SourceListItem {
 
   isAudioSource: boolean;
 }
+
+export const roomOffSourceKey = '$off';

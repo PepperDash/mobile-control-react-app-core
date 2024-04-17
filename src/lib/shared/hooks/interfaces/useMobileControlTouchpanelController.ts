@@ -5,9 +5,7 @@ import { useWebsocketContext } from "src/lib/utils/useWebsocketContext";
 export function useMobileControlTouchpanelController(
   key: string
 ): MobileControlTouchpanelControllerReturn | undefined {
-  const touchpanelState = useGetDevice(key) as
-    | MobileControlTouchpanelState
-    | undefined;
+  const touchpanelState = useGetDevice<MobileControlTouchpanelState>(key);
 
   const { sendMessage } = useWebsocketContext();
 

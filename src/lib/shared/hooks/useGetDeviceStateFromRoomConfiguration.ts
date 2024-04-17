@@ -16,7 +16,8 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
 
     const deviceKeys = [];
 
-    config.displayKeys.forEach((d) => {
+   
+    Object.values(config.destinations).forEach((d) => {
       deviceKeys.push(d);
     });
 
@@ -25,7 +26,7 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
     });
 
     config.environmentalDevices.forEach((d) => {
-      deviceKeys.push(d);
+      deviceKeys.push(d.deviceKey);
     });
 
     if (config.audioCodecKey) {
@@ -36,8 +37,20 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(config.videoCodecKey);
     }
 
+    if (config.matrixRoutingKey) {
+      deviceKeys.push(config.matrixRoutingKey);
+    }
+
+    if (config.endpointKeys) {
+      config.endpointKeys.forEach((ek) => {
+        deviceKeys.push(ek);
+      });
+    }
+
     for (const value of Object.values(config.sourceList)) {
-      deviceKeys.push(value.sourceKey);
+      // if the source has a source key, add it to the list of device keys
+      if(value.sourceKey && value.sourceKey !== "$off")
+        deviceKeys.push(value.sourceKey);
     }
 
     deviceKeys.forEach((dk) => {
