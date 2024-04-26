@@ -1,7 +1,7 @@
 import { DeviceState } from './DeviceState';
 
 export interface IShutdownPromptTimerState extends DeviceState {
-  timeRemaining?: string;
+  secondsRemaining?: number;
   percentageRemaining?: number;
   shutdownPromptSeconds: number;
 }
