@@ -1,5 +1,5 @@
 import { Provider } from "react-redux";
-import WebsocketProvider from 'src/lib/utils/WebsocketContext';
+import WebsocketProvider from 'src/lib/utils/WebsocketProvider';
 import { store } from "../../store/index";
 
 /**

@@ -15,8 +15,8 @@ import {
 } from "../store/runtimeConfig/runtimeSelectors";
 import { EventContent, Message } from "../types";
 import sessionStorageKeys from "../types/classes/session-storage-keys";
+import WebsocketContext from "./WebsocketContext";
 import { loadValue, saveValue } from "./joinParamsService";
-import WebsocketContext from "./useWebsocketContext";
 
 /**
  * The context component that contains the websocket connection and provides the sendMessage function
@@ -35,6 +35,14 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();
 
   /* HANDLERS *******************************************************/
+
+  /**
+   * Stores event handlers for the websocket
+   * key: a unique key for the handler to allow for removal
+   * eventType: the type of event to listen for
+   * callback: the function to call when the event is received that takes the message as an argument
+   * if additional data is required beyond the eventType
+   */
   const eventHandlers = useRef<Record<string, Record<string, (data: Message) => void>>>({});
 
   /* FUNCTIONS *******************************************************/
