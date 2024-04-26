@@ -72,7 +72,7 @@ export interface IconButtonProps
   > {
   iconClassName?: string;
   otherContentClassName?: string;
-  multiIcon: (props: IconProps) => JSX.Element;
+  multiIcon: MultiIconFC;
   otherContent?: ReactNode;
   vert?: boolean;
   feedback?: boolean;
@@ -84,3 +84,5 @@ export interface IconProps {
   disabled?: boolean;
   className?: string;
 }
+
+export type MultiIconFC = (props: IconProps) => JSX.Element;

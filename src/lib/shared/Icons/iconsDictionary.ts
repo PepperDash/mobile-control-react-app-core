@@ -1,4 +1,4 @@
-import { IconProps } from "../Buttons/IconButton/IconButton";
+import { MultiIconFC } from "../Buttons/IconButton/IconButton";
 import { IconMultiMic } from './MultiStateIcons/IconMultMic';
 import { IconMultiAlert } from "./MultiStateIcons/IconMultiAlert";
 import { IconMultiBan } from './MultiStateIcons/IconMultiBan';
@@ -64,7 +64,7 @@ export type IconNames =
 
 export const iconsDictionary: Record<
   IconNames,
-  (props: IconProps) => JSX.Element
+  MultiIconFC
 > = {
   Alert: IconMultiAlert,
   Camera: IconMultiCamera,
