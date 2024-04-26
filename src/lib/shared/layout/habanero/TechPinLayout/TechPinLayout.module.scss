@@ -1,0 +1,31 @@
+$headerRowHeight: 7.5rem;
+
+.grid {
+  display: grid;
+  grid-template-columns:
+    [column1-start] 1fr
+    [column1-end];
+  grid-template-rows:
+    [row1-start] $headerRowHeight
+    [row1-end row2-start] 1fr
+    [row2-end];
+  grid-template-areas:
+    'header'
+    'content';
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.header {
+  grid-area: header;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.content {
+  grid-area: content;
+  z-index: 0;
+  overflow: hidden;
+}
+

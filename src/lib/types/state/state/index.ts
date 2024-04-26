@@ -9,6 +9,7 @@ export * from './IHasInputsState';
 export * from './IHasSelectableItemsState';
 export * from './IHasSurroundChannelsState';
 export * from './IHasSurroundSoundModesState';
+export * from './IShutdownPromptTimerState';
 export * from './LevelControlsState';
 export * from './LightingState';
 export * from './MatrixRoutingState';

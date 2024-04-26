@@ -1,13 +1,10 @@
-import React from 'react';
+import classes from './TechPinLayout.module.scss';
 
-import classes from './TechLayout.module.scss';
-
-export const TechLayout = ({className, header, content, leftNav}: TechLayoutProps ) => {
+export const TechPinLayout = ({className, header, content}: TechLayoutProps ) => {
   
   return (
     <div className={`${className} ${classes.grid}`}>
       <div className={classes.header}>{header}</div>
-      {leftNav && <div className={classes.leftNav}>{leftNav}</div>}
       <div className={classes.content}>{content}</div>
     </div>
     );
@@ -16,6 +13,5 @@ export const TechLayout = ({className, header, content, leftNav}: TechLayoutProp
 interface TechLayoutProps {
   header: React.ReactNode;
   content: React.ReactNode;
-  leftNav?: React.ReactNode;
   className?: string;
 }

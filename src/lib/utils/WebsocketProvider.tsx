@@ -13,10 +13,10 @@ import {
   useRoomKey,
   useWsIsConnected,
 } from "../store/runtimeConfig/runtimeSelectors";
-import { Message } from "../types";
+import { EventContent, Message } from "../types";
 import sessionStorageKeys from "../types/classes/session-storage-keys";
+import WebsocketContext from "./WebsocketContext";
 import { loadValue, saveValue } from "./joinParamsService";
-import WebsocketContext from "./useWebsocketContext";
 
 /**
  * The context component that contains the websocket connection and provides the sendMessage function
@@ -33,6 +33,17 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const appConfig = useAppConfig();
   const clientRef = useRef<WebSocket | null>(null);
   const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();
+
+  /* HANDLERS *******************************************************/
+
+  /**
+   * Stores event handlers for the websocket
+   * key: a unique key for the handler to allow for removal
+   * eventType: the type of event to listen for
+   * callback: the function to call when the event is received that takes the message as an argument
+   * if additional data is required beyond the eventType
+   */
+  const eventHandlers = useRef<Record<string, Record<string, (data: Message) => void>>>({});
 
   /* FUNCTIONS *******************************************************/
 
@@ -77,6 +88,26 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     (type: string, value: boolean | number | string ) => {
       sendMessage(type, { value });
     };
+
+  const addEventHandler = useCallback(
+    (key: string, eventType: string, callback: (data: Message) => void) => {
+      if (!eventHandlers.current[eventType]) {
+        eventHandlers.current[eventType] = {};
+      }
+
+      eventHandlers.current[eventType][key] = callback;
+    },
+    []
+  );
+
+  const removeEventHandler = useCallback(
+    (key: string, eventType: string) => {
+      if (eventHandlers.current[eventType]) {
+        delete eventHandlers.current[eventType][key];
+      }
+    },
+    []
+  );
 
 
   //* EFFECTS *********************************************************/
@@ -171,6 +202,21 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                 );
                 break;
             }
+          } else if (message.type.startsWith("/event/")) {
+            const eventType = (message.content as EventContent).eventType;
+            if (!eventType) return;
+            const handlers = eventHandlers.current[eventType];
+
+            if (handlers) {
+              Object.values(handlers).forEach((handler) => {
+                try {
+                handler(message)
+                }
+                catch (err) {
+                  console.error(err);
+                }
+              });
+            }
           } else if (message.type.startsWith("/room/")) {
             store.dispatch(roomsActions.setRoomState(message));
           } else if (message.type.startsWith("/device/")) {
@@ -202,7 +248,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
   //* RENDER **********************************************************/
   return (
-    <WebsocketContext.Provider value={{ sendMessage, sendSimpleMessage }}>
+    <WebsocketContext.Provider value={{ sendMessage, sendSimpleMessage, addEventHandler, removeEventHandler }}>
       {isConnected ? children : <DisconnectedMessage />}
     </WebsocketContext.Provider>
   );

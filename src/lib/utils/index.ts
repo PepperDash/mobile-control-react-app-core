@@ -1,3 +1,3 @@
 export * from "./Clock";
-export * from "./WebsocketContext";
+export * from "./useWebsocketContext";
 
