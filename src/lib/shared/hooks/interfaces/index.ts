@@ -19,6 +19,7 @@ export * from "./useIRunDirectRouteAction";
 export * from "./useIRunRouteAction";
 export * from "./useISetTopBoxcontrols";
 export * from "./useIShadesOpenCloseStop";
+export * from "./useIShutdownPromptTimer";
 export * from "./useISwitchedOutput";
 export * from "./useITransport";
 export * from "./useMobileControlTouchpanelController";

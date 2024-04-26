@@ -33,6 +33,7 @@ export interface RoomConfiguration {
   hasEnvironmentalControls?: boolean;
   hasVideoConferencing?: boolean;
   helpMessage?: string;
+  techPassword?: string;
   sourceList: Record<string, SourceListItem>;
   supportsAdvancedSharing?: boolean;
   uiBehavior?: EssentialsRoomUiBehaviorConfiguration;
@@ -43,7 +44,7 @@ export interface RoomConfiguration {
   zoomRoomControllerKey?: string;
   matrixRoutingKey?: string;
   endpointKeys?: string[];
-  shutdownPromptSeconds: number;
+  accessoryDevices?: AccessoryDeviceConfiguration[];
 }
 
 export interface EssentialsRoomUiBehaviorConfiguration {
@@ -55,6 +56,13 @@ export class EnvironmentalDeviceConfiguration {
 
   deviceType?: EnvironmentalDeviceTypes;
 }
+
+export class AccessoryDeviceConfiguration {
+  deviceKey?: string;
+  deviceType?: AccessoryDeviceTypes;
+}
+
+export type AccessoryDeviceTypes = 'Camera' | 'ProjectorLift' | 'Screen';
 
 export type EnvironmentalDeviceTypes = 'Lighting' | 'Shade' | 'ShadeController' | 'Relay';
 

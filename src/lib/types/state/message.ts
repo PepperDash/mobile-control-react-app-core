@@ -5,3 +5,7 @@ export interface Message {
 
   content: unknown;
 }
+
+export interface EventContent {
+  eventType: string;
+}
