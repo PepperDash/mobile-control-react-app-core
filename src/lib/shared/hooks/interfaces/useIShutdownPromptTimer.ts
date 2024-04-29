@@ -36,3 +36,4 @@ export interface IShutdownPromptTimerReturn {
     shutdownCancel: () => void;
 }
 
+export type IShutdownPromptTimerEventTypes = 'timerStarted' | 'timerFinished' | 'timerCancelled';

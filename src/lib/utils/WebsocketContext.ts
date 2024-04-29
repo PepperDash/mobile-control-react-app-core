@@ -4,8 +4,8 @@ import { Message, SimpleContent } from '../types';
 export interface WebsocketContextType {
   sendMessage: (type: string, payload: SimpleContent | unknown ) => void;
   sendSimpleMessage: (type: string, payload: boolean | number | string ) => void;
-  addEventHandler: (key: string, eventType: string, callback: (data: Message) => void) => void;
-  removeEventHandler: (key: string, eventType: string) => void;
+  addEventHandler: (eventType: string, key: string, callback: (data: Message) => void) => void;
+  removeEventHandler: (eventType: string, key: string) => void;
 }
 
 const WebsocketContext = createContext<WebsocketContextType>({
