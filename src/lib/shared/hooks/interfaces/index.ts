@@ -21,6 +21,7 @@ export * from "./useISetTopBoxcontrols";
 export * from "./useIShadesOpenCloseStop";
 export * from "./useIShutdownPromptTimer";
 export * from "./useISwitchedOutput";
+export * from "./useITechPassword";
 export * from "./useITransport";
 export * from "./useMobileControlTouchpanelController";
 export * from "./useTwoWayDisplayBase";

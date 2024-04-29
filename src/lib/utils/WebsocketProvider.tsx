@@ -13,7 +13,7 @@ import {
   useRoomKey,
   useWsIsConnected,
 } from "../store/runtimeConfig/runtimeSelectors";
-import { EventContent, Message } from "../types";
+import { Message } from "../types";
 import sessionStorageKeys from "../types/classes/session-storage-keys";
 import WebsocketContext from "./WebsocketContext";
 import { loadValue, saveValue } from "./joinParamsService";
@@ -90,20 +90,24 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     };
 
   const addEventHandler = useCallback(
-    (key: string, eventType: string, callback: (data: Message) => void) => {
+    (eventType: string, key: string, callback: (data: Message) => void) => {
       if (!eventHandlers.current[eventType]) {
         eventHandlers.current[eventType] = {};
       }
 
       eventHandlers.current[eventType][key] = callback;
+
+      console.log('event handler added', eventType, key);
     },
     []
   );
 
   const removeEventHandler = useCallback(
-    (key: string, eventType: string) => {
+    (eventType: string, key: string) => {
       if (eventHandlers.current[eventType]) {
         delete eventHandlers.current[eventType][key];
+
+        console.log('event handler removed', eventType, key);
       }
     },
     []
@@ -203,9 +207,14 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                 break;
             }
           } else if (message.type.startsWith("/event/")) {
-            const eventType = (message.content as EventContent).eventType;
-            if (!eventType) return;
-            const handlers = eventHandlers.current[eventType];
+            console.log('event message received', message);
+            // const eventType = (message.content as EventContent).eventType;
+            // if (!eventType) return;
+            const handlers = eventHandlers.current[message.type];
+
+            if(!handlers) {
+              console.log('no handlers found for event type', message.type);
+            }
 
             if (handlers) {
               Object.values(handlers).forEach((handler) => {

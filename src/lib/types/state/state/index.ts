@@ -10,6 +10,7 @@ export * from './IHasSelectableItemsState';
 export * from './IHasSurroundChannelsState';
 export * from './IHasSurroundSoundModesState';
 export * from './IShutdownPromptTimerState';
+export * from './ITechPasswordState';
 export * from './LevelControlsState';
 export * from './LightingState';
 export * from './MatrixRoutingState';

@@ -1,6 +1,6 @@
-import { DeviceState } from './DeviceState';
+import { RoomState } from './RoomState';
 
-export interface IShutdownPromptTimerState extends DeviceState {
+export interface IShutdownPromptTimerState extends RoomState {
   secondsRemaining?: number;
   percentageRemaining?: number;
   shutdownPromptSeconds: number;
