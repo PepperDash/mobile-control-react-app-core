@@ -5,6 +5,7 @@ export * from './DeviceInfoState';
 export * from './DeviceState';
 export * from './DisplayState';
 export * from './EnvironmentState';
+export * from "./IEssentialsRoomCombinerState";
 export * from './IHasInputsState';
 export * from './IHasSelectableItemsState';
 export * from './IHasSurroundChannelsState';

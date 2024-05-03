@@ -45,6 +45,7 @@ export interface RoomConfiguration {
   matrixRoutingKey?: string;
   endpointKeys?: string[];
   accessoryDevices?: AccessoryDeviceConfiguration[];
+  roomCombinerKey?: string;
 }
 
 export interface EssentialsRoomUiBehaviorConfiguration {

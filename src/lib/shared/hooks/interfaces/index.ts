@@ -8,6 +8,7 @@ export * from "./useICommunicationMonitor";
 export * from "./useIDPad";
 export * from "./useIDeviceInfoMessenger";
 export * from "./useIDvr";
+export * from "./useIEssentialsRoomCombiner";
 export * from "./useIHasPowerControl";
 export * from "./useIHasSelectableItems";
 export * from "./useILevelControls";

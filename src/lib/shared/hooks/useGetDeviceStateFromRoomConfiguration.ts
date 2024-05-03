@@ -45,6 +45,10 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(config.matrixRoutingKey);
     }
 
+    if (config.roomCombinerKey) {
+      deviceKeys.push(config.roomCombinerKey);
+    }
+
     if (config.endpointKeys) {
       config.endpointKeys.forEach((ek) => {
         deviceKeys.push(ek);
