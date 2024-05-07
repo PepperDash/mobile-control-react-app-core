@@ -21,11 +21,11 @@ export function useIEssentialsRoomCombiner(key: string): IEssentialsRoomCombiner
   };
 
   const togglePartitionState = (partitionKey: string) => {
-    sendMessage(`/device/${key}/togglePartitionState`, {partitionKey});
+    sendMessage(`/device/${key}/togglePartitionState`, partitionKey);
   }
 
   const setRoomCombinationScenario = (scenarioKey: string) => {
-    sendMessage(`/device/${key}/setCombinationScenario`, {scenarioKey});
+    sendMessage(`/device/${key}/setCombinationScenario`, scenarioKey);
   };
 
   return { roomCombinerState, setAutoMode, setManualMode, toggleMode, togglePartitionState, setRoomCombinationScenario };
