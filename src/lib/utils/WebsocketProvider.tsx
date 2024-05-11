@@ -62,6 +62,10 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         })
         .catch((err) => {
           console.log(err);
+
+          if(err.repsonse && err.response.status === 498) {
+            console.error('Invalid token. Unable to join room');
+          }
         });
     },
     [token]

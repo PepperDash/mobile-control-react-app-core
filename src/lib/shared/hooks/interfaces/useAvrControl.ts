@@ -36,4 +36,3 @@ interface AvrReturn {
     surroundChannels: IHasSurroundChannelsReturn;
     mainVolumeControl: IBasicVolumeWithFeedbackReturn;
 }
-
