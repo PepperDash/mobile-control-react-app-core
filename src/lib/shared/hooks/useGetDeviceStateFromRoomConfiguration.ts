@@ -4,7 +4,9 @@ import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
 
 /**
- * This hook will send messages to the websocket to get the state of all devices in the room
+ * This hook will gather up all the keys for devices in the room
+ * and  send messages to the websocket to get the iniital state 
+ * for each device
  */
 export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: RoomConfiguration | undefined}) => {
   const { sendMessage } = useWebsocketContext();
@@ -14,11 +16,15 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       return
     }
 
-    const deviceKeys = [];
+    const deviceKeys = []
 
    
     Object.values(config.destinations).forEach((d) => {
       deviceKeys.push(d);
+    });
+
+    Object.values(config.destinationList).forEach((dli) => {
+      deviceKeys.push(dli.sinkKey);
     });
 
     config.touchpanelKeys?.forEach((d) => {
@@ -29,8 +35,8 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(d.deviceKey);
     });
 
-    config.accessoryDevices?.forEach((d) => {
-      deviceKeys.push(d.deviceKey);
+    config.accessoryDeviceKeys?.forEach((d) => {
+      deviceKeys.push(d);
     });
 
     if (config.audioCodecKey) {
@@ -60,6 +66,8 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       if(value.sourceKey && value.sourceKey !== "$off")
         deviceKeys.push(value.sourceKey);
     }
+
+    console.log("deviceKeys", deviceKeys);
 
     deviceKeys.forEach((dk) => {
       sendMessage(`/device/${dk}/fullStatus`, { deviceKey: dk });

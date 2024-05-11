@@ -10,6 +10,7 @@ export * from './IHasInputsState';
 export * from './IHasSelectableItemsState';
 export * from './IHasSurroundChannelsState';
 export * from './IHasSurroundSoundModesState';
+export * from './IProjectorScreenLiftControlState';
 export * from './IShutdownPromptTimerState';
 export * from './ITechPasswordState';
 export * from './LevelControlsState';

@@ -42,9 +42,10 @@ export interface RoomConfiguration {
   videoCodecKey?: string;
   touchpanelKeys?: string[];
   zoomRoomControllerKey?: string;
+  ciscoNavigatorKey?: string;
   matrixRoutingKey?: string;
   endpointKeys?: string[];
-  accessoryDevices?: AccessoryDeviceConfiguration[];
+  accessoryDeviceKeys?: string[];
   roomCombinerKey?: string;
 }
 

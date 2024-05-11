@@ -25,7 +25,7 @@ export function useIEssentialsRoomCombiner(key: string): IEssentialsRoomCombiner
   }
 
   const setRoomCombinationScenario = (scenarioKey: string) => {
-    sendMessage(`/device/${key}/setCombinationScenario`, scenarioKey);
+    sendMessage(`/device/${key}/setRoomCombinationScenario`, scenarioKey);
   };
 
   return { roomCombinerState, setAutoMode, setManualMode, toggleMode, togglePartitionState, setRoomCombinationScenario };
