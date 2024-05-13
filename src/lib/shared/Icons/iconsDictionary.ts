@@ -1,4 +1,5 @@
 import { MultiIconFC } from "../Buttons/IconButton/IconButton";
+import { IconMultiController, IconMultiRoomPC } from './MultiStateIcons';
 import { IconMultiMic } from './MultiStateIcons/IconMultMic';
 import { IconMultiAlert } from "./MultiStateIcons/IconMultiAlert";
 import { IconMultiBan } from './MultiStateIcons/IconMultiBan';
@@ -35,6 +36,7 @@ export type IconNames =
   | "Ban"
   | "Camera"
   | "Check"
+  | "Controller"
   | "DownArrow"
   | "Elipses"
   | "Flag"
@@ -52,6 +54,7 @@ export type IconNames =
   | "Privacy"
   | "Question"
   | "RightArrow"
+  | "RoomPC"
   | "Shade"
   | "Sun"
   | "UpArrow"
@@ -71,6 +74,7 @@ export const iconsDictionary: Record<
   DownArrow: IconMultiDownArrow,
   Ban: IconMultiBan,
   Check: IconMultiCheck,
+  Controller: IconMultiController,
   Elipses: IconMultiElipses,
   Flag: IconMultiFlag,
   Gear: IconMultiGear,
@@ -87,6 +91,7 @@ export const iconsDictionary: Record<
   Privacy: IconMultiPrivacy,
   Question: IconMultiQuestion,
   RightArrow: IconMultiRightArrow,
+  RoomPC: IconMultiRoomPC,
   Shade: IconMultiShade,
   Sun: IconMultiSun,
   UpArrow: IconMultiUpArrow,
