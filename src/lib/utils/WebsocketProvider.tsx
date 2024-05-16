@@ -11,6 +11,9 @@ import {
 import {
   useClientId,
   useRoomKey,
+  useServerIsRunningOnProcessorHardware,
+  useSystemUuid,
+  useUserCode,
   useWsIsConnected,
 } from "../store/runtimeConfig/runtimeSelectors";
 import { Message } from "../types";
@@ -31,6 +34,9 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const clientId = useClientId();
   const initialize = useInitialize();
   const appConfig = useAppConfig();
+  const serverIsRunningOnProcessorHardware = useServerIsRunningOnProcessorHardware();
+  const systemUuid = useSystemUuid();
+  const userCode = useUserCode();
   const clientRef = useRef<WebSocket | null>(null);
   const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();
 
@@ -170,8 +176,9 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         console.log(err);
       };
 
-      newWs.onclose = () => {
-        console.log("disconnected");
+      newWs.onclose = (closeEvent:CloseEvent) => {
+        console.log(`disconnected ${closeEvent}`);
+
         if (clientRef.current) {
           console.log("WebSocket closed by server.");
         } else {
@@ -184,10 +191,16 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         }
 
         store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+        
+        if (serverIsRunningOnProcessorHardware) {
+          setWaitingToReconnect(true);
 
-        setWaitingToReconnect(true);
+          setTimeout(() => setWaitingToReconnect(undefined), 5000);
+          return;
+        }
 
-        setTimeout(() => setWaitingToReconnect(undefined), 5000);
+        const newUrl = `${appConfig.gatewayAppPath}?uuid=${systemUuid}&roomKey=${roomKey}`;
+        window.location.href = userCode ? `${newUrl}&code=${userCode}` : newUrl;
       };
 
       newWs.onmessage = (e) => {
@@ -248,7 +261,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
       clientRef.current = null;
     };
-  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
+  }, [appConfig.apiPath, appConfig.gatewayAppPath, getRoomData, roomKey, serverIsRunningOnProcessorHardware, systemUuid, token, userCode, waitingToReconnect]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes
