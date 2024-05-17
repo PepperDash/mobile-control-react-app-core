@@ -177,7 +177,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       };
 
       newWs.onclose = (closeEvent:CloseEvent) => {
-        console.log(`disconnected ${closeEvent}`);
+        console.log(`disconnected ${closeEvent.code} ${closeEvent.reason}`);
 
         if (clientRef.current) {
           console.log("WebSocket closed by server.");
@@ -192,15 +192,15 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
         store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
         
-        if (serverIsRunningOnProcessorHardware) {
+        // if (serverIsRunningOnProcessorHardware) {
           setWaitingToReconnect(true);
 
           setTimeout(() => setWaitingToReconnect(undefined), 5000);
           return;
-        }
+        // }
 
-        const newUrl = `${appConfig.gatewayAppPath}?uuid=${systemUuid}&roomKey=${roomKey}`;
-        window.location.href = userCode ? `${newUrl}&code=${userCode}` : newUrl;
+        // const newUrl = `${appConfig.gatewayAppPath}?uuid=${systemUuid}&roomKey=${roomKey}`;
+        // window.location.href = userCode ? `${newUrl}&code=${userCode}` : newUrl;
       };
 
       newWs.onmessage = (e) => {
