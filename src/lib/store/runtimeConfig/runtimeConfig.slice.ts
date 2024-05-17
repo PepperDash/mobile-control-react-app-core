@@ -24,6 +24,7 @@ const initialState: RuntimeConfigState = {
         userCode: '',
         qrUrl: '',
     },
+    isTouchpanel: false,
 };
 
 
@@ -57,6 +58,9 @@ const runtimeConfigSlice = createSlice({
             state.roomData.userCode = action.payload.userCode;
             state.roomData.qrUrl = action.payload.qrUrl;
         },
+        setIsTouchpanel(state, action: PayloadAction<boolean>) {
+            state.isTouchpanel = action.payload;
+        }
     }
 })
 
@@ -71,6 +75,7 @@ export interface RuntimeConfigState {
     token: string;
     roomData: RoomData;
     currentRoomKey: string;
+    isTouchpanel: boolean;
 }
 
 export interface UserCode {

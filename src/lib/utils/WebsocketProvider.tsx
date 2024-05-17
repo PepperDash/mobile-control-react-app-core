@@ -10,6 +10,7 @@ import {
 } from "../store/runtimeConfig/runtimeConfig.slice";
 import {
   useClientId,
+  useRoomData,
   useRoomKey,
   useWsIsConnected,
 } from "../store/runtimeConfig/runtimeSelectors";
@@ -32,6 +33,9 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const initialize = useInitialize();
   const appConfig = useAppConfig();
   const clientRef = useRef<WebSocket | null>(null);
+  // const isTouchpanel = useIsTouchpanel();
+  // const serverIsRunningOnProcessorHardware = useIsServerRunningOnProcessorHardware();
+  const roomData = useRoomData();
   const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();
 
   /* HANDLERS *******************************************************/
@@ -54,7 +58,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * @param apiPath base path to the api without the token
    */
   const getRoomData = useCallback(
-    async (apiPath: string) => {
+    async (apiPath: string) => {      
       await httpClient
         .get(`${apiPath}/ui/joinroom?token=${token}`)
         .then((res) => {
@@ -65,13 +69,45 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         .catch((err) => {
           console.log(err);
 
-          if (err.repsonse && err.response.status === 498) {
+          if (err.response && err.response.status === 498) {
             console.error("Invalid token. Unable to join room");
           }
         });
     },
     [token]
   );
+
+  // const getToken = useCallback(
+  //   async (apiPath: string) => {
+  //     console.log(roomData);
+  //     await httpClient.get(`${apiPath}/ui/prejoin/?uuid=${roomData.systemUuid}&roomKey=${roomData.roomKey}&code=${roomData.userCode}`)
+  //       .then((res) => {
+  //         if (res.status === 200 && res.data) {
+  //           // room is offline
+  //           if (res.data.error) {
+  //             console.log(res.data.error);
+  //             return;
+  //           }
+
+  //           if (res.data.token) {
+  //             store.dispatch(runtimeConfigActions.setToken(res.data.token));
+  //           }            
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+
+  //         if (err.response && err.response.status === 404) {
+  //           console.log(err.response.data);
+
+  //           if (err.response.data == 'invalid code') {
+  //             const newUrl = `${appConfig.gatewayAppPath}?uuid=${roomData.systemUuid}&roomKey=${roomData.roomKey}`;
+  //             window.location.href = newUrl;
+  //           }
+  //         }
+  //       });
+  //   },[appConfig.gatewayAppPath, roomData]
+  // )
 
   /**
    * Sends a message to the server
@@ -187,26 +223,43 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
           store.dispatch(devicesActions.clearDevices());
           store.dispatch(roomsActions.clearRooms());
+          store.dispatch(runtimeConfigActions.setCurrentRoomKey(""));
 
           setWaitingToReconnect(true);
 
           setTimeout(() => setWaitingToReconnect(undefined), 5000);
-        };
+      };
 
         newWs.onmessage = (e) => {
           try {
             const message: Message = JSON.parse(e.data);
-            console.log(message);
+            console.log(message);            
 
             if (message.type.startsWith("/system/")) {
               switch (message.type) {
+                case "/system/online":
+                  {
+                    console.log('system is online');
+                    //sendMessage('/system/clientJoined', { clientId, roomKey: roomData.roomKey })
+
+                    // newWs.send(JSON.stringify({ type:'/system/clientJoined', content: {clientId, roomKey: roomData.roomKey} }));
+                    break;
+                  }
                 case "/system/roomKey":
+                  
                   store.dispatch(
                     runtimeConfigActions.setCurrentRoomKey(
                       message.content as string
                     )
                   );
                   break;
+                case "/system/touchPanelInfo":
+                  {
+                    const tokens = Object.keys(message.content as Record<string, unknown>);
+
+                    store.dispatch(runtimeConfigActions.setIsTouchpanel(tokens.length > 0 && tokens.includes(token)));
+                    break;
+                  }
                 case "/system/userCodeChanged":
                   store.dispatch(
                     runtimeConfigActions.setUserCode(
@@ -262,7 +315,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     }
 
     joinWebsocket();
-  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
+  }, [appConfig.apiPath, clientId, getRoomData, roomData.roomKey, sendMessage, token, waitingToReconnect]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes
