@@ -209,6 +209,12 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                   runtimeConfigActions.setUserCode(message.content as UserCode)
                 );
                 break;
+              case "/system/roomCombinationChanged":
+                window.location.reload();
+                break;
+              default:
+                console.log("unhandled system message", message);
+                break;
             }
           } else if (message.type.startsWith("/event/")) {
             console.log('event message received', message);
@@ -255,6 +261,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    *  */
   useEffect(() => {
     if (roomKey) {
+      console.log("requesting status from room: ", roomKey);
       sendMessage(`/room/${roomKey}/status`, null);
     }
   }, [roomKey, sendMessage]);

@@ -1,6 +1,7 @@
 export interface RoomData {
   clientId: string | number;
-  roomKey: string;
+  defaultRoomKey: string;
+  currentRoomKey: string;
   systemUuid: string;
   roomUuid: string;
   userAppUrl: string;

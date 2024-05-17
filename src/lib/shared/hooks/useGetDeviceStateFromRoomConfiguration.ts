@@ -27,6 +27,12 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(dli.sinkKey);
     });
 
+    if(config.levelControlList) {
+      Object.values(config.levelControlList).forEach((lcl) => {
+        deviceKeys.push(lcl.deviceKey);
+      });
+    }
+
     config.touchpanelKeys?.forEach((d) => {
       deviceKeys.push(d);
     });

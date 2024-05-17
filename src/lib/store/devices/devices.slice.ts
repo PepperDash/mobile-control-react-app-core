@@ -31,7 +31,10 @@ const devicesSlice = createSlice({
             state[key] = newState;
 
             return state;
-        }
+        },
+        clearDevices() {
+            return initialState;
+        },
     },
 })
 
