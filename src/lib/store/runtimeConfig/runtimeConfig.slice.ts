@@ -10,6 +10,7 @@ const initialState: RuntimeConfigState = {
     pluginVersion: '',
     disconnectionMessage: '',
     token: '',
+    roomKey: '',
     roomData: {
         clientId: '',
         roomKey: '',
@@ -45,7 +46,7 @@ const runtimeConfigSlice = createSlice({
             state.roomData = action.payload;
         },
         setCurrentRoomKey(state, action: PayloadAction<string>) {
-            state.roomData.roomKey = action.payload;
+            state.roomKey = action.payload;
         },
         setUserCode(state, action: PayloadAction<UserCode>) {
             state.roomData.userCode = action.payload.userCode;
@@ -63,6 +64,7 @@ export interface RuntimeConfigState {
     pluginVersion: string;
     disconnectionMessage: string;
     token: string;
+    roomKey: string;
     roomData: RoomData;
 }
 

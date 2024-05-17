@@ -95,9 +95,10 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * @param value 
    */
   const sendSimpleMessage = 
+    useCallback(
     (type: string, value: boolean | number | string ) => {
       sendMessage(type, { value });
-    };
+    },[sendMessage])
 
   const addEventHandler = useCallback(
     (eventType: string, key: string, callback: (data: Message) => void) => {
@@ -261,7 +262,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
       clientRef.current = null;
     };
-  }, [appConfig.apiPath, appConfig.gatewayAppPath, getRoomData, roomKey, serverIsRunningOnProcessorHardware, systemUuid, token, userCode, waitingToReconnect]);
+  }, [appConfig.apiPath, appConfig.gatewayAppPath, getRoomData, serverIsRunningOnProcessorHardware, systemUuid, token, userCode, waitingToReconnect]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes
@@ -270,7 +271,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     if (roomKey) {
       sendMessage(`/room/${roomKey}/status`, null);
     }
-  }, [roomKey, sendMessage]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomKey]);
 
   //* RENDER **********************************************************/
   return (
