@@ -13,10 +13,10 @@ const initialState: RuntimeConfigState = {
     pluginVersion: '',
     disconnectionMessage: '',
     token: '',
+    currentRoomKey: '',
     roomData: {
         clientId: '',
-        defaultRoomKey: '',
-        currentRoomKey: '',
+        roomKey: '',
         systemUuid: '',
         roomUuid: '',
         userAppUrl: '',
@@ -24,7 +24,6 @@ const initialState: RuntimeConfigState = {
         userCode: '',
         qrUrl: '',
     },
-
 };
 
 
@@ -52,7 +51,7 @@ const runtimeConfigSlice = createSlice({
             // clear out any existing room/device data
             store.dispatch(roomsActions.clearRooms());
             store.dispatch(devicesActions.clearDevices());
-            state.roomData.currentRoomKey = action.payload;
+            state.currentRoomKey = action.payload;
         },
         setUserCode(state, action: PayloadAction<UserCode>) {
             state.roomData.userCode = action.payload.userCode;
@@ -71,6 +70,7 @@ export interface RuntimeConfigState {
     disconnectionMessage: string;
     token: string;
     roomData: RoomData;
+    currentRoomKey: string;
 }
 
 export interface UserCode {

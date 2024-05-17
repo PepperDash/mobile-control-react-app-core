@@ -43,7 +43,9 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * callback: the function to call when the event is received that takes the message as an argument
    * if additional data is required beyond the eventType
    */
-  const eventHandlers = useRef<Record<string, Record<string, (data: Message) => void>>>({});
+  const eventHandlers = useRef<
+    Record<string, Record<string, (data: Message) => void>>
+  >({});
 
   /* FUNCTIONS *******************************************************/
 
@@ -63,8 +65,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         .catch((err) => {
           console.log(err);
 
-          if(err.repsonse && err.response.status === 498) {
-            console.error('Invalid token. Unable to join room');
+          if (err.repsonse && err.response.status === 498) {
+            console.error("Invalid token. Unable to join room");
           }
         });
     },
@@ -76,6 +78,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    */
   const sendMessage = useCallback(
     (type: string, content: unknown) => {
+
       if (clientRef.current && isConnected) {
         clientRef.current.send(JSON.stringify({ type, clientId, content }));
       }
@@ -85,13 +88,15 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
   /**
    * Helper function to send a simple message with a boolean, number, or string value
-   * @param type 
-   * @param value 
+   * @param type
+   * @param value
    */
-  const sendSimpleMessage = 
-    (type: string, value: boolean | number | string ) => {
-      sendMessage(type, { value });
-    };
+  const sendSimpleMessage = (
+    type: string,
+    value: boolean | number | string
+  ) => {
+    sendMessage(type, { value });
+  };
 
   const addEventHandler = useCallback(
     (eventType: string, key: string, callback: (data: Message) => void) => {
@@ -101,26 +106,21 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
       eventHandlers.current[eventType][key] = callback;
 
-      console.log('event handler added', eventType, key);
+      console.log("event handler added", eventType, key);
     },
     []
   );
 
-  const removeEventHandler = useCallback(
-    (eventType: string, key: string) => {
-      if (eventHandlers.current[eventType]) {
-        delete eventHandlers.current[eventType][key];
+  const removeEventHandler = useCallback((eventType: string, key: string) => {
+    if (eventHandlers.current[eventType]) {
+      delete eventHandlers.current[eventType][key];
 
-        console.log('event handler removed', eventType, key);
-      }
-    },
-    []
-  );
-
+      console.log("event handler removed", eventType, key);
+    }
+  }, []);
 
   //* EFFECTS *********************************************************/
   useEffect(() => {
-
     // Get the join token from the url params or from session storage and sets it as a local state variable
     const qp = new URLSearchParams(window.location.search);
 
@@ -149,126 +149,143 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * Connect to the websocket and get the room data when the apiPath changes
    */
   useEffect(() => {
-    if (!appConfig.apiPath || waitingToReconnect || !token) return;
+    async function joinWebsocket() {
+      if (!appConfig.apiPath || waitingToReconnect || !token) return;
 
-    getRoomData(appConfig.apiPath);
+      await getRoomData(appConfig.apiPath);
 
-    if (!clientRef.current) {
-      const wsPath = appConfig.apiPath.replace("http", "ws");
-      const url = `${wsPath}/ui/join/${token}`;
+      if (!clientRef.current) {
+        const wsPath = appConfig.apiPath.replace("http", "ws");
+        const url = `${wsPath}/ui/join/${token}`;
 
-      const newWs = new WebSocket(url);
+        const newWs = new WebSocket(url);
 
-      clientRef.current = newWs;
+        clientRef.current = newWs;
 
-      newWs.onopen = () => {
-        console.log("connected");
-        store.dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
-      };
+        newWs.onopen = () => {
+          console.log("connected");
+          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
+        };
 
-      newWs.onerror = (err) => {
-        console.log(err);
-      };
-
-      newWs.onclose = () => {
-        console.log("disconnected");
-        if (clientRef.current) {
-          console.log("WebSocket closed by server.");
-        } else {
-          console.log("WebSocket closed by client.");
-          return;
-        }
-
-        if (waitingToReconnect) {
-          return;
-        }
-
-        store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-
-        setWaitingToReconnect(true);
-
-        setTimeout(() => setWaitingToReconnect(undefined), 5000);
-      };
-
-      newWs.onmessage = (e) => {
-        try {
-          const message: Message = JSON.parse(e.data);
-          console.log(message);
-
-          if (message.type.startsWith("/system/")) {
-            switch (message.type) {
-              case "/system/roomKey":
-                store.dispatch(
-                  runtimeConfigActions.setCurrentRoomKey(
-                    message.content as string
-                  )
-                );
-                break;
-              case "/system/userCodeChanged":
-                store.dispatch(
-                  runtimeConfigActions.setUserCode(message.content as UserCode)
-                );
-                break;
-              case "/system/roomCombinationChanged":
-                window.location.reload();
-                break;
-              default:
-                console.log("unhandled system message", message);
-                break;
-            }
-          } else if (message.type.startsWith("/event/")) {
-            console.log('event message received', message);
-            // const eventType = (message.content as EventContent).eventType;
-            // if (!eventType) return;
-            const handlers = eventHandlers.current[message.type];
-
-            if(!handlers) {
-              console.log('no handlers found for event type', message.type);
-            }
-
-            if (handlers) {
-              Object.values(handlers).forEach((handler) => {
-                try {
-                handler(message)
-                }
-                catch (err) {
-                  console.error(err);
-                }
-              });
-            }
-          } else if (message.type.startsWith("/room/")) {
-            store.dispatch(roomsActions.setRoomState(message));
-          } else if (message.type.startsWith("/device/")) {
-            store.dispatch(devicesActions.setDeviceState(message));
-          }
-        } catch (err) {
+        newWs.onerror = (err) => {
           console.log(err);
+        };
+
+        newWs.onclose = () => {
+          console.log("disconnected");
+          if (clientRef.current) {
+            console.log("WebSocket closed by server.");
+          } else {
+            console.log("WebSocket closed by client.");
+            return;
+          }
+
+          if (waitingToReconnect) {
+            return;
+          }
+
+          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+          store.dispatch(devicesActions.clearDevices());
+          store.dispatch(roomsActions.clearRooms());
+
+          setWaitingToReconnect(true);
+
+          setTimeout(() => setWaitingToReconnect(undefined), 5000);
+        };
+
+        newWs.onmessage = (e) => {
+          try {
+            const message: Message = JSON.parse(e.data);
+            console.log(message);
+
+            if (message.type.startsWith("/system/")) {
+              switch (message.type) {
+                case "/system/roomKey":
+                  store.dispatch(
+                    runtimeConfigActions.setCurrentRoomKey(
+                      message.content as string
+                    )
+                  );
+                  break;
+                case "/system/userCodeChanged":
+                  store.dispatch(
+                    runtimeConfigActions.setUserCode(
+                      message.content as UserCode
+                    )
+                  );
+                  break;
+                case "/system/roomCombinationChanged":
+                  // TODO: Revisit if this is the right way to handle combination scenario changes
+                  window.location.reload();
+                  break;
+                default:
+                  console.log("unhandled system message", message);
+                  break;
+              }
+            } else if (message.type.startsWith("/event/")) {
+              console.log("event message received", message);
+              // const eventType = (message.content as EventContent).eventType;
+              // if (!eventType) return;
+              const handlers = eventHandlers.current[message.type];
+
+              if (!handlers) {
+                console.log("no handlers found for event type", message.type);
+              }
+
+              if (handlers) {
+                Object.values(handlers).forEach((handler) => {
+                  try {
+                    handler(message);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                });
+              }
+            } else if (message.type.startsWith("/room/")) {
+              store.dispatch(roomsActions.setRoomState(message));
+            } else if (message.type.startsWith("/device/")) {
+              store.dispatch(devicesActions.setDeviceState(message));
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        };
+      }
+      // Cleanup first websocket in dev mode due to double render cycle
+      return () => {
+        if (clientRef.current) {
+          clientRef.current.close();
         }
+
+        clientRef.current = null;
       };
     }
-    // Cleanup first websocket in dev mode due to double render cycle
-    return () => {
-      if (clientRef.current) {
-        clientRef.current.close();
-      }
 
-      clientRef.current = null;
-    };
+    joinWebsocket();
   }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes
    *  */
   useEffect(() => {
-    if (roomKey) {
-      console.log("requesting status from room: ", roomKey);
-      sendMessage(`/room/${roomKey}/status`, null);
-    }
-  }, [roomKey, sendMessage]);
+    if (!roomKey || !isConnected) return;
+    console.log("clientId: ", clientId);
+    if (!clientId) return;
+
+    console.log("requesting status from room: ", roomKey);
+    sendMessage(`/room/${roomKey}/status`, null);
+  }, [roomKey, clientId, isConnected, sendMessage]);
 
   //* RENDER **********************************************************/
   return (
-    <WebsocketContext.Provider value={{ sendMessage, sendSimpleMessage, addEventHandler, removeEventHandler }}>
+    <WebsocketContext.Provider
+      value={{
+        sendMessage,
+        sendSimpleMessage,
+        addEventHandler,
+        removeEventHandler,
+      }}
+    >
       {isConnected ? children : <DisconnectedMessage />}
     </WebsocketContext.Provider>
   );
