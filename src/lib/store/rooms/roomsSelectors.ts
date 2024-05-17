@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RoomVolumeType, Volume } from 'src/lib/types';
-import { DisplayState, RoomConfiguration } from "src/lib/types/state/state";
+import { DisplayState, LevelControlsState, RoomConfiguration } from "src/lib/types/state/state";
 import { useGetAllDevices } from '../devices/devicesSelectors';
 import { useAppSelector } from "../hooks";
 import store, { RootState } from '../rootReducer';
@@ -26,10 +26,22 @@ export const useRoomVolume = (roomKey: string, volumeKey: RoomVolumeType) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.volumes[volumeKey] as Volume : undefined
   );
 
+export const useRoomLevelControls = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey] ? state.rooms[roomKey] as unknown as LevelControlsState : undefined
+  );
+
 export const useRoomSourceList = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey]
       ? state.rooms[roomKey]?.configuration?.sourceList
+      : undefined
+  );
+
+export const useRoomLevelControlList = (roomKey: string) =>
+  useAppSelector((state) =>
+    state.rooms[roomKey]
+      ? state.rooms[roomKey]?.configuration?.levelControlList
       : undefined
   );
 

@@ -1,5 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RoomData } from '../../types/index';
+import { devicesActions } from '../devices/devices.slice';
+import { roomsActions } from '../rooms/rooms.slice';
+import store from '../rootReducer';
 
 const initialState: RuntimeConfigState = {
     apiVersion: '',
@@ -10,6 +13,7 @@ const initialState: RuntimeConfigState = {
     pluginVersion: '',
     disconnectionMessage: '',
     token: '',
+    currentRoomKey: '',
     roomData: {
         clientId: '',
         roomKey: '',
@@ -20,7 +24,6 @@ const initialState: RuntimeConfigState = {
         userCode: '',
         qrUrl: '',
     },
-
 };
 
 
@@ -45,7 +48,10 @@ const runtimeConfigSlice = createSlice({
             state.roomData = action.payload;
         },
         setCurrentRoomKey(state, action: PayloadAction<string>) {
-            state.roomData.roomKey = action.payload;
+            // clear out any existing room/device data
+            store.dispatch(roomsActions.clearRooms());
+            store.dispatch(devicesActions.clearDevices());
+            state.currentRoomKey = action.payload;
         },
         setUserCode(state, action: PayloadAction<UserCode>) {
             state.roomData.userCode = action.payload.userCode;
@@ -64,6 +70,7 @@ export interface RuntimeConfigState {
     disconnectionMessage: string;
     token: string;
     roomData: RoomData;
+    currentRoomKey: string;
 }
 
 export interface UserCode {

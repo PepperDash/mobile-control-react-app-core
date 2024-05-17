@@ -38,7 +38,10 @@ const roomsSlice = createSlice({
             console.log(state);
 
             return state;
-        }
+        },
+        clearRooms() {
+            return initialState;
+        },
     },
 })
 

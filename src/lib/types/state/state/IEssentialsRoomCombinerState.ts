@@ -17,11 +17,9 @@ export interface RoomCombinationScenario extends IKeyName {
   isActive: boolean;
 }
 
-export interface Partition {
+export interface Partition extends IKeyName {
   partitionPresent: boolean;
   adjacentRoomKeys: string[];
-  Name: string;
-  Key: string;
 }
 
 export interface PartitionState {
