@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
 import { DestinationListItem } from '../DestinationListItem';
+import { LevelControlListItem } from '../LevelControlListItem';
 import { SourceListItem } from '../sourceListItem';
 import { Volume } from '../volume/volume';
 import { DeviceState } from './DeviceState';
@@ -23,30 +24,31 @@ export interface RoomState extends DeviceState{
 }
 
 export interface RoomConfiguration {
+  accessoryDeviceKeys?: string[];
   audioCodecKey?: string;
+  ciscoNavigatorKey?: string;
   defaultDisplayKey?: string;
   defaultPresentationSourceKey: string;
-  destinations: Record<DestinationTypes, string>;
   destinationList: Record<string, DestinationListItem>;
+  destinations: Record<DestinationTypes, string>;
+  endpointKeys?: string[];
   environmentalDevices: EnvironmentalDeviceConfiguration[];
   hasAudioConferencing?: boolean;
   hasEnvironmentalControls?: boolean;
   hasVideoConferencing?: boolean;
   helpMessage?: string;
-  techPassword?: string;
+  levelControlList: Record<string, LevelControlListItem>;
+  matrixRoutingKey?: string;
+  roomCombinerKey?: string;
   sourceList: Record<string, SourceListItem>;
   supportsAdvancedSharing?: boolean;
+  techPassword?: string;
+  touchpanelKeys?: string[];
   uiBehavior?: EssentialsRoomUiBehaviorConfiguration;
   userCanChangeShareMode?: boolean;
   videoCodecIsZoomRoom?: boolean;
   videoCodecKey?: string;
-  touchpanelKeys?: string[];
   zoomRoomControllerKey?: string;
-  ciscoNavigatorKey?: string;
-  matrixRoutingKey?: string;
-  endpointKeys?: string[];
-  accessoryDeviceKeys?: string[];
-  roomCombinerKey?: string;
 }
 
 export interface EssentialsRoomUiBehaviorConfiguration {
