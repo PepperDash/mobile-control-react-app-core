@@ -1,4 +1,6 @@
+export * from './AudioControlPointListItemBase';
 export * from './LevelControlListItem';
+export * from './PresetListItem';
 export * from './collections';
 export * from './common-functions-util';
 export * from './config';

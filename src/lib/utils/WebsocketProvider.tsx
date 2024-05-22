@@ -60,10 +60,11 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         .then((res) => {
           if (res.status === 200 && res.data) {
             store.dispatch(runtimeConfigActions.setRoomData(res.data));
+            store.dispatch(runtimeConfigActions.setPluginVersion(res.data.config.runtimeInfo.pluginVersion));
           }
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
 
           if (err.repsonse && err.response.status === 498) {
             console.error("Invalid token. Unable to join room");
@@ -149,12 +150,17 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * Connect to the websocket and get the room data when the apiPath changes
    */
   useEffect(() => {
-    async function joinWebsocket() {
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
 
-      await getRoomData(appConfig.apiPath);
+      try {
+       getRoomData(appConfig.apiPath);
+      } catch (err) {
+        console.error(err);
+      }
 
       if (!clientRef.current) {
+        console.log("connecting to websocket");
+
         const wsPath = appConfig.apiPath.replace("http", "ws");
         const url = `${wsPath}/ui/join/${token}`;
 
@@ -251,6 +257,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           }
         };
       }
+
       // Cleanup first websocket in dev mode due to double render cycle
       return () => {
         if (clientRef.current) {
@@ -259,9 +266,6 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
         clientRef.current = null;
       };
-    }
-
-    joinWebsocket();
   }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
 
   /**

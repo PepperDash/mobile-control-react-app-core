@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
+import { PresetListItem } from '..';
 import { DestinationListItem } from '../DestinationListItem';
 import { LevelControlListItem } from '../LevelControlListItem';
 import { SourceListItem } from '../sourceListItem';
@@ -37,7 +38,7 @@ export interface RoomConfiguration {
   hasEnvironmentalControls?: boolean;
   hasVideoConferencing?: boolean;
   helpMessage?: string;
-  levelControlList: Record<string, LevelControlListItem>;
+  audioControlPointList: AudioControlPointListItem;
   matrixRoutingKey?: string;
   roomCombinerKey?: string;
   sourceList: Record<string, SourceListItem>;
@@ -55,15 +56,20 @@ export interface EssentialsRoomUiBehaviorConfiguration {
   disableActivityButtonsWhileWarmingCooling: boolean;
 }
 
-export class EnvironmentalDeviceConfiguration {
+export interface EnvironmentalDeviceConfiguration {
   deviceKey?: string;
 
   deviceType?: EnvironmentalDeviceTypes;
 }
 
-export class AccessoryDeviceConfiguration {
+export interface AccessoryDeviceConfiguration {
   deviceKey?: string;
   deviceType?: AccessoryDeviceTypes;
+}
+
+export interface AudioControlPointListItem {
+  levelControls: Record<string, LevelControlListItem>;
+  presets: Record<string, PresetListItem>;
 }
 
 export type AccessoryDeviceTypes = 'Camera' | 'ProjectorLift' | 'Screen';
