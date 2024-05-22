@@ -17,3 +17,7 @@ export const useGetCurrentPopoverIdForGroup = (popoverGroup: string) => useAppSe
 });
 
 export const useShowPopoverById = (popoverGroup: string, popoverId: string) => useAppSelector((state) => state.ui.popoverVisibility[popoverGroup]?.[popoverId]);
+
+export const useError = () => useAppSelector((state) => state.ui.error);
+
+export const useShowReconnect = () => useAppSelector((state) => state.ui.showReconnect);
