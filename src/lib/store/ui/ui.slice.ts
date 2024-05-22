@@ -1,6 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: UiConfigState = {
+  showReconnect: false,
+  error: '',
   modalVisibility: {
     showShutdownModal: false,
     showIncomingCallModal: false,
@@ -38,10 +40,18 @@ const uiSlice = createSlice({
 
       state.popoverVisibility[action.payload.popoverGroup][action.payload.popoverId] = action.payload.value;
     },
+    setErrorMessage(state, action: PayloadAction<string>) {
+      state.error = action.payload;
+    },
+    setShowReconnect(state, action: PayloadAction<boolean>) { 
+      state.showReconnect = action.payload;
+    }
   }
 })
 
 export interface UiConfigState {
+  showReconnect: boolean;
+  error: string;
   modalVisibility: Record<modalType | string, boolean>;
   popoverVisibility: Record<popoverGroup | string, Record<string, boolean>>;
 }
