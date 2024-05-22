@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { httpClient, useInitialize } from "../services";
 import DisconnectedMessage from "../shared/disconnectedMessage/DisconnectedMessage";
-import { store, useAppConfig } from "../store";
+import { store, uiActions, useAppConfig } from "../store";
 import { devicesActions } from "../store/devices/devices.slice";
 import { roomsActions } from "../store/rooms/rooms.slice";
 import {
@@ -11,12 +11,16 @@ import {
 import {
   useClientId,
   useRoomKey,
+  useServerIsRunningOnProcessorHardware,
+  useSystemUuid,
+  useUserCode,
   useWsIsConnected,
 } from "../store/runtimeConfig/runtimeSelectors";
-import { Message } from "../types";
+import { Message, RoomData } from "../types";
 import sessionStorageKeys from "../types/classes/session-storage-keys";
 import WebsocketContext from "./WebsocketContext";
 import { loadValue, saveValue } from "./joinParamsService";
+import { AxiosError } from "axios";
 
 /**
  * The context component that contains the websocket connection and provides the sendMessage function
@@ -31,6 +35,10 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const clientId = useClientId();
   const initialize = useInitialize();
   const appConfig = useAppConfig();
+  const systemUuid = useSystemUuid();
+  const userCode = useUserCode();
+  const serverisRunningOnProcessorHardware = useServerIsRunningOnProcessorHardware();
+  
   const clientRef = useRef<WebSocket | null>(null);
   const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();
 
@@ -54,24 +62,47 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * @param apiPath base path to the api without the token
    */
   const getRoomData = useCallback(
-    async (apiPath: string) => {
-      await httpClient
-        .get(`${apiPath}/ui/joinroom?token=${token}`)
-        .then((res) => {
-          if (res.status === 200 && res.data) {
-            store.dispatch(runtimeConfigActions.setRoomData(res.data));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
+    async (apiPath: string):Promise<boolean> => {
+      try {
+        const res = await httpClient.get<RoomData>(`${apiPath}/ui/joinroom?token=${token}`);
+      
+        if (res.status === 200 && res.data) {
+          store.dispatch(runtimeConfigActions.setRoomData(res.data));
+          return true;
+        }
 
-          if (err.repsonse && err.response.status === 498) {
-            console.error("Invalid token. Unable to join room");
-          }
-        });
+        return false
+      }
+      catch (err) {
+        console.log(err);
+
+        if(serverisRunningOnProcessorHardware){
+          return true;
+        }
+
+        if (err instanceof AxiosError && err.response && err.response.status === 498) {
+          console.error("Invalid token. Unable to join room");
+          store.dispatch(uiActions.setErrorMessage(`Token ${token} is invalid. Unable to join room`));      
+          return false;
+        }
+
+        console.error("Error getting room data", err);
+        
+        if (err instanceof Error) {
+          store.dispatch(uiActions.setErrorMessage(err.message));
+        } else {
+          store.dispatch(uiActions.setErrorMessage("Error getting room data"));
+        }
+        return false;        
+      }
     },
-    [token]
+    [token, serverisRunningOnProcessorHardware]
   );
+
+  const reconnect = useCallback(() => {   
+    const newUrl = `${appConfig.gatewayAppPath}?uuid=${systemUuid}&roomKey=${roomKey}`;
+    window.location.href = userCode ? `${newUrl}&Code=${userCode}` : newUrl;
+  }, [appConfig.gatewayAppPath, roomKey, systemUuid, userCode]);  
 
   /**
    * Sends a message to the server
@@ -117,19 +148,14 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
       console.log("event handler removed", eventType, key);
     }
-  }, []);
+  }, []);  
 
   //* EFFECTS *********************************************************/
   useEffect(() => {
     // Get the join token from the url params or from session storage and sets it as a local state variable
     const qp = new URLSearchParams(window.location.search);
 
-    let joinToken = qp.get("token");
-
-    // if(!token && !appConfig.enableDev) {
-    //   console.error('No join token found. Unable to continue');
-    //   return;
-    // }
+    let joinToken = qp.get("token");    
 
     if (joinToken) {
       console.log("saving token: ", joinToken);
@@ -145,14 +171,19 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+
   /**
    * Connect to the websocket and get the room data when the apiPath changes
    */
   useEffect(() => {
     async function joinWebsocket() {
+      console.log('effect is running');
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
 
-      await getRoomData(appConfig.apiPath);
+      const tokenResult = await getRoomData(appConfig.apiPath);
+
+      if(!tokenResult) return;
 
       if (!clientRef.current) {
         const wsPath = appConfig.apiPath.replace("http", "ws");
@@ -162,8 +193,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
         clientRef.current = newWs;
 
-        newWs.onopen = () => {
-          console.log("connected");
+        newWs.onopen = (ev: Event) => {
+          console.log("connected", ev.type, ev.target);
           store.dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
         };
 
@@ -171,8 +202,40 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           console.log(err);
         };
 
-        newWs.onclose = () => {
-          console.log("disconnected");
+        newWs.onclose = (closeEvent: CloseEvent): void => {
+          console.log("disconnected: ", closeEvent.reason, closeEvent.code);
+
+          if (closeEvent.code === 4000) {
+            console.log("user code changed");
+            store.dispatch(runtimeConfigActions.setUserCode({ userCode: '', qrUrl: ''}));
+            store.dispatch(uiActions.setErrorMessage("User code changed. Click reconnect to enter the new code"));
+            store.dispatch(uiActions.setShowReconnect(true));
+            store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+            store.dispatch(devicesActions.clearDevices());
+            store.dispatch(roomsActions.clearRooms());
+            return;
+          }
+
+          if (closeEvent.code === 4001 && !serverisRunningOnProcessorHardware) {
+            console.log("processor disconnected");
+            store.dispatch(uiActions.setErrorMessage("Processor has disconnected. Click Reconnect"));
+            store.dispatch(uiActions.setShowReconnect(true));
+            store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+            store.dispatch(devicesActions.clearDevices());
+            store.dispatch(roomsActions.clearRooms());
+            return;
+          }
+
+          if (closeEvent.code === 4002) {
+            console.log("room combination changed");
+            store.dispatch(uiActions.setErrorMessage("Room combination changed. Click Reconnect to re-join the room"));
+            store.dispatch(uiActions.setShowReconnect(true));
+            store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+            store.dispatch(devicesActions.clearDevices());
+            store.dispatch(roomsActions.clearRooms());
+            return;
+          }          
+
           if (clientRef.current) {
             console.log("WebSocket closed by server.");
           } else {
@@ -183,10 +246,10 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           if (waitingToReconnect) {
             return;
           }
-
+          
           store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
           store.dispatch(devicesActions.clearDevices());
-          store.dispatch(roomsActions.clearRooms());
+          store.dispatch(roomsActions.clearRooms());          
 
           setWaitingToReconnect(true);
 
@@ -198,8 +261,13 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
             const message: Message = JSON.parse(e.data);
             console.log(message);
 
+            if (message.type === 'close') // MC API sent a close message
+            {
+              newWs.close(4001, message.content as string);              
+              return;
+            }
             if (message.type.startsWith("/system/")) {
-              switch (message.type) {
+              switch (message.type) {                
                 case "/system/roomKey":
                   store.dispatch(
                     runtimeConfigActions.setCurrentRoomKey(
@@ -251,18 +319,20 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           }
         };
       }
-      // Cleanup first websocket in dev mode due to double render cycle
-      return () => {
-        if (clientRef.current) {
-          clientRef.current.close();
-        }
-
-        clientRef.current = null;
-      };
     }
 
     joinWebsocket();
-  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
+
+    // Cleanup first websocket in dev mode due to double render cycle
+    return () => {
+      if (clientRef.current) {
+        clientRef.current.close();
+      }
+
+      clientRef.current = null;
+    };
+    
+  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect, serverisRunningOnProcessorHardware]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes
@@ -284,6 +354,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         sendSimpleMessage,
         addEventHandler,
         removeEventHandler,
+        reconnect,
       }}
     >
       {isConnected ? children : <DisconnectedMessage />}
