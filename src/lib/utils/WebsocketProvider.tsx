@@ -76,6 +76,10 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       catch (err) {
         console.log(err);
 
+        if(serverisRunningOnProcessorHardware){
+          return true;
+        }
+
         if (err instanceof AxiosError && err.response && err.response.status === 498) {
           console.error("Invalid token. Unable to join room");
           store.dispatch(uiActions.setErrorMessage(`Token ${token} is invalid. Unable to join room`));      
@@ -92,7 +96,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         return false;        
       }
     },
-    [token]
+    [token, serverisRunningOnProcessorHardware]
   );
 
   const reconnect = useCallback(() => {   
