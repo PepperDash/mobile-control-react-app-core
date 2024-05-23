@@ -20,7 +20,14 @@ const initialState: RuntimeConfigState = {
         systemUuid: '',
         roomUuid: '',
         userAppUrl: '',
-        config: undefined,
+        config: {
+            runtimeInfo: {
+                pluginVersion: '',
+                essentialsVersion: '',
+                pepperDashCoreVersion: '',
+                essentialsPlugins: [],
+            },
+        },
         userCode: '',
         qrUrl: '',
     },

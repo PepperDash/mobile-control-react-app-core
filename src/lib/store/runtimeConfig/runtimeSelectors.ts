@@ -11,3 +11,5 @@ export const useSystemUuid = () => useAppSelector((state) => state.runtimeConfig
 export const useUserCode = () => useAppSelector((state) => state.runtimeConfig.roomData.userCode);
 
 export const useServerIsRunningOnProcessorHardware = () => useAppSelector((state) => state.runtimeConfig.serverIsRunningOnProcessorHardware);
+
+export const useRuntimeInfo = () => useAppSelector((state) => state.runtimeConfig.roomData.config?.runtimeInfo);
