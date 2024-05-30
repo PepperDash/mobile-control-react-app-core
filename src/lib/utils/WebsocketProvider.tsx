@@ -267,7 +267,14 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
               return;
             }
             if (message.type.startsWith("/system/")) {
-              switch (message.type) {                
+              switch (message.type) {          
+                case "/system/touchpanelKey":
+                  store.dispatch(
+                    runtimeConfigActions.setTouchpanelKey(
+                      message.content as string
+                    )
+                  );
+                  break;
                 case "/system/roomKey":
                   store.dispatch(
                     runtimeConfigActions.setCurrentRoomKey(

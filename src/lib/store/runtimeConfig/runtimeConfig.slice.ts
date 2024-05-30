@@ -14,6 +14,7 @@ const initialState: RuntimeConfigState = {
     disconnectionMessage: '',
     token: '',
     currentRoomKey: '',
+    touchpanelKey: '',
     roomData: {
         clientId: '',
         roomKey: '',
@@ -57,6 +58,9 @@ const runtimeConfigSlice = createSlice({
             state.roomData.userCode = action.payload.userCode;
             state.roomData.qrUrl = action.payload.qrUrl;
         },
+        setTouchpanelKey(state, action: PayloadAction<string>) {
+            state.touchpanelKey = action.payload;
+        }
     }
 })
 
@@ -71,6 +75,7 @@ export interface RuntimeConfigState {
     token: string;
     roomData: RoomData;
     currentRoomKey: string;
+    touchpanelKey: string;
 }
 
 export interface UserCode {
