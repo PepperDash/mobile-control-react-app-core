@@ -29,3 +29,4 @@ export * from "./useITransport";
 export * from "./useMobileControlTouchpanelController";
 export * from "./useTwoWayDisplayBase";
 export * from "./useIRunDefaultPresentRoute";
+export * from "./useITheme";
