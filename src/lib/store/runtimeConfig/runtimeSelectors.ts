@@ -13,3 +13,7 @@ export const useUserCode = () => useAppSelector((state) => state.runtimeConfig.r
 export const useServerIsRunningOnProcessorHardware = () => useAppSelector((state) => state.runtimeConfig.serverIsRunningOnProcessorHardware);
 
 export const useRuntimeInfo = () => useAppSelector((state) => state.runtimeConfig.roomData.config?.runtimeInfo);
+
+export const useTouchpanelKey = () => useAppSelector((state) => state.runtimeConfig.touchpanelKey);
+
+export const useIsTouchpanel = () => useAppSelector((state) => state.runtimeConfig.touchpanelKey !== '');

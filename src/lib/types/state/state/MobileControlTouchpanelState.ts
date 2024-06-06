@@ -1,6 +1,6 @@
 import { DeviceState } from './DeviceState';
 
-export interface MobileControlTouchpanelState extends DeviceState, ITswAppControlMessengerState, ITswZoomControlMessengerState  {
+export interface MobileControlTouchpanelState extends DeviceState, ITswAppControlMessengerState, ITswZoomControlMessengerState, IThemeMessengerState  {
 
 }
 
@@ -11,4 +11,8 @@ interface ITswAppControlMessengerState {
 interface ITswZoomControlMessengerState {
   inCall?: boolean;
   incomingCall?: boolean;
+}
+
+interface IThemeMessengerState {
+  theme?: string;
 }
