@@ -4,9 +4,18 @@ export interface RoomData {
   systemUuid: string;
   roomUuid: string;
   userAppUrl: string;
-  config: unknown;
+  config?: EssentialsConfig;
   userCode: string;
   codeExpires?: Date;
   enableDebug?: boolean;
   qrUrl: string;
+}
+
+export interface EssentialsConfig {
+  runtimeInfo: {
+    pluginVersion: string;
+    essentialsVersion: string;
+    pepperDashCoreVersion: string;
+    essentialsPlugins: { name: string; version: string }[];
+  };
 }

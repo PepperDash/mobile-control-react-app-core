@@ -1,9 +1,6 @@
-export interface LevelControlListItem {
-  deviceKey: string;
-  preferredName: string;
-  name: string;
-  includeInUserList: boolean;
-  order: number;
+import { AudioControlPointListItemBase } from '.';
+
+export interface LevelControlListItem extends AudioControlPointListItemBase {
   type: LevelControlType;
 }
 

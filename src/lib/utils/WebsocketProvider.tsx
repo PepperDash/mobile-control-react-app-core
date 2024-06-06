@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { httpClient, useInitialize } from "../services";
 import DisconnectedMessage from "../shared/disconnectedMessage/DisconnectedMessage";
@@ -20,7 +21,6 @@ import { Message, RoomData } from "../types";
 import sessionStorageKeys from "../types/classes/session-storage-keys";
 import WebsocketContext from "./WebsocketContext";
 import { loadValue, saveValue } from "./joinParamsService";
-import { AxiosError } from "axios";
 
 /**
  * The context component that contains the websocket connection and provides the sendMessage function
@@ -37,7 +37,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const appConfig = useAppConfig();
   const systemUuid = useSystemUuid();
   const userCode = useUserCode();
-  const serverisRunningOnProcessorHardware = useServerIsRunningOnProcessorHardware();
+  const serverIsRunningOnProcessorHardware = useServerIsRunningOnProcessorHardware();
   
   const clientRef = useRef<WebSocket | null>(null);
   const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();
@@ -76,9 +76,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       catch (err) {
         console.log(err);
 
-        if(serverisRunningOnProcessorHardware){
-          return true;
-        }
+        if (serverIsRunningOnProcessorHardware) return true;
 
         if (err instanceof AxiosError && err.response && err.response.status === 498) {
           console.error("Invalid token. Unable to join room");
@@ -96,7 +94,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         return false;        
       }
     },
-    [token, serverisRunningOnProcessorHardware]
+    [token, serverIsRunningOnProcessorHardware]
   );
 
   const reconnect = useCallback(() => {   
@@ -186,6 +184,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       if(!tokenResult) return;
 
       if (!clientRef.current) {
+        console.log("connecting to websocket");
+
         const wsPath = appConfig.apiPath.replace("http", "ws");
         const url = `${wsPath}/ui/join/${token}`;
 
@@ -216,7 +216,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
 
-          if (closeEvent.code === 4001 && !serverisRunningOnProcessorHardware) {
+          if (closeEvent.code === 4001 && !serverIsRunningOnProcessorHardware) {
             console.log("processor disconnected");
             store.dispatch(uiActions.setErrorMessage("Processor has disconnected. Click Reconnect"));
             store.dispatch(uiActions.setShowReconnect(true));
@@ -339,7 +339,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       clientRef.current = null;
     };
     
-  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect, serverisRunningOnProcessorHardware]);
+  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect, serverIsRunningOnProcessorHardware]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes

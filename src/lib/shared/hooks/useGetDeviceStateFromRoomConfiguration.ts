@@ -27,9 +27,9 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(dli.sinkKey);
     });
 
-    if(config.levelControlList) {
-      Object.values(config.levelControlList).forEach((lcl) => {
-        deviceKeys.push(lcl.deviceKey);
+    if(config.audioControlPointList) {
+      Object.values(config.audioControlPointList?.levelControls).forEach((lcl) => {
+        deviceKeys.push(lcl.parentDeviceKey + "--" + lcl.itemKey);
       });
     }
 

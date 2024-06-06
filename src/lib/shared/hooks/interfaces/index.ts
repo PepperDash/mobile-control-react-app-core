@@ -7,6 +7,7 @@ export * from "./useIColor";
 export * from "./useICommunicationMonitor";
 export * from "./useIDPad";
 export * from "./useIDeviceInfoMessenger";
+export * from './useIDspPresets';
 export * from "./useIDvr";
 export * from "./useIEssentialsRoomCombiner";
 export * from "./useIHasPowerControl";

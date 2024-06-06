@@ -38,10 +38,10 @@ export const useRoomSourceList = (roomKey: string) =>
       : undefined
   );
 
-export const useRoomLevelControlList = (roomKey: string) =>
+export const useRoomAudioControlPointList = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey]
-      ? state.rooms[roomKey]?.configuration?.levelControlList
+      ? state.rooms[roomKey]?.configuration?.audioControlPointList
       : undefined
   );
 

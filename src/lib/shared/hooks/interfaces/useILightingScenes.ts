@@ -4,15 +4,15 @@ import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
 export function useILightingScenes(key: string): ILightingScenesReturn | undefined {
   const { sendMessage } = useWebsocketContext();
-  const device = useGetDevice<LightingState>(key);
+  const state = useGetDevice<LightingState>(key);
 
-  if (!device) return undefined;
+  if (!state) return undefined;
 
   const setScene = (scene: LightingScene) => {
     sendMessage(`/device/${key}/selectScene`, scene);
   };
 
-  return { lightingState: device, selectScene: setScene };
+  return { lightingState: state, selectScene: setScene };
 }
 
 export interface ILightingScenesReturn {
