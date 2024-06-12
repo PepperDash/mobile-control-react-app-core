@@ -3,7 +3,7 @@ import { RoomVolumeType, Volume } from 'src/lib/types';
 import { DisplayState, LevelControlsState, RoomConfiguration } from "src/lib/types/state/state";
 import { useGetAllDevices } from '../devices/devicesSelectors';
 import { useAppSelector } from "../hooks";
-import store, { RootState } from '../rootReducer';
+import {store, RootState } from '../store';
 
 export const useRoomConfiguration: (roomKey: string) => RoomConfiguration | undefined = (roomKey: string) =>
   useAppSelector((state) =>

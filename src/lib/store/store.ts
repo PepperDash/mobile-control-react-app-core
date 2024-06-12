@@ -5,7 +5,7 @@ import { roomsReducer } from './rooms/rooms.slice';
 import { runtimeConfigReducer } from './runtimeConfig/runtimeConfig.slice';
 import { uiReducer } from './ui/ui.slice';
 
-export const rootReducer = combineReducers({
+const rootReducer = combineReducers({
   appConfig: appConfigReducer,
   runtimeConfig: runtimeConfigReducer,
   rooms: roomsReducer,
@@ -13,10 +13,9 @@ export const rootReducer = combineReducers({
   ui: uiReducer,
 })
 
-const store = configureStore({
+export const store = configureStore({
   reducer: rootReducer
 })
 
 export type RootState = ReturnType<typeof store.getState>;
-
-export default store;
+export type AppDispatch = typeof store.dispatch;
