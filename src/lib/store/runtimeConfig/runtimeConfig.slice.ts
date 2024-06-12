@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RoomData } from '../../types/index';
 import { devicesActions } from '../devices/devices.slice';
 import { roomsActions } from '../rooms/rooms.slice';
-import store from '../rootReducer';
+import { store } from '../store';
 
 const initialState: RuntimeConfigState = {
     apiVersion: '',
