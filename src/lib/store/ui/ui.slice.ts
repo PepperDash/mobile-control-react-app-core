@@ -45,7 +45,11 @@ const uiSlice = createSlice({
     },
     setShowReconnect(state, action: PayloadAction<boolean>) { 
       state.showReconnect = action.payload;
+    },
+    setTheme(state, action: PayloadAction<string>){
+      state.theme = action.payload;
     }
+    
   }
 })
 
@@ -54,6 +58,7 @@ export interface UiConfigState {
   error: string;
   modalVisibility: Record<modalType | string, boolean>;
   popoverVisibility: Record<popoverGroup | string, Record<string, boolean>>;
+  theme?: string;
 }
 
 type modalType = 'showShutdownModal' | 'showIncomingCallModal';
