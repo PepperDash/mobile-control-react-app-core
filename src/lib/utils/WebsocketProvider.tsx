@@ -275,13 +275,16 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                     )
                   );
                   break;
-                case "/system/roomKey":
+                case "/system/roomKey": {
+                  store.dispatch(roomsActions.clearRooms());
+                  store.dispatch(devicesActions.clearDevices());
                   store.dispatch(
                     runtimeConfigActions.setCurrentRoomKey(
                       message.content as string
                     )
                   );
                   break;
+                }
                 case "/system/userCodeChanged":
                   store.dispatch(
                     runtimeConfigActions.setUserCode(
