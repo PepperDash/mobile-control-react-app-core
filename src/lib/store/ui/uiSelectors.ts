@@ -21,3 +21,5 @@ export const useShowPopoverById = (popoverGroup: string, popoverId: string) => u
 export const useError = () => useAppSelector((state) => state.ui.error);
 
 export const useShowReconnect = () => useAppSelector((state) => state.ui.showReconnect);
+
+export const useTheme = () => useAppSelector((state) => state.ui.theme);

@@ -1,8 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RoomData } from '../../types/index';
-import { devicesActions } from '../devices/devices.slice';
-import { roomsActions } from '../rooms/rooms.slice';
-import { store } from '../store';
 
 const initialState: RuntimeConfigState = {
     apiVersion: '',
@@ -56,9 +53,7 @@ const runtimeConfigSlice = createSlice({
             state.roomData = action.payload;
         },
         setCurrentRoomKey(state, action: PayloadAction<string>) {
-            // clear out any existing room/device data
-            store.dispatch(roomsActions.clearRooms());
-            store.dispatch(devicesActions.clearDevices());
+            // clear out any existing room/device data            
             state.currentRoomKey = action.payload;
         },
         setUserCode(state, action: PayloadAction<UserCode>) {
