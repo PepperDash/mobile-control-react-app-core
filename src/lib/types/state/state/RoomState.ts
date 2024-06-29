@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
 import { PresetListItem } from '..';
+import { CameraListItem } from '../CameraListItem';
 import { DestinationListItem } from '../DestinationListItem';
 import { LevelControlListItem } from '../LevelControlListItem';
 import { SourceListItem } from '../sourceListItem';
@@ -27,6 +28,8 @@ export interface RoomState extends DeviceState{
 export interface RoomConfiguration {
   accessoryDeviceKeys?: string[];
   audioCodecKey?: string;
+  audioControlPointList: AudioControlPointListItem;
+  cameraList?: Record<string, CameraListItem>;
   ciscoNavigatorKey?: string;
   defaultDisplayKey?: string;
   defaultPresentationSourceKey: string;
@@ -38,7 +41,6 @@ export interface RoomConfiguration {
   hasEnvironmentalControls?: boolean;
   hasVideoConferencing?: boolean;
   helpMessage?: string;
-  audioControlPointList: AudioControlPointListItem;
   matrixRoutingKey?: string;
   roomCombinerKey?: string;
   sourceList: Record<string, SourceListItem>;
