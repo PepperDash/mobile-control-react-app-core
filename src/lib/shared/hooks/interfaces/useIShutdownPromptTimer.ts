@@ -3,26 +3,31 @@ import { useRoomState } from 'src/lib';
 import { IShutdownPromptTimerState } from 'src/lib/types/state/state/IShutdownPromptTimerState';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
-export function useIShutdownPromptTimer(key: string): IShutdownPromptTimerReturn | undefined {
+/**
+ * hook that controls a room that implements the IShutdownPromptTimer interface
+ * @param roomKey key of the room
+ * @returns 
+ */
+export function useIShutdownPromptTimer(roomKey: string): IShutdownPromptTimerReturn | undefined {
     const { sendMessage } = useWebsocketContext();
-    const shutdownPromptTimerState = useRoomState(key) as IShutdownPromptTimerState | undefined;
+    const shutdownPromptTimerState = useRoomState(roomKey) as IShutdownPromptTimerState | undefined;
 
     if (!shutdownPromptTimerState) return undefined;
 
     const setShutdownPromptSeconds = (seconds: number) => {
-        sendMessage(`/room/${key}/setShutdownPromptSeconds`, seconds);
+        sendMessage(`/room/${roomKey}/setShutdownPromptSeconds`, seconds);
     };
 
     const shutdownStart = () => {
-        sendMessage(`/room/${key}/shutdownStart`, null);
+        sendMessage(`/room/${roomKey}/shutdownStart`, null);
     };
 
     const shutdownEnd = () => {
-        sendMessage(`/room/${key}/shutdownEnd`, null);
+        sendMessage(`/room/${roomKey}/shutdownEnd`, null);
     };
 
     const shutdownCancel = () => {
-        sendMessage(`/room/${key}/shutdownCancel`, null);
+        sendMessage(`/room/${roomKey}/shutdownCancel`, null);
     };
 
     return { shutdownPromptTimerState, setShutdownPromptSeconds, shutdownStart, shutdownEnd, shutdownCancel};

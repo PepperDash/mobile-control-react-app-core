@@ -24,3 +24,4 @@ From that point forward, room and device state messages from the control system 
 
 ## How this Library is Intended to be Used
 
+The intent is to use the various hooks provided in this library to easily link up to buttons and other elements on an HTML5 UI in a React App to handle the heavy lifting of integrating with the Mobile Control API.  This library will provide hooks for the messengers in the Mobile Control plugin, but you will also be able to write hooks in the React App for custom API that can integrate directly with a messenger defined in any Essentials room or device plugin.  This allows consistency with the core communication that most systems will rely on, while also providing easy customization and extensibility for more esoteric or application specific needs that may not see wide use and justify inclusion in this library.

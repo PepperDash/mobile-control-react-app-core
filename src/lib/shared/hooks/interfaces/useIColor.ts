@@ -1,6 +1,11 @@
 import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
+/**
+ * hook to control a device that implements the IColor interface
+ * @param key 
+ * @returns 
+ */
 export function useIColor(key: string): IColorProps | undefined {
   const path = `/device/${key}`;
 

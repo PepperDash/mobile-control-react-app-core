@@ -2,6 +2,11 @@ import { useGetDevice } from 'src/lib/store';
 import { IEssentialsRoomCombinerState } from 'src/lib/types/state/state/IEssentialsRoomCombinerState';
 import { useWebsocketContext } from 'src/lib/utils';
 
+/**
+ * hook to control a device that implements the IEssentialsRoomCombiner interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useIEssentialsRoomCombiner(key: string): IEssentialsRoomCombinerReturn | undefined {
   const { sendMessage } = useWebsocketContext();
   const roomCombinerState = useGetDevice(key) as IEssentialsRoomCombinerState | undefined;

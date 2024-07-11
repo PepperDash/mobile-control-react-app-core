@@ -2,7 +2,11 @@ import { useGetDevice, useRoomLevelControls } from 'src/lib/store';
 import { LevelControlsState } from 'src/lib/types/state/state/LevelControlsState';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
-
+/**
+ * hook that controls a device that implements the ILevelControls interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useILevelControls(key: string): ILevelControlsReturn | undefined {
   const { sendMessage, sendSimpleMessage } = useWebsocketContext();
   const device = useGetDevice<LevelControlsState>(key);

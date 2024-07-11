@@ -1,7 +1,10 @@
 import { CameraState, PressHoldReleaseReturn, useGetDevice, useWebsocketContext } from 'src/lib';
 import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
 
-
+/**
+ * Provides a set of hooks to control a device that extends the CameraBase class
+ * @param key key of the device
+ */
 export function useCameraBase(key: string): CameraBaseProps | undefined{
   const { sendMessage } = useWebsocketContext();
   const path = `/device/${key}`;

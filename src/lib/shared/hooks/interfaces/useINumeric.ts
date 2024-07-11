@@ -2,7 +2,7 @@ import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
 /**
- * hook to return the functions to trigger for a numeric keypad
+ * hook to return the functions to trigger for a numeric keypad for a device that implements the INumeric interface
  * @param key device key
  * @returns 
  */

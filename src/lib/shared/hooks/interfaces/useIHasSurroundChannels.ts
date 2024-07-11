@@ -1,7 +1,11 @@
 import { LevelControlsState, Volume, useGetDevice } from 'src/lib';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
-
+/**
+ * hook to control a device that implements the IHasSurroundChannels interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useIHasSurroundChannels(key: string): IHasSurroundChannelsReturn | undefined {
   const { sendMessage } = useWebsocketContext();
 

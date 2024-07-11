@@ -1,6 +1,11 @@
 import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
+/**
+ * hook to control a channel messenger device that implements the IChannelMessenger interface
+ * @param key the key of the device
+ * @returns 
+ */
 export function useIChannelMessenger(key: string): IChannelMessengerProps | undefined {
 
     const path = `/device/${key}`;

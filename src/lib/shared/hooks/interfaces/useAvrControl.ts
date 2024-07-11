@@ -8,6 +8,12 @@ import { IHasPowerWithFeedbackProps, useIHasPowerControl } from './useIHasPowerC
 import { IHasSelectableItemsReturn, useIHasSelectableItems } from './useIHasSelectableItems';
 import { IHasSurroundChannelsReturn, useIHasSurroundChannels } from './useIHasSurroundChannels';
 
+
+/**
+ * Provides a set of hooks to control an AVR device
+ * @param key key of the device
+ * @returns 
+ */
 export function useAvrControl(key: string): AvrReturn | undefined {
     const avrState = useGetDevice<PowerState>(key);
     const powerControl = useIHasPowerControl(key);

@@ -1,5 +1,10 @@
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
+/**
+ * 
+ * @param roomKey key of the room
+ * @returns 
+ */
 export function useIRunDirectRouteAction(roomKey: string): IRunDirectRouteActionProps {
     const { sendMessage } = useWebsocketContext();
 

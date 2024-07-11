@@ -1,7 +1,11 @@
 import { useGetDevice } from 'src/lib';
 import { EndpointState } from 'src/lib/types/state/state/endpointState/endpointState';
 
-
+/**
+ * A hook that provides access to the endpoint state
+ * @param key the key of the endpoint
+ * @returns 
+ */
 export function useEndpoint(key: string): IEndpointReturn | undefined {
 
     const endpointState = useGetDevice<EndpointState>(key);

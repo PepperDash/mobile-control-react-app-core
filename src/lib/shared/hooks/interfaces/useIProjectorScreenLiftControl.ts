@@ -1,6 +1,10 @@
 import { IProjectorScreenLiftControlState, useGetDevice, useWebsocketContext } from 'src/lib';
 
-
+/**
+ * hook to control a device that implements the IProjectorScreenLiftControl interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useIProjectorScreenLiftControl(key: string): IProjectorScreenLiftControlReturn | undefined {
     const { sendMessage } = useWebsocketContext();
     const projectorScreenLiftControlState = useGetDevice(key) as IProjectorScreenLiftControlState | undefined;
