@@ -6,7 +6,7 @@ import { PressHoldReleaseReturn } from '../usePressHoldRelease';
  * @param key the key of the device
  * @returns 
  */
-export function useIChannelMessenger(key: string): IChannelMessengerProps | undefined {
+export function useIChannel(key: string): IChannelMessengerProps | undefined {
 
     const path = `/device/${key}`;
 
