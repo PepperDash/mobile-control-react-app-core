@@ -1,6 +1,11 @@
 import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
+/**
+ * hook that controls a device that implements the ITransport interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useITransport(key: string): ITransportProps | undefined {
   const path = `/device/${key}`;
 

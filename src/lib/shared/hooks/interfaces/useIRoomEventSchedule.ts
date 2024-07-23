@@ -1,6 +1,12 @@
 import { ScheduleEvent, ScheduleState, useRoomState } from 'src/lib';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
+
+/**
+ * hook to control a device that implements the IRoomEventSchedule interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useIRoomEventSchedule(key: string): IRoomEventScheduleReturn | undefined {
     const { sendMessage } = useWebsocketContext();
     const roomEventScheduleState = useRoomState(key) as ScheduleState | undefined;

@@ -2,6 +2,11 @@ import { useGetDevice } from 'src/lib/store';
 import { LightingScene, LightingState } from 'src/lib/types';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
+/**
+ * hook to control a device that implements the ILightingScenes interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useILightingScenes(key: string): ILightingScenesReturn | undefined {
   const { sendMessage } = useWebsocketContext();
   const state = useGetDevice<LightingState>(key);

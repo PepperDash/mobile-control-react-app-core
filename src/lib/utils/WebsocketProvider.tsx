@@ -23,7 +23,7 @@ import WebsocketContext from "./WebsocketContext";
 import { loadValue, saveValue } from "./joinParamsService";
 
 /**
- * The context component that contains the websocket connection and provides the sendMessage function
+ * The context component that contains the websocket connection and provides the functions to send messages
  * Must wrap all other components
  * @param children the child components.  First child should be a room buseness logic component
  */

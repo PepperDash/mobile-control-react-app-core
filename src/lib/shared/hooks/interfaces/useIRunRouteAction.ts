@@ -2,12 +2,17 @@ import { useGetDevice } from 'src/lib/store';
 import { RoutingState } from 'src/lib/types';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
-export function useIRunRouteAction(key: string): IRunRouteActionProps | undefined {
+/**
+ * hook to control a room that implements the IRunRouteAction interface
+ * @param roomKey key of the room
+ * @returns 
+ */
+export function useIRunRouteAction(roomKey: string): IRunRouteActionProps | undefined {
   const { sendMessage } = useWebsocketContext();
-  const routingState = useGetDevice<RoutingState>(key);
+  const routingState = useGetDevice<RoutingState>(roomKey);
   
   const runRoute = (request: RouteRequest) => {
-    sendMessage(`/room/${key}/source`, request);
+    sendMessage(`/room/${roomKey}/source`, request);
   };
 
   return { routingState, runRoute };

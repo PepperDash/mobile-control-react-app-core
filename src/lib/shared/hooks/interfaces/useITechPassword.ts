@@ -2,19 +2,23 @@ import { useRoomState } from 'src/lib';
 import { ITechPasswordState } from 'src/lib/types/state/state/ITechPasswordState';
 import { useWebsocketContext } from 'src/lib/utils';
 
-
-export function useITechPassword(key: string): ITechPasswordReturn | undefined {
+/**
+ * hook that controls a room that implements the ITechPassword interface
+ * @param roomKey key of the room
+ * @returns 
+ */
+export function useITechPassword(roomKey: string): ITechPasswordReturn | undefined {
   const { sendMessage } = useWebsocketContext();
-  const techPasswordState = useRoomState(key) as ITechPasswordState | undefined;
+  const techPasswordState = useRoomState(roomKey) as ITechPasswordState | undefined;
  
   if(!techPasswordState) return undefined;
 
   const validatePassword = (password: string) => {
-    sendMessage(`/room/${key}/validateTechPassword`, {password});
+    sendMessage(`/room/${roomKey}/validateTechPassword`, {password});
   };
 
   const setPassword = (oldPassword: string, newPassword: string) => {
-    sendMessage(`/room/${key}/setTechPassword`, {oldPassword, newPassword});
+    sendMessage(`/room/${roomKey}/setTechPassword`, {oldPassword, newPassword});
   };
 
   return { techPasswordState, validatePassword, setPassword };

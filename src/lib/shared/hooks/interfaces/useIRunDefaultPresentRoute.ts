@@ -1,10 +1,15 @@
 import { useWebsocketContext } from "src/lib/utils";
 
-export function useIRunDefaultPresentRoute(key: string):IRunDefaultPresentRouteProps {
+/**
+ * hook to control a room that implements the IRunDefaultPresentRoute interface
+ * @param roomKey key of the room
+ * @returns 
+ */
+export function useIRunDefaultPresentRoute(roomKey: string):IRunDefaultPresentRouteProps {
   const { sendMessage } = useWebsocketContext();
   
   const runDefaultPresentRoute = () => {
-    sendMessage(`/room/${key}/defaultsource`, {});
+    sendMessage(`/room/${roomKey}/defaultsource`, {});
   };
  
   return {runDefaultPresentRoute}

@@ -2,6 +2,11 @@ import { useGetDevice } from "src/lib/store";
 import { MobileControlTouchpanelState } from "src/lib/types/state/state/MobileControlTouchpanelState";
 import { useWebsocketContext } from "src/lib/utils/useWebsocketContext";
 
+/**
+ * hook that controls a device that implements the MobileControlTouchpanelController interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useMobileControlTouchpanelController(
   key: string
 ): MobileControlTouchpanelControllerReturn | undefined {

@@ -7,7 +7,11 @@ import {
 } from "./useIHasPowerControl";
 import { IHasSelectableItemsReturn, useIHasSelectableItems } from './useIHasSelectableItems';
 
-
+/**
+ * Provides a set of hooks to control a device that extends the TwoWayDisplayBase class
+ * @param key key of the device
+ * @returns 
+ */
 export function useTwoWayDisplayBase(
   key: string
 ): TwoWayDisplayBaseReturn | undefined {

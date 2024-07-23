@@ -2,7 +2,11 @@ import { useGetDevice } from 'src/lib/store';
 import { ShadeState } from 'src/lib/types';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
-
+/**
+ * hook that controls a device that implements the IShadesOpenCloseStop interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useIShadesOpenCloseStop(key: string): IShadesOpenCloseStopProps | undefined {
   const { sendMessage } = useWebsocketContext();
   const shadeState = useGetDevice<ShadeState>(key);

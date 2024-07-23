@@ -3,6 +3,12 @@ import { useWebsocketContext } from "src/lib/utils/useWebsocketContext";
 import { useButtonHeldHeartbeat } from "../useHeldButtonAction";
 import { PressHoldReleaseReturn } from "../usePressHoldRelease";
 
+/**
+ * hook to control a volume device that implements the IBasicVolumeWithFeedback interface
+ * @param path path prefix to for the device. i.e. /device/{key} or /room/{key}
+ * @param volumeState 
+ * @returns 
+ */
 export function useIBasicVolumeWithFeedback(
   path: string, volumeState: Volume | undefined
 ): IBasicVolumeWithFeedbackReturn | undefined {
@@ -42,6 +48,7 @@ export interface IBasicVolumeWithFeedbackReturn {
   muteOn: () => void;
   muteOff: () => void;
 }
+
 
 export function useGetIBasicVolumeWithFeedback(
   path: string, volumeState: Volume | undefined

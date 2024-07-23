@@ -1,9 +1,12 @@
 import { useGetDevice } from 'src/lib/store';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
+
 /**
  * Hook for devices that have selectable items
  * TState is the type of the expected state of the device
+ * @param key key of the device
+ * @returns 
  */
 export function useIHasSelectableItems<TState>(key: string): IHasSelectableItemsReturn<TState> | undefined {
   const { sendMessage } = useWebsocketContext();

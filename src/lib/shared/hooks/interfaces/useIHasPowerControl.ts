@@ -1,5 +1,10 @@
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
+/**
+ * hook to control a device that implements the IHasPowerControl interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useIHasPowerControl(key: string): IHasPowerWithFeedbackProps {
   const { sendMessage } = useWebsocketContext();
 

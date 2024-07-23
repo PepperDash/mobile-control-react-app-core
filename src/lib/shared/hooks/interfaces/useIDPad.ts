@@ -1,6 +1,11 @@
 import { useButtonHeldHeartbeat } from "../useHeldButtonAction";
 import { PressHoldReleaseReturn } from "../usePressHoldRelease";
 
+/**
+ * hook to control a device that implements the IDPad interface
+ * @param key key of the device
+ * @returns 
+ */
 export function useIDPad(key: string): IDPadProps | undefined {
   const path = `/device/${key}`;
 
