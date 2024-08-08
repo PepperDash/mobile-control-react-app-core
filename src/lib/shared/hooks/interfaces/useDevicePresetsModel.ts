@@ -2,7 +2,7 @@ import { DevicePresetsState, PresetChannel, useGetDevice } from 'src/lib';
 import { useWebsocketContext } from 'src/lib/utils';
 
 
-export function useIDevicePresetsModel(key: string): IDevicePresetsModelProps | undefined {
+export function useDevicePresetsModel(key: string): DevicePresetsModelProps | undefined {
     const { sendMessage } = useWebsocketContext();
     const state = useGetDevice<DevicePresetsState>(key);
     const path = `/device/${key}`;
@@ -21,7 +21,7 @@ export function useIDevicePresetsModel(key: string): IDevicePresetsModelProps | 
     return { state, recallPreset, savePresets };
 }
 
-export interface IDevicePresetsModelProps {
+export interface DevicePresetsModelProps {
     state: DevicePresetsState;
     recallPreset: (deviceKey: string, preset: PresetChannel) => void;
     savePresets: (presets: PresetChannel[]) => void;

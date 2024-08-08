@@ -1,5 +1,24 @@
 import { useRef } from 'react';
 
+
+/**
+ * This hook is used to link up the functions to trigger for a button that can be pressed and held
+ * @param onPress function to call when the pointer is pressed
+ * @param onRelease function to call when the pointer is released
+ * @param onHold function to call when the pointer is held
+ * @param holdTimeMs time in milliseconds to hold before onHold is called 
+ * @returns an object that can be easily applied to a button or other element using a spread operator to attach to the element events
+ * @example
+ * const button1 = usePressHoldRelease({
+ *  onPress: () => console.log('pressed'),
+ *  onRelease: () => console.log('released'),
+ *  onHold: () => console.log('held'),
+ *  holdTimeMs: 2000
+ * });
+ * 
+ * // use the spread operator to attach the events to the button
+ * <button {...button1}>Press and Hold</button>
+ */
 export function usePressHoldRelease({
   onPress,
   onRelease,
