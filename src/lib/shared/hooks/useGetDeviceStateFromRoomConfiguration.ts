@@ -29,7 +29,12 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
 
     if(config.audioControlPointList) {
       Object.values(config.audioControlPointList?.levelControls).forEach((lcl) => {
-        deviceKeys.push(lcl.parentDeviceKey + "--" + lcl.itemKey);
+        // if the level control has an item key, combine it with the parent device key
+        if(lcl.itemKey) {
+          deviceKeys.push(lcl.parentDeviceKey + "--" + lcl.itemKey);
+        } else {
+          deviceKeys.push(lcl.parentDeviceKey);
+        }
       });
     }
 
