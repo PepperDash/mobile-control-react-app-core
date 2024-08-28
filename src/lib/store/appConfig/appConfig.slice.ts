@@ -38,9 +38,16 @@ export interface AppConfig {
     iconSet: IconType;
     loginMode: string;
     modes: { [key: string]: unknown };
+    partnerMetadata?: PartnerMetadata[];
   }
   
 export type IconType = 'GOOGLE' | 'HABANERO' | 'NEO';
+
+export interface PartnerMetadata {
+    role: string;
+    description: string;
+    logoPath: string;
+}
 
 
 export const appConfigActions = appConfigSlice.actions;
