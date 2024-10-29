@@ -10,11 +10,11 @@ export function useDevicePresetsModel(key: string): DevicePresetsModelProps | un
     if (!state) return undefined;
 
     const recallPreset = (deviceKey: string, preset: PresetChannel) => {
-        sendMessage(`${path}/recall`, {deviceKey, preset});
+        sendMessage(`${path}/presets/recall`, {deviceKey, preset});
     }
 
     const savePresets = (presets: PresetChannel[]) => {
-        sendMessage(`${path}/save`, presets);
+        sendMessage(`${path}/presets/save`, presets);
     }
     
 
