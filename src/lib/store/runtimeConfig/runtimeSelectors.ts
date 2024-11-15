@@ -17,3 +17,5 @@ export const useRuntimeInfo = () => useAppSelector((state) => state.runtimeConfi
 export const useTouchpanelKey = () => useAppSelector((state) => state.runtimeConfig.touchpanelKey);
 
 export const useIsTouchpanel = () => useAppSelector((state) => state.runtimeConfig.touchpanelKey !== '');
+
+export const useUserInterfaceConfig = () => useAppSelector((state) => state.runtimeConfig.roomData.userInteraceConfig);
