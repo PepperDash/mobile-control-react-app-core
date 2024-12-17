@@ -1,35 +1,39 @@
 import { MultiIconFC } from "../Buttons/IconButton/IconButton";
-import { IconMultiController, IconMultiRoomPC } from './MultiStateIcons';
-import { IconMultiMic } from './MultiStateIcons/IconMultMic';
+import {
+  IconMultiController,
+  IconMultiDisplay,
+  IconMultiRoomPC,
+} from "./MultiStateIcons";
+import { IconMultiMic } from "./MultiStateIcons/IconMultMic";
 import { IconMultiAlert } from "./MultiStateIcons/IconMultiAlert";
-import { IconMultiBan } from './MultiStateIcons/IconMultiBan';
+import { IconMultiBan } from "./MultiStateIcons/IconMultiBan";
 import { IconMultiCamera } from "./MultiStateIcons/IconMultiCamera";
-import { IconMultiCheck } from './MultiStateIcons/IconMultiCheck';
+import { IconMultiCheck } from "./MultiStateIcons/IconMultiCheck";
 import { IconMultiDownArrow } from "./MultiStateIcons/IconMultiDownArrow";
-import { IconMultiElipses } from './MultiStateIcons/IconMultiElipses';
-import { IconMultiFlag } from './MultiStateIcons/IconMultiFlag';
-import { IconMultiGear } from './MultiStateIcons/IconMultiGear';
-import { IconMultiGlass } from './MultiStateIcons/IconMultiGlass';
-import { IconMultiHdmi } from './MultiStateIcons/IconMultiHdmi';
-import { IconMultiLaptop } from './MultiStateIcons/IconMultiLaptop';
-import { IconMultiLeftArrow } from './MultiStateIcons/IconMultiLeftArrow';
-import { IconMultiLight } from './MultiStateIcons/IconMultiLight';
-import { IconMultiMoon } from './MultiStateIcons/IconMultiMoon';
-import { IconMultiPlaystation } from './MultiStateIcons/IconMultiPlaystation';
-import { IconMultiPodium } from './MultiStateIcons/IconMultiPodium';
-import { IconMultiPower } from './MultiStateIcons/IconMultiPower';
-import { IconMultiPrivacy } from './MultiStateIcons/IconMultiPrivacy';
-import { IconMultiQuestion } from './MultiStateIcons/IconMultiQuestion';
-import { IconMultiRightArrow } from './MultiStateIcons/IconMultiRightArrow';
-import { IconMultiShade } from './MultiStateIcons/IconMultiShade';
-import { IconMultiSun } from './MultiStateIcons/IconMultiSun';
-import { IconMultiUpArrow } from './MultiStateIcons/IconMultiUpArrow';
-import { IconMultiVolDown } from './MultiStateIcons/IconMultiVolDown';
-import { IconMultiVolMute } from './MultiStateIcons/IconMultiVolMute';
-import { IconMultiVolUp } from './MultiStateIcons/IconMultiVolUp';
-import { IconMultiWireless } from './MultiStateIcons/IconMultiWireless';
-import { IconMultiX } from './MultiStateIcons/IconMultiX';
-import { IconMultiXbox } from './MultiStateIcons/IconMultiXbox';
+import { IconMultiElipses } from "./MultiStateIcons/IconMultiElipses";
+import { IconMultiFlag } from "./MultiStateIcons/IconMultiFlag";
+import { IconMultiGear } from "./MultiStateIcons/IconMultiGear";
+import { IconMultiGlass } from "./MultiStateIcons/IconMultiGlass";
+import { IconMultiHdmi } from "./MultiStateIcons/IconMultiHdmi";
+import { IconMultiLaptop } from "./MultiStateIcons/IconMultiLaptop";
+import { IconMultiLeftArrow } from "./MultiStateIcons/IconMultiLeftArrow";
+import { IconMultiLight } from "./MultiStateIcons/IconMultiLight";
+import { IconMultiMoon } from "./MultiStateIcons/IconMultiMoon";
+import { IconMultiPlaystation } from "./MultiStateIcons/IconMultiPlaystation";
+import { IconMultiPodium } from "./MultiStateIcons/IconMultiPodium";
+import { IconMultiPower } from "./MultiStateIcons/IconMultiPower";
+import { IconMultiPrivacy } from "./MultiStateIcons/IconMultiPrivacy";
+import { IconMultiQuestion } from "./MultiStateIcons/IconMultiQuestion";
+import { IconMultiRightArrow } from "./MultiStateIcons/IconMultiRightArrow";
+import { IconMultiShade } from "./MultiStateIcons/IconMultiShade";
+import { IconMultiSun } from "./MultiStateIcons/IconMultiSun";
+import { IconMultiUpArrow } from "./MultiStateIcons/IconMultiUpArrow";
+import { IconMultiVolDown } from "./MultiStateIcons/IconMultiVolDown";
+import { IconMultiVolMute } from "./MultiStateIcons/IconMultiVolMute";
+import { IconMultiVolUp } from "./MultiStateIcons/IconMultiVolUp";
+import { IconMultiWireless } from "./MultiStateIcons/IconMultiWireless";
+import { IconMultiX } from "./MultiStateIcons/IconMultiX";
+import { IconMultiXbox } from "./MultiStateIcons/IconMultiXbox";
 
 export type IconNames =
   | "Alert"
@@ -38,6 +42,7 @@ export type IconNames =
   | "Check"
   | "Controller"
   | "DownArrow"
+  | "Display"
   | "Elipses"
   | "Flag"
   | "Gear"
@@ -65,10 +70,7 @@ export type IconNames =
   | "X"
   | "Xbox";
 
-export const iconsDictionary: Record<
-  IconNames,
-  MultiIconFC
-> = {
+export const iconsDictionary: Record<IconNames, MultiIconFC> = {
   Alert: IconMultiAlert,
   Camera: IconMultiCamera,
   DownArrow: IconMultiDownArrow,
@@ -101,4 +103,5 @@ export const iconsDictionary: Record<
   Wireless: IconMultiWireless,
   X: IconMultiX,
   Xbox: IconMultiXbox,
+  Display: IconMultiDisplay,
 };
