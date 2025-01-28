@@ -60,7 +60,8 @@ export const IconButton = ({
         className={`${iconClassName || classes.iconsm}`}
         {...{ active: showActive, disabled }}
       />}
-      <div className={otherContentClassName}>{otherContent}</div>
+      {otherContentClassName ? <div className={otherContentClassName}>{otherContent}</div> : <div>{otherContent}</div>}
+      
     </button>
   );
 };
