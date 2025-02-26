@@ -1,3 +1,5 @@
+import { IKeyName } from "../interfaces";
+
 export interface RoomData {
   clientId: string | number;
   roomKey: string;
@@ -18,4 +20,10 @@ export interface EssentialsConfig {
     pepperDashCoreVersion: string;
     essentialsPlugins: { name: string; version: string }[];
   };
+  rooms: EssentialsRoom[];
+  devices: EssentialsDevice[];
 }
+
+export interface EssentialsRoom extends IKeyName{}
+
+export interface EssentialsDevice extends IKeyName{}
