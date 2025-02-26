@@ -25,6 +25,8 @@ const initialState: RuntimeConfigState = {
                 pepperDashCoreVersion: '',
                 essentialsPlugins: [],
             },
+            rooms: [],
+            devices:[]
         },
         userCode: '',
         qrUrl: '',
