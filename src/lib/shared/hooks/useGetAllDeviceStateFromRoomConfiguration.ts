@@ -17,15 +17,18 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
     }
 
     const deviceKeys = []
-
    
-    Object.values(config.destinations).forEach((d) => {
-      deviceKeys.push(d);
-    });
+    if (config.destinations) {
+      Object.values(config.destinations).forEach((d) => {
+        deviceKeys.push(d);
+      });
+    }
 
-    Object.values(config.destinationList).forEach((dli) => {
-      deviceKeys.push(dli.sinkKey);
-    });
+    if (config.destinationList) {
+      Object.values(config.destinationList).forEach((dli) => {
+        deviceKeys.push(dli.sinkKey);
+      });
+    }
 
     if(config.audioControlPointList) {
       Object.values(config.audioControlPointList?.levelControls).forEach((lcl) => {
@@ -42,7 +45,7 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
       deviceKeys.push(d);
     });
 
-    config.environmentalDevices.forEach((d) => {
+    config.environmentalDevices?.forEach((d) => {
       deviceKeys.push(d.deviceKey);
     });
 
@@ -71,11 +74,13 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: Roo
         deviceKeys.push(ek);
       });
     }
-
-    for (const value of Object.values(config.sourceList)) {
-      // if the source has a source key, add it to the list of device keys
-      if(value.sourceKey && value.sourceKey !== "$off")
-        deviceKeys.push(value.sourceKey);
+    
+    if (config.sourceList) {
+      for (const value of Object.values(config.sourceList)) {
+        // if the source has a source key, add it to the list of device keys
+        if (value.sourceKey && value.sourceKey !== "$off")
+          deviceKeys.push(value.sourceKey);
+      }
     }
 
     console.log("deviceKeys", deviceKeys);

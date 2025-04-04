@@ -1,6 +1,6 @@
 export * from "./interfaces";
 export * from "./useDeviceIBasicVolumeWithFeedback";
-export * from "./useGetDeviceStateFromRoomConfiguration";
+export * from "./useGetAllDeviceStateFromRoomConfiguration";
 export * from "./useHeldButtonAction";
 export * from "./useOverflow";
 export * from "./usePressHoldRelease";
