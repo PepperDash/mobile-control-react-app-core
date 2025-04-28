@@ -1,19 +1,20 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RoomVolumeType, Volume } from 'src/lib/types';
-import { DisplayState, LevelControlsState, RoomConfiguration } from "src/lib/types/state/state";
+import { DisplayState, LevelControlsState, RoomConfiguration, RoomState } from "src/lib/types/state/state";
 import { useGetAllDevices } from '../devices/devicesSelectors';
 import { useAppSelector } from "../hooks";
-import {store, RootState } from '../store';
+import { RootState, store } from '../store';
 
 export const useRoomConfiguration: (roomKey: string) => RoomConfiguration | undefined = (roomKey: string) =>
   useAppSelector((state) =>
     state.rooms[roomKey] ? state.rooms[roomKey]?.configuration : undefined
   );
 
-export const useRoomState = (roomKey: string) =>
-  useAppSelector((state) =>
-    state.rooms[roomKey] ? state.rooms[roomKey] : undefined
+export function useRoomState<T extends RoomState = RoomState>(roomKey: string): T | undefined {
+  return useAppSelector((state) =>
+    state.rooms[roomKey] ? state.rooms[roomKey] as T : undefined
   );
+}
 
 export const useRoomName = (roomKey: string) =>
   useAppSelector((state) =>

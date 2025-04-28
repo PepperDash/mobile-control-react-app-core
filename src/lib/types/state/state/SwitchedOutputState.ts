@@ -1,5 +1,6 @@
+import { DeviceState } from 'src/lib';
 
 
-export interface SwitchedOutputState {
+export interface SwitchedOutputState extends DeviceState {
   isOn: boolean;
 }

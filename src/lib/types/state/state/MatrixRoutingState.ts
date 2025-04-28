@@ -3,7 +3,7 @@ import { IKeyName } from '../../interfaces';
 import { IOnline } from '../../interfaces/IOnline';
 import { DeviceState } from './DeviceState';
 
-export interface MatrixRoutingState {
+export interface MatrixRoutingState extends DeviceState {
   inputs: Record<string, InputSlot>;
   outputs: Record<string, OutputSlot>;
 }

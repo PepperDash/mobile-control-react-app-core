@@ -1,5 +1,6 @@
+import { DeviceState } from 'src/lib';
 import { IHasSelectableItemsState } from './IHasSelectableItemsState';
 
-export interface IHasSurroundSoundModesState {
+export interface IHasSurroundSoundModesState extends DeviceState {
   surroundSoundModes: IHasSelectableItemsState;
 }
