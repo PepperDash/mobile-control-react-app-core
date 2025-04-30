@@ -36,8 +36,7 @@ const roomsSlice = createSlice({
             state[key] = newState;
 
             console.log(state);
-
-            return state;
+            // Don't return state - Immer handles this automatically
         },
         clearRooms() {
             return initialState;
@@ -46,5 +45,8 @@ const roomsSlice = createSlice({
 })
 
 
-export const roomsActions = roomsSlice.actions;
+export const roomsActions = {
+    setRoomState: roomsSlice.actions.setRoomState,
+    clearRooms: roomsSlice.actions.clearRooms
+}
 export const roomsReducer =  roomsSlice.reducer;
