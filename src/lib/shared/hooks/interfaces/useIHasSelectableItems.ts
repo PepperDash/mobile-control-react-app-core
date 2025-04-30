@@ -9,7 +9,7 @@ import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
  * @param key key of the device
  * @returns 
  */
-export function useIHasSelectableItems<TState extends DeviceState>(key: string): IHasSelectableItemsReturn<TState> | undefined {
+export function useIHasSelectableItems<TState extends DeviceState = DeviceState>(key: string): IHasSelectableItemsReturn<TState> | undefined {
   const { sendMessage } = useWebsocketContext();
   const device = useGetDevice<TState>(key);
 

@@ -1,5 +1,6 @@
 import { DeviceState } from 'src/lib';
 import { useAppSelector } from '../hooks';
+import { selectAllDevices, selectDeviceByKey } from './devices.hooks';
 
 
 /**
@@ -7,7 +8,7 @@ import { useAppSelector } from '../hooks';
  * @returns Record<string, DeviceState>
  */
 export const useGetAllDevices = () => {
-  return useAppSelector((state) => state.devices);
+  return useAppSelector(selectAllDevices);
 }
 
 /**
@@ -16,6 +17,6 @@ export const useGetAllDevices = () => {
  * @returns DeviceState or undefined
  */
 export function useGetDevice<T extends DeviceState = DeviceState>(deviceKey: string): T | undefined {
-  return useAppSelector((state) => state.devices[deviceKey] ? state.devices[deviceKey] : undefined) as T | undefined;
+  return useAppSelector(selectDeviceByKey(deviceKey)) as T | undefined;
 }
 

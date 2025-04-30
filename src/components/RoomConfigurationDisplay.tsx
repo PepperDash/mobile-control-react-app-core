@@ -1,8 +1,8 @@
 import {
-  useGetAllDeviceStateFromRoomConfiguration, useINumeric
+    useGetAllDeviceStateFromRoomConfiguration, useINumeric
 } from "src/lib/shared";
-import { useRoomConfiguration } from "src/lib/store/rooms/roomsSelectors";
-import { useRoomKey } from "src/lib/store/runtimeConfig/runtimeSelectors";
+import { useRoomConfiguration } from "src/lib/store/rooms/rooms.selectors";
+import { useRoomKey } from "src/lib/store/runtimeConfig/runtime.selectors";
 
 const RoomConfigurationDisplay = () => {
   const roomKey = useRoomKey();
