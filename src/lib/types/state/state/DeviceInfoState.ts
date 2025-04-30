@@ -1,4 +1,6 @@
-export interface DeviceInfoState {
+import { DeviceState } from 'src/lib';
+
+export interface DeviceInfoState  extends DeviceState {
     deviceInfo: DeviceInfo;
 }
 

@@ -29,8 +29,8 @@ const devicesSlice = createSlice({
             // overlay the incoming state properties onto the existing item
             // or create new item
             state[key] = newState;
-
-            return state;
+            
+            // Don't return state when using immer
         },
         clearDevices() {
             return initialState;
@@ -40,5 +40,9 @@ const devicesSlice = createSlice({
 
 
 
-export const devicesActions = devicesSlice.actions;
-export const devicesReducer =  devicesSlice.reducer;
+// Extract specific action creators to avoid exposing WritableDraft
+export const devicesActions = {
+  setDeviceState: devicesSlice.actions.setDeviceState,
+  clearDevices: devicesSlice.actions.clearDevices
+};
+export const devicesReducer = devicesSlice.reducer;
