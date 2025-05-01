@@ -80,26 +80,28 @@ export const useRoomShareState = (roomKey: string) =>
  * @param roomKey
  * @returns the display states for the room's displays
  */
+const selectRoomDisplayStates = createSelector(
+  [
+    (state: RootState, roomKey: string) => roomKey,
+    (state: RootState) => useGetAllDevices(),
+    (state: RootState, roomKey: string) => state.rooms[roomKey]?.configuration?.destinations,
+  ],
+  (roomKey, deviceStates, destinations) => {
+    console.log("roomKey", roomKey);
+    console.log("devices", deviceStates);
+    console.log("destinations", destinations);
+    if (!destinations) return undefined;
+
+    const displayKeys = Object.entries(destinations).filter(([key]) => key !== "programAudio" && key !== "codecContent").map(([, value]) => value);
+
+    const displayStates = Object.values(deviceStates).filter((device) => Object.values(displayKeys).includes(device.key));
+
+    return displayStates as DisplayState[];
+  }
+);
+
 export const useGetRoomDisplayStates = (roomKey: string) => {
-  return createSelector(
-    [
-      (_state, roomKey: string) => roomKey,
-      useGetAllDevices,
-      (state: RootState) => state.rooms[roomKey]?.configuration?.destinations,     
-    ],
-    (roomKey, deviceStates, destinations) => {
-      console.log("roomKey", roomKey);
-      console.log("devices", deviceStates);
-      console.log("destinations", destinations);
-      if (!destinations) return undefined;
-
-      const displayKeys = Object.entries(destinations).filter(([key]) => key !== "programAudio" && key !== "codecContent").map(([,value]) => value);
-    
-      const displayStates = Object.values(deviceStates).filter((device) => Object.values(displayKeys).includes(device.key));
-
-      return displayStates as DisplayState[];
-    }
-  )(store.getState(), roomKey);
+  return useAppSelector((state) => selectRoomDisplayStates(state, roomKey));
 };
 
 export const useGetZoomRoomControllerKey = (roomKey: string) =>
