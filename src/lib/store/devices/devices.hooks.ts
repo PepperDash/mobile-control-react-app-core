@@ -6,7 +6,7 @@ const devicesConfigSlice = (state: RootState) => state.devices;
 
 export const selectAllDevices = createSelector(
   devicesConfigSlice,
-  (devices) => devices.devices
+  (devices) => devices
 );
 
 export const selectDeviceByKey = (deviceKey: string) => createSelector(
