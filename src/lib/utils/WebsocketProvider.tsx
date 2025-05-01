@@ -199,7 +199,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         };
 
         newWs.onerror = (err) => {
-          console.log(err);
+          console.error('Websocket error', err);
         };
 
         newWs.onclose = (closeEvent: CloseEvent): void => {
@@ -243,10 +243,12 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
 
+          console.log('websocket waitingToReconnect', waitingToReconnect);
           if (waitingToReconnect) {
             return;
           }
           
+          console.log('websocket clearing state on disconnect');
           store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
           store.dispatch(devicesActions.clearDevices());
           store.dispatch(roomsActions.clearRooms());          
@@ -325,7 +327,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
               store.dispatch(devicesActions.setDeviceState(message));
             }
           } catch (err) {
-            console.log(err);
+            console.error('websocket message handling error', err);
           }
         };
       }
