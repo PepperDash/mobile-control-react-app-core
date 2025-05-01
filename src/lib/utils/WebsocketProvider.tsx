@@ -176,7 +176,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    */
   useEffect(() => {
     async function joinWebsocket() {
-      console.log('effect is running');
+      console.log('effect is running...actually');
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
 
       const tokenResult = await getRoomData(appConfig.apiPath);
@@ -335,10 +335,13 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
     joinWebsocket();
 
+    console.log(`App mode: ${import.meta.env.MODE}`);
+    console.log(`Is dev mode: ${import.meta.env.DEV}`);
     // Cleanup first websocket in dev mode due to double render cycle
     return () => {
       if (clientRef.current) {
-        clientRef.current.close();
+        console.log("closing websocket dev mode");
+        clientRef.current.close(4100, 'app running in dev mode');
       }
 
       clientRef.current = null;
