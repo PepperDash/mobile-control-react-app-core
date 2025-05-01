@@ -1,9 +1,7 @@
-import { createSelector } from '@reduxjs/toolkit';
+import { selectRoomDisplayStates } from 'src/lib';
 import { RoomVolumeType } from 'src/lib/types';
-import { DisplayState, LevelControlsState, RoomConfiguration, RoomState } from "src/lib/types/state/state";
-import { useGetAllDevices } from '../devices/devices.hooks';
+import { LevelControlsState, RoomConfiguration, RoomState } from "src/lib/types/state/state";
 import { useAppSelector } from "../hooks";
-import { RootState, store } from '../store';
 import { selectRoomAdvancedSharingActive, selectRoomAudioControlPointList, selectRoomByKey, selectRoomCodecContentDestinationKey, selectRoomConfiguration, selectRoomDestinationList, selectRoomDestinations, selectRoomEnvironmentalDevices, selectRoomInCall, selectRoomIsCoolingDown, selectRoomIsOn, selectRoomIsWarmingUp, selectRoomLevelControls, selectRoomName, selectRoomProgramAudioDestinationKey, selectRooms, selectRoomShareState, selectRoomSourceList, selectRoomVolume, selectZoomRoomControllerKey } from './rooms.selectors';
 
 export function useRoomConfiguration(roomKey: string): RoomConfiguration | undefined {
@@ -73,32 +71,6 @@ export const useRoomAdvancedSharingActive = (roomKey: string) =>
 
 export const useRoomShareState = (roomKey: string) =>
   useAppSelector(selectRoomShareState(roomKey));
-
-/**
- * Get the display states for the room
- * Exludes the programAudio and codecContent destinations
- * @param roomKey
- * @returns the display states for the room's displays
- */
-const selectRoomDisplayStates = createSelector(
-  [
-    (state: RootState, roomKey: string) => roomKey,
-    (state: RootState) => useGetAllDevices(),
-    (state: RootState, roomKey: string) => state.rooms[roomKey]?.configuration?.destinations,
-  ],
-  (roomKey, deviceStates, destinations) => {
-    console.log("roomKey", roomKey);
-    console.log("devices", deviceStates);
-    console.log("destinations", destinations);
-    if (!destinations) return undefined;
-
-    const displayKeys = Object.entries(destinations).filter(([key]) => key !== "programAudio" && key !== "codecContent").map(([, value]) => value);
-
-    const displayStates = Object.values(deviceStates).filter((device) => Object.values(displayKeys).includes(device.key));
-
-    return displayStates as DisplayState[];
-  }
-);
 
 export const useGetRoomDisplayStates = (roomKey: string) => {
   return useAppSelector((state) => selectRoomDisplayStates(state, roomKey));
