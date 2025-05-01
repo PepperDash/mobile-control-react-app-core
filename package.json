@@ -64,7 +64,7 @@
       "import": "./dist/mobile-control-react-app-core.es.js",
       "require": "./dist/mobile-control-react-app-core.umd.js"
     },
-    "./dist/style.css": "./dist/style.css"
+    "./dist/style.css": "./dist/mobile-control-react-app-core.css"
   },
   "main": "./dist/mobile-control-react-app-core.umd.js",
   "module": "./dist/mobile-control-react-app-core.es.js",
