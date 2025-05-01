@@ -176,7 +176,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    */
   useEffect(() => {
     async function joinWebsocket() {
-      console.log('effect is running');
+      console.log('Attempting to join websocket...');
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
 
       const tokenResult = await getRoomData(appConfig.apiPath);
@@ -199,7 +199,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         };
 
         newWs.onerror = (err) => {
-          console.log(err);
+          console.error('Websocket error', err);
         };
 
         newWs.onclose = (closeEvent: CloseEvent): void => {
@@ -243,10 +243,12 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
 
+          console.log('websocket waitingToReconnect', waitingToReconnect);
           if (waitingToReconnect) {
             return;
           }
           
+          console.log('websocket clearing state on disconnect');
           store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
           store.dispatch(devicesActions.clearDevices());
           store.dispatch(roomsActions.clearRooms());          
@@ -325,7 +327,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
               store.dispatch(devicesActions.setDeviceState(message));
             }
           } catch (err) {
-            console.log(err);
+            console.error('websocket message handling error', err);
           }
         };
       }
@@ -333,10 +335,13 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
     joinWebsocket();
 
+    console.log(`App mode: ${import.meta.env.MODE}`);
+    console.log(`Is dev mode: ${import.meta.env.DEV}`);
     // Cleanup first websocket in dev mode due to double render cycle
     return () => {
       if (clientRef.current) {
-        clientRef.current.close();
+        console.log("closing websocket dev mode");
+        clientRef.current.close(4100, 'app running in dev mode');
       }
 
       clientRef.current = null;
