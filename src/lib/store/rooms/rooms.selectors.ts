@@ -1,107 +1,109 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RoomVolumeType } from 'src/lib/types';
-import { DisplayState, LevelControlsState, RoomConfiguration, RoomState } from "src/lib/types/state/state";
-import { useGetAllDevices } from '../devices/devices.selectors';
-import { useAppSelector } from "../hooks";
-import { RootState, store } from '../store';
-import { selectRoomAdvancedSharingActive, selectRoomAudioControlPointList, selectRoomByKey, selectRoomCodecContentDestinationKey, selectRoomConfiguration, selectRoomDestinationList, selectRoomDestinations, selectRoomEnvironmentalDevices, selectRoomInCall, selectRoomIsCoolingDown, selectRoomIsOn, selectRoomIsWarmingUp, selectRoomLevelControls, selectRoomName, selectRoomProgramAudioDestinationKey, selectRooms, selectRoomShareState, selectRoomSourceList, selectRoomVolume, selectZoomRoomControllerKey } from './rooms.hooks';
-
-export function useRoomConfiguration(roomKey: string): RoomConfiguration | undefined {
-  return useAppSelector(
-   selectRoomConfiguration(roomKey)) as RoomConfiguration | undefined;
-}
-
-export function useGetAllRooms() {
-  return useAppSelector(selectRooms);
-}
-
-export function useRoomState<T extends RoomState = RoomState>(roomKey: string): T | undefined {
-  return useAppSelector(selectRoomByKey(roomKey)) as T | undefined;
-}
+import { RootState } from 'src/lib';
 
 
-/** Alternate for useRoomState */
-export const useGetRoom = useRoomState;
+const roomsState = (state: RootState) => state.rooms;
 
-export const useRoomName = (roomKey: string) =>
-  useAppSelector(selectRoomName(roomKey)
-  );
+export const selectRoomConfiguration = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey].configuration : undefined
+);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const useRoomVolume = (roomKey: string, volumeKey: RoomVolumeType) =>
-  useAppSelector(selectRoomVolume(roomKey, volumeKey)
-  );
+export const selectRooms = createSelector(
+  roomsState,
+  (rooms) => rooms
+);
 
-export const useRoomLevelControls = (roomKey: string) =>
-  useAppSelector(selectRoomLevelControls(roomKey)) as unknown as LevelControlsState || undefined;
+export const selectRoomByKey = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey] : undefined
+);
 
-export const useRoomSourceList = (roomKey: string) =>
-  useAppSelector(selectRoomSourceList(roomKey));
+export const selectRoomName = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey].name : undefined
+);
 
-export const useRoomAudioControlPointList = (roomKey: string) =>
-  useAppSelector(selectRoomAudioControlPointList(roomKey));
+export const selectRoomVolume = (roomKey: string, volumeKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey].volumes[volumeKey] : undefined
+);
 
-export const useRoomDestinations = (roomKey: string) =>
-  useAppSelector(selectRoomDestinations(roomKey));
+export const selectRoomLevelControls = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey] : undefined
+);
 
-export const useRoomDestinationList = (roomKey: string) =>
-  useAppSelector(selectRoomDestinationList(roomKey));
+export const selectRoomSourceList = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.configuration?.sourceList : undefined
+);
+  
+export const selectRoomAudioControlPointList = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.configuration?.audioControlPointList : undefined
+);
 
-export const useRoomEnvironmentalDevices = (roomKey: string) =>
-  useAppSelector(selectRoomEnvironmentalDevices(roomKey));
+export const selectRoomDestinations = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.configuration?.destinations : undefined
+);
 
-export const useRoomProgramAudioDestinationKey = (roomKey: string) =>
-  useAppSelector(selectRoomProgramAudioDestinationKey(roomKey));
+export const selectRoomDestinationList = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.configuration?.destinationList : undefined
+);
 
-export const useRoomCodecContentDestinationKey = (roomKey: string) =>
-  useAppSelector(selectRoomCodecContentDestinationKey(roomKey));
+export const selectRoomEnvironmentalDevices = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.configuration?.environmentalDevices : undefined
+);
 
-export const useRoomInCall = (roomKey: string) =>
-  useAppSelector(selectRoomInCall(roomKey));
+export const selectRoomProgramAudioDestinationKey = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey]?.configuration?.destinationList["programAudio"]
+    ? rooms[roomKey]?.configuration?.destinationList["programAudio"]?.sinkKey
+    : rooms[roomKey]?.configuration?.destinationList["defaultDisplay"]?.sinkKey || ""
+);
 
-export const useRoomIsWarmingUp = (roomKey: string) =>
-  useAppSelector(selectRoomIsWarmingUp(roomKey));
+export const selectRoomCodecContentDestinationKey = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey]
+    ? rooms[roomKey]?.configuration?.destinationList["codecContent"]?.sinkKey
+    : undefined
+);
 
-export const useRoomIsCoolingDown = (roomKey: string) =>
-  useAppSelector(selectRoomIsCoolingDown(roomKey));
+export const selectRoomInCall = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.isInCall : undefined
+);
 
-export const useRoomIsOn = (roomKey: string) =>
-  useAppSelector(selectRoomIsOn(roomKey));
+export const selectRoomIsWarmingUp = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.isWarmingUp : undefined
+);
 
-export const useRoomAdvancedSharingActive = (roomKey: string) =>
-  useAppSelector(selectRoomAdvancedSharingActive(roomKey));
+export const selectRoomIsCoolingDown = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.isCoolingDown : undefined
+);
 
-export const useRoomShareState = (roomKey: string) =>
-  useAppSelector(selectRoomShareState(roomKey));
+export const selectRoomIsOn = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.isOn : undefined
+);
 
-/**
- * Get the display states for the room
- * Exludes the programAudio and codecContent destinations
- * @param roomKey
- * @returns the display states for the room's displays
- */
-export const useGetRoomDisplayStates = (roomKey: string) => {
-  return createSelector(
-    [
-      (_state, roomKey: string) => roomKey,
-      useGetAllDevices,
-      (state: RootState) => state.rooms[roomKey]?.configuration?.destinations,     
-    ],
-    (roomKey, deviceStates, destinations) => {
-      console.log("roomKey", roomKey);
-      console.log("devices", deviceStates);
-      console.log("destinations", destinations);
-      if (!destinations) return undefined;
+export const selectRoomAdvancedSharingActive = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.advancedSharingActive : undefined
+);
 
-      const displayKeys = Object.entries(destinations).filter(([key]) => key !== "programAudio" && key !== "codecContent").map(([,value]) => value);
-    
-      const displayStates = Object.values(deviceStates).filter((device) => Object.values(displayKeys).includes(device.key));
+export const selectRoomShareState = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.share : undefined
+);
 
-      return displayStates as DisplayState[];
-    }
-  )(store.getState(), roomKey);
-};
-
-export const useGetZoomRoomControllerKey = (roomKey: string) =>
-  useAppSelector(selectZoomRoomControllerKey(roomKey));
-
+export const selectZoomRoomControllerKey = (roomKey: string) => createSelector(
+  roomsState,
+  (rooms) => rooms[roomKey] ? rooms[roomKey]?.configuration?.zoomRoomControllerKey : undefined
+);

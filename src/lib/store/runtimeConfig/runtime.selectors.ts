@@ -1,20 +1,50 @@
-import { useAppSelector } from '../hooks';
-import { selectClientId, selectIsTouchpanel, selectRoomKey, selectRuntimeInfo, selectServerIsRunningOnProcessorHardware, selectSystemUuid, selectTouchpanelKey, selectUserCode, selectWsIsConnected } from './runtime.hooks';
+import { createSelector } from '@reduxjs/toolkit';
+import { RootState } from 'src/lib';
 
-export const useWsIsConnected = () => useAppSelector(selectWsIsConnected);
 
-export const useRoomKey = () => useAppSelector(selectRoomKey);
+const runtimeState = (state: RootState) => state.runtimeConfig;
 
-export const useClientId = () => useAppSelector(selectClientId);
+export const selectWsIsConnected = createSelector(
+  runtimeState,
+  (state) => state.websocket.isConnected
+);
 
-export const useSystemUuid = () => useAppSelector(selectSystemUuid);
+export const selectRoomKey = createSelector(
+  runtimeState,
+  (state) => state.currentRoomKey
+);
 
-export const useUserCode = () => useAppSelector(selectUserCode);
+export const selectClientId = createSelector(
+  runtimeState,
+  (state) => state.roomData.clientId
+);
 
-export const useServerIsRunningOnProcessorHardware = () => useAppSelector(selectServerIsRunningOnProcessorHardware);
+export const selectSystemUuid = createSelector(
+  runtimeState,
+  (state) => state.roomData.systemUuid
+);
 
-export const useRuntimeInfo = () => useAppSelector(selectRuntimeInfo);
+export const selectUserCode = createSelector(
+  runtimeState,
+  (state) => state.roomData.userCode
+);
 
-export const useTouchpanelKey = () => useAppSelector(selectTouchpanelKey);
+export const selectServerIsRunningOnProcessorHardware = createSelector(
+  runtimeState,
+  (state) => state.serverIsRunningOnProcessorHardware
+);
 
-export const useIsTouchpanel = () => useAppSelector(selectIsTouchpanel);
+export const selectRuntimeInfo = createSelector(
+  runtimeState,
+  (state) => state.roomData.config?.runtimeInfo
+);
+
+export const selectTouchpanelKey = createSelector(
+  runtimeState,
+  (state) => state.touchpanelKey
+);
+
+export const selectIsTouchpanel = createSelector(
+  runtimeState,
+  (state) => state.touchpanelKey !== ''
+);
