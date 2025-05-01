@@ -11,7 +11,7 @@ export const selectRoomConfiguration = (roomKey: string) => createSelector(
 
 export const selectRooms = createSelector(
   roomsState,
-  (rooms) => rooms.rooms
+  (rooms) => rooms
 );
 
 export const selectRoomByKey = (roomKey: string) => createSelector(
