@@ -176,7 +176,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    */
   useEffect(() => {
     async function joinWebsocket() {
-      console.log('effect is running...actually');
+      console.log('Attempting to join websocket...');
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
 
       const tokenResult = await getRoomData(appConfig.apiPath);
