@@ -1,22 +1,15 @@
-import { DeviceState } from 'src/lib';
-import { useAppSelector } from '../hooks';
-import { selectAllDevices, selectDeviceByKey } from './devices.hooks';
+import { createSelector } from '@reduxjs/toolkit';
+import { RootState } from 'src/lib';
 
 
-/**
- * Selector for all devices
- * @returns Record<string, DeviceState>
- */
-export const useGetAllDevices = () => {
-  return useAppSelector(selectAllDevices);
-}
+const devicesConfigSlice = (state: RootState) => state.devices;
 
-/**
- * Selector for a single device
- * @param deviceKey 
- * @returns DeviceState or undefined
- */
-export function useGetDevice<T extends DeviceState = DeviceState>(deviceKey: string): T | undefined {
-  return useAppSelector(selectDeviceByKey(deviceKey)) as T | undefined;
-}
+export const selectAllDevices = createSelector(
+  devicesConfigSlice,
+  (devices) => devices
+);
 
+export const selectDeviceByKey = (deviceKey: string) => createSelector(
+  devicesConfigSlice,
+  (devices) => devices[deviceKey] ? devices[deviceKey] : undefined
+);

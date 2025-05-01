@@ -1,11 +1,25 @@
-import { useAppSelector } from '../hooks';
-import { selectApiPath, selectAppConfig, selectLogoPath, selectPartnerMetadata } from './appConfig.hooks';
+import { createSelector } from '@reduxjs/toolkit';
+import { AppConfigExtras, RootState } from 'src/lib';
 
-// Temporary cast to AppConfigExtras until the data is moved to a websocket message
-export const useAppConfig = () => useAppSelector(selectAppConfig);
 
-export const useApiPath = () => useAppSelector(selectApiPath);
+const appConfigSlice = (state: RootState) => state.appConfig;
 
-export const useLogoPath = () => useAppSelector(selectLogoPath);
+export const selectAppConfig = createSelector(
+  appConfigSlice,
+  (appConfig) => appConfig.config as AppConfigExtras
+);
 
-export const usePartnerMetadata = () => useAppSelector(selectPartnerMetadata)
+export const selectApiPath = createSelector(
+  appConfigSlice,
+  (appConfig) => appConfig.config.apiPath
+);
+
+export const selectLogoPath = createSelector(
+  appConfigSlice,
+  (appConfig) => appConfig.config.logoPath
+);
+
+export const selectPartnerMetadata = createSelector(
+  appConfigSlice,
+  (appConfig) => appConfig.config.partnerMetadata
+);
