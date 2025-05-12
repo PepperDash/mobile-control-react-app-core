@@ -40,7 +40,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   const serverIsRunningOnProcessorHardware = useServerIsRunningOnProcessorHardware();
   
   const clientRef = useRef<WebSocket | null>(null);
-  const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();
+  const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>();  
 
   /* HANDLERS *******************************************************/
 
@@ -170,6 +170,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
 
+  console.log("connection dependencies", appConfig.apiPath, getRoomData, token, waitingToReconnect, serverIsRunningOnProcessorHardware);
 
   /**
    * Connect to the websocket and get the room data when the apiPath changes
@@ -181,34 +182,42 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
       const tokenResult = await getRoomData(appConfig.apiPath);
 
-      if(!tokenResult) return;
+      if (!tokenResult) return;
+      
+      if (clientRef.current) {
+        console.log("websocket exists")
+        return;
+      }
+      
+      console.log("connecting to websocket");
 
-      if (!clientRef.current) {
-        console.log("connecting to websocket");
+      const wsPath = appConfig.apiPath.replace("http", "ws");
+      const url = `${wsPath}/ui/join/${token}`;
 
-        const wsPath = appConfig.apiPath.replace("http", "ws");
-        const url = `${wsPath}/ui/join/${token}`;
+      const newWs = new WebSocket(url);
 
-        const newWs = new WebSocket(url);
+      clientRef.current = newWs;
 
-        clientRef.current = newWs;
+      newWs.onopen = (ev: Event) => {
+        console.log("connected", ev.type, ev.target);
+        store.dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
+      };
 
-        newWs.onopen = (ev: Event) => {
-          console.log("connected", ev.type, ev.target);
-          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
-        };
+      newWs.onerror = (err) => {
+        console.error('Websocket error', err);
+      };
 
-        newWs.onerror = (err) => {
-          console.error('Websocket error', err);
-        };
+      newWs.onclose = (closeEvent: CloseEvent): void => {
+        console.log("disconnected: ", closeEvent.reason, closeEvent.code);
 
-        newWs.onclose = (closeEvent: CloseEvent): void => {
-          console.log("disconnected: ", closeEvent.reason, closeEvent.code);
+        setWaitingToReconnect(true);
 
-          if (closeEvent.code === 4000) {
-            console.log("user code changed");
-            store.dispatch(runtimeConfigActions.setUserCode({ userCode: '', qrUrl: ''}));
-            store.dispatch(uiActions.setErrorMessage("User code changed. Click reconnect to enter the new code"));
+        // Handle explicit client-side close from useEffect cleanup
+          if (closeEvent.code === 4100) { // Code used in clientRef.current.close() in useEffect cleanup
+            console.log("WebSocket closed by client (useEffect cleanup).");
+            // No need to set waitingToReconnect, as the useEffect will handle re-triggering connection if necessary.
+            // The store will be repopulated by getRoomData on successful reconnection.
+            // If immediate clearing of device/room state is desired here, it can be added.
             store.dispatch(uiActions.setShowReconnect(true));
             store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
             store.dispatch(devicesActions.clearDevices());
@@ -216,135 +225,144 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
 
-          if (closeEvent.code === 4001 && !serverIsRunningOnProcessorHardware) {
-            console.log("processor disconnected");
-            store.dispatch(uiActions.setErrorMessage("Processor has disconnected. Click Reconnect"));
-            store.dispatch(uiActions.setShowReconnect(true));
-            store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-            store.dispatch(devicesActions.clearDevices());
-            store.dispatch(roomsActions.clearRooms());
-            return;
-          }
-
-          if (closeEvent.code === 4002) {
-            console.log("room combination changed");
-            store.dispatch(uiActions.setErrorMessage("Room combination changed. Click Reconnect to re-join the room"));
-            store.dispatch(uiActions.setShowReconnect(true));
-            store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-            store.dispatch(devicesActions.clearDevices());
-            store.dispatch(roomsActions.clearRooms());
-            return;
-          }          
-
-          if (clientRef.current) {
-            console.log("WebSocket closed by server.");
-          } else {
-            console.log("WebSocket closed by client.");
-            return;
-          }
-
-          console.log('websocket waitingToReconnect', waitingToReconnect);
-          if (waitingToReconnect) {
-            return;
-          }
-          
-          console.log('websocket clearing state on disconnect');
+        if (closeEvent.code === 4000) {
+          console.log("user code changed");
+          store.dispatch(runtimeConfigActions.setUserCode({ userCode: '', qrUrl: ''}));
+          store.dispatch(uiActions.setErrorMessage("User code changed. Click reconnect to enter the new code"));
+          store.dispatch(uiActions.setShowReconnect(true));
           store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
           store.dispatch(devicesActions.clearDevices());
-          store.dispatch(roomsActions.clearRooms());          
+          store.dispatch(roomsActions.clearRooms());
+          return;
+        }
 
-          setWaitingToReconnect(true);
+        if (closeEvent.code === 4001 && !serverIsRunningOnProcessorHardware) {
+          console.log("processor disconnected");
+          store.dispatch(uiActions.setErrorMessage("Processor has disconnected. Click Reconnect"));
+          store.dispatch(uiActions.setShowReconnect(true));
+          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+          store.dispatch(devicesActions.clearDevices());
+          store.dispatch(roomsActions.clearRooms());
+          return;
+        }
 
-          setTimeout(() => setWaitingToReconnect(undefined), 5000);
-        };
+        if (closeEvent.code === 4002) {
+          console.log("room combination changed");
+          store.dispatch(uiActions.setErrorMessage("Room combination changed. Click Reconnect to re-join the room"));
+          store.dispatch(uiActions.setShowReconnect(true));
+          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+          store.dispatch(devicesActions.clearDevices());
+          store.dispatch(roomsActions.clearRooms());
+          return;
+        }          
 
-        newWs.onmessage = (e) => {
-          try {
-            const message: Message = JSON.parse(e.data);
-            console.log(message);
+        if (clientRef.current) {
+          console.log("WebSocket closed by server.");
+        } else {
+          console.log("WebSocket closed by client.");
+          return;
+        }
 
-            if (message.type === 'close') // MC API sent a close message
-            {
-              newWs.close(4001, message.content as string);              
-              return;
-            }
-            if (message.type.startsWith("/system/")) {
-              switch (message.type) {          
-                case "/system/touchpanelKey":
-                  store.dispatch(
-                    runtimeConfigActions.setTouchpanelKey(
-                      message.content as string
-                    )
-                  );
-                  break;
-                case "/system/roomKey": {
-                  store.dispatch(roomsActions.clearRooms());
-                  store.dispatch(devicesActions.clearDevices());
-                  store.dispatch(
-                    runtimeConfigActions.setCurrentRoomKey(
-                      message.content as string
-                    )
-                  );
-                  break;
-                }
-                case "/system/userCodeChanged":
-                  store.dispatch(
-                    runtimeConfigActions.setUserCode(
-                      message.content as UserCode
-                    )
-                  );
-                  break;
-                case "/system/roomCombinationChanged":
-                  // TODO: Revisit if this is the right way to handle combination scenario changes
-                  window.location.reload();
-                  break;
-                default:
-                  console.log("unhandled system message", message);
-                  break;
-              }
-            } else if (message.type.startsWith("/event/")) {
-              console.log("event message received", message);
-              // const eventType = (message.content as EventContent).eventType;
-              // if (!eventType) return;
-              const handlers = eventHandlers.current[message.type];
+        console.log('websocket waitingToReconnect', waitingToReconnect);
+        if (waitingToReconnect) {
+          return;
+        }
+        
+        console.log('websocket clearing state on disconnect');
+        store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+        store.dispatch(devicesActions.clearDevices());
+        store.dispatch(roomsActions.clearRooms());        
 
-              if (!handlers) {
-                console.log("no handlers found for event type", message.type);
-              }
+        setTimeout(() => setWaitingToReconnect(undefined), 5000);
+      };
 
-              if (handlers) {
-                Object.values(handlers).forEach((handler) => {
-                  try {
-                    handler(message);
-                  } catch (err) {
-                    console.error(err);
-                  }
-                });
-              }
-            } else if (message.type.startsWith("/room/")) {
-              store.dispatch(roomsActions.setRoomState(message));
-            } else if (message.type.startsWith("/device/")) {
-              store.dispatch(devicesActions.setDeviceState(message));
-            }
-          } catch (err) {
-            console.error('websocket message handling error', err);
+      newWs.onmessage = (e) => {
+        try {
+          const message: Message = JSON.parse(e.data);
+          console.log(message);
+
+          if (message.type === 'close') // MC API sent a close message
+          {
+            newWs.close(4001, message.content as string);              
+            return;
           }
-        };
-      }
+          if (message.type.startsWith("/system/")) {
+            switch (message.type) {          
+              case "/system/touchpanelKey":
+                store.dispatch(
+                  runtimeConfigActions.setTouchpanelKey(
+                    message.content as string
+                  )
+                );
+                break;
+              case "/system/roomKey": {
+                store.dispatch(roomsActions.clearRooms());
+                store.dispatch(devicesActions.clearDevices());
+                store.dispatch(
+                  runtimeConfigActions.setCurrentRoomKey(
+                    message.content as string
+                  )
+                );
+                break;
+              }
+              case "/system/userCodeChanged":
+                store.dispatch(
+                  runtimeConfigActions.setUserCode(
+                    message.content as UserCode
+                  )
+                );
+                break;
+              case "/system/roomCombinationChanged":
+                // TODO: Revisit if this is the right way to handle combination scenario changes
+                window.location.reload();
+                break;
+              default:
+                console.log("unhandled system message", message);
+                break;
+            }
+          } else if (message.type.startsWith("/event/")) {
+            console.log("event message received", message);
+            // const eventType = (message.content as EventContent).eventType;
+            // if (!eventType) return;
+            const handlers = eventHandlers.current[message.type];
+
+            if (!handlers) {
+              console.log("no handlers found for event type", message.type);
+            }
+
+            if (handlers) {
+              Object.values(handlers).forEach((handler) => {
+                try {
+                  handler(message);
+                } catch (err) {
+                  console.error(err);
+                }
+              });
+            }
+          } else if (message.type.startsWith("/room/")) {
+            store.dispatch(roomsActions.setRoomState(message));
+          } else if (message.type.startsWith("/device/")) {
+            store.dispatch(devicesActions.setDeviceState(message));
+          }
+        } catch (err) {
+          console.error('websocket message handling error', err);
+        }
+      };
+      
     }
 
     joinWebsocket();
 
     console.log(`App mode: ${import.meta.env.MODE}`);
     console.log(`Is dev mode: ${import.meta.env.DEV}`);
+
     // Cleanup first websocket in dev mode due to double render cycle
     return () => {
       if (clientRef.current) {
         console.log("closing websocket dev mode");
         clientRef.current.close(4100, 'app running in dev mode');
+        clientRef.current = null;
       }
-
-      clientRef.current = null;
     };
     
   }, [appConfig.apiPath, getRoomData, token, waitingToReconnect, serverIsRunningOnProcessorHardware]);
