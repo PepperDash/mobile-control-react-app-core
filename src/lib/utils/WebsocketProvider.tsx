@@ -184,7 +184,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
       if (!tokenResult) return;
       
-      if(clientRef.current){
+      if (clientRef.current) {
         console.log("websocket exists")
         return;
       }
