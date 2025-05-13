@@ -3,7 +3,7 @@ import { IconProps, MultiStateIconContainer } from "../../Buttons";
 export const IconMultiRoomPC = ({
   active,
   // Just to shut up the linter on this template. Prefer deleting this lint rule
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   className = "",
   disabled,
 }: IconProps) => (

@@ -25,7 +25,7 @@ export const useRoomName = (roomKey: string) =>
   useAppSelector(selectRoomName(roomKey)
   );
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export const useRoomVolume = (roomKey: string, volumeKey: RoomVolumeType) =>
   useAppSelector(selectRoomVolume(roomKey, volumeKey)
   );

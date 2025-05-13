@@ -1,10 +1,10 @@
-import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
+import { useButtonHeldHeartbeat } from '../useButtonHeldHeartbeat';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
 /**
  * hook that controls a device that implements the ITransport interface
  * @param key key of the device
- * @returns 
+ * @returns
  */
 export function useITransport(key: string): ITransportProps | undefined {
   const path = `/device/${key}`;
@@ -25,7 +25,16 @@ export function useITransport(key: string): ITransportProps | undefined {
 
   const record = useButtonHeldHeartbeat(path, 'record');
 
-  return { play, pause, stop, prevTrack, nextTrack, rewind, fastForward, record };
+  return {
+    play,
+    pause,
+    stop,
+    prevTrack,
+    nextTrack,
+    rewind,
+    fastForward,
+    record,
+  };
 }
 
 interface ITransportProps {

@@ -208,22 +208,24 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       };
 
       newWs.onclose = (closeEvent: CloseEvent): void => {
-        console.log("disconnected: ", closeEvent.reason, closeEvent.code);
-
-        setWaitingToReconnect(true);
+        console.log("disconnected: ", closeEvent.reason, closeEvent.code);        
 
         // Handle explicit client-side close from useEffect cleanup
-          if (closeEvent.code === 4100) { // Code used in clientRef.current.close() in useEffect cleanup
-            console.log("WebSocket closed by client (useEffect cleanup).");
-            // No need to set waitingToReconnect, as the useEffect will handle re-triggering connection if necessary.
-            // The store will be repopulated by getRoomData on successful reconnection.
-            // If immediate clearing of device/room state is desired here, it can be added.
-            store.dispatch(uiActions.setShowReconnect(true));
-            store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-            store.dispatch(devicesActions.clearDevices());
-            store.dispatch(roomsActions.clearRooms());
-            return;
-          }
+        if (closeEvent.code === 4100) { // Code used in clientRef.current.close() in useEffect cleanup
+          console.log("WebSocket closed by client (useEffect cleanup).");
+          // No need to set waitingToReconnect, as the useEffect will handle re-triggering connection if necessary.
+          // The store will be repopulated by getRoomData on successful reconnection.
+          // If immediate clearing of device/room state is desired here, it can be added.
+          store.dispatch(uiActions.setShowReconnect(true));
+          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+          store.dispatch(devicesActions.clearDevices());
+          store.dispatch(roomsActions.clearRooms());
+          return;
+        }
+
+        // Set waitingToReconnect to true for all cases except explicit client-side closures (code 4100),
+        // which are handled separately above.
+        setWaitingToReconnect(true);
 
         if (closeEvent.code === 4000) {
           console.log("user code changed");

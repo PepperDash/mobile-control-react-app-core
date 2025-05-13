@@ -1,0 +1,26 @@
+{
+  "eslint.validate": ["javascript", "typescript", "html"],
+  "eslint.options": {
+    "extensions": [".js", ".ts", "html", "tsx"]
+  },
+  "eslint.rules.customizations": [
+    {
+      "rule": "prettier/prettier",
+      "severity": "info"
+    }
+  ],
+  "editor.codeActionsOnSave": [
+    "source.organizeImports",
+    "source.fixAll.eslint"
+  ],
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "editor.linkedEditing": true,
+  "prettier.jsxSingleQuote": false,
+  "prettier.singleQuote": true
+}
