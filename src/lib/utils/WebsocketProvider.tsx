@@ -223,6 +223,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
+        // Set waitingToReconnect to true for all cases except explicit client-side closures (code 4100),
+        // which are handled separately above.
         setWaitingToReconnect(true);
 
         if (closeEvent.code === 4000) {
