@@ -1,10 +1,10 @@
-import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
+import { useButtonHeldHeartbeat } from '../useButtonHeldHeartbeat';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
 /**
  * hook to control a device that implements the ISetTopBoxControls interface
  * @param key key of the device
- * @returns 
+ * @returns
  */
 export function useISetTopBoxControls(key: string): ISetTopBoxControlsProps {
   const path = `/device/${key}`;
@@ -12,7 +12,6 @@ export function useISetTopBoxControls(key: string): ISetTopBoxControlsProps {
   const dvrList = useButtonHeldHeartbeat(path, 'chanUp');
 
   const replay = useButtonHeldHeartbeat(path, 'chanDown');
-
 
   return { dvrList, replay };
 }

@@ -1,13 +1,12 @@
-import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
+import { useButtonHeldHeartbeat } from '../useButtonHeldHeartbeat';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
 /**
  * hook to return the functions to trigger for a numeric keypad for a device that implements the INumeric interface
  * @param key device key
- * @returns 
+ * @returns
  */
-export function useINumeric(key: string): INumericProps  {
-
+export function useINumeric(key: string): INumericProps {
   const path = `/device/${key}`;
 
   const digit0 = useButtonHeldHeartbeat(path, 'num0');
@@ -34,7 +33,20 @@ export function useINumeric(key: string): INumericProps  {
 
   const keypadAccessoryButton2 = useButtonHeldHeartbeat(path, 'numEnter');
 
-  return { digit0, digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, digit9, keypadAccessoryButton1, keypadAccessoryButton2 };
+  return {
+    digit0,
+    digit1,
+    digit2,
+    digit3,
+    digit4,
+    digit5,
+    digit6,
+    digit7,
+    digit8,
+    digit9,
+    keypadAccessoryButton1,
+    keypadAccessoryButton2,
+  };
 }
 
 export interface INumericProps {

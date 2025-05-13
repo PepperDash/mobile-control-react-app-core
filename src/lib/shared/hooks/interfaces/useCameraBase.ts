@@ -1,15 +1,19 @@
-import { CameraState, PressHoldReleaseReturn, useGetDevice, useWebsocketContext } from 'src/lib';
-import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
+import {
+  CameraState,
+  PressHoldReleaseReturn,
+  useGetDevice,
+  useWebsocketContext,
+} from 'src/lib';
+import { useButtonHeldHeartbeat } from '../useButtonHeldHeartbeat';
 
 /**
  * Provides a set of hooks to control a device that extends the CameraBase class
  * @param key key of the device
  */
-export function useCameraBase(key: string): CameraBaseProps | undefined{
+export function useCameraBase(key: string): CameraBaseProps | undefined {
   const { sendMessage } = useWebsocketContext();
   const path = `/device/${key}`;
   const cameraState = useGetDevice<CameraState>(key);
-
 
   const up = useButtonHeldHeartbeat(path, 'cameraUp');
   const down = useButtonHeldHeartbeat(path, 'cameraDown');
@@ -18,12 +22,21 @@ export function useCameraBase(key: string): CameraBaseProps | undefined{
   const zoomIn = useButtonHeldHeartbeat(path, 'cameraZoomIn');
   const zoomOut = useButtonHeldHeartbeat(path, 'cameraZoomOut');
 
-  const recallPreset = (presetNumber: number) => sendMessage('/camera/recallPreset', presetNumber);
+  const recallPreset = (presetNumber: number) =>
+    sendMessage('/camera/recallPreset', presetNumber);
 
+  if (!cameraState) return undefined;
 
-  if(!cameraState) return undefined;
-
-  return { state: cameraState, zoomIn, zoomOut, up, down, left, right, recallPreset};
+  return {
+    state: cameraState,
+    zoomIn,
+    zoomOut,
+    up,
+    down,
+    left,
+    right,
+    recallPreset,
+  };
 }
 
 export interface CameraBaseProps {

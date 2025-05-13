@@ -1,14 +1,13 @@
-import { useButtonHeldHeartbeat } from '../useHeldButtonAction';
+import { useButtonHeldHeartbeat } from '../useButtonHeldHeartbeat';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 
 /**
  * hook to control a device that implements the IDvr interface
  * @param key key of the device
- * @returns 
+ * @returns
  */
 export function useIDvr(key: string): IDvrProps | undefined {
   const path = `/device/${key}`;
-
 
   const dvrList = useButtonHeldHeartbeat(path, 'dvrList');
 
@@ -21,6 +20,3 @@ interface IDvrProps {
   dvrList: PressHoldReleaseReturn;
   record: PressHoldReleaseReturn;
 }
-
-
-
