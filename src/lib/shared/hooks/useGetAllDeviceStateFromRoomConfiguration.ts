@@ -1,91 +1,96 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 import { RoomConfiguration } from 'src/lib/types/state/state';
 import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
 
-
 /**
  * This hook will gather up all the keys for devices in the room
- * and  send messages to the websocket to get the iniital state 
+ * and  send messages to the websocket to get the iniital state
  * for each device
  */
-export const useGetAllDeviceStateFromRoomConfiguration = ({config}: {config: RoomConfiguration | undefined}) => {
+export const useGetAllDeviceStateFromRoomConfiguration = ({
+  config,
+}: {
+  config: RoomConfiguration | undefined;
+}) => {
   const { sendMessage } = useWebsocketContext();
 
   useEffect(() => {
     if (!config) {
-      return
+      return;
     }
 
-    const deviceKeys = []
-   
+    const deviceKeysSet: Set<string> = new Set<string>();
+
     if (config.destinations) {
       Object.values(config.destinations).forEach((d) => {
-        deviceKeys.push(d);
+        deviceKeysSet.add(d);
       });
     }
 
     if (config.destinationList) {
       Object.values(config.destinationList).forEach((dli) => {
-        deviceKeys.push(dli.sinkKey);
+        deviceKeysSet.add(dli.sinkKey);
       });
     }
 
-    if(config.audioControlPointList) {
-      Object.values(config.audioControlPointList?.levelControls).forEach((lcl) => {
-        // if the level control has an item key, combine it with the parent device key
-        if(lcl.itemKey) {
-          deviceKeys.push(lcl.parentDeviceKey + "--" + lcl.itemKey);
-        } else {
-          deviceKeys.push(lcl.parentDeviceKey);
+    if (config.audioControlPointList) {
+      Object.values(config.audioControlPointList?.levelControls).forEach(
+        (lcl) => {
+          // if the level control has an item key, combine it with the parent device key
+          if (lcl.itemKey) {
+            deviceKeysSet.add(lcl.parentDeviceKey + '--' + lcl.itemKey);
+          } else {
+            deviceKeysSet.add(lcl.parentDeviceKey);
+          }
         }
-      });
+      );
     }
 
     config.touchpanelKeys?.forEach((d) => {
-      deviceKeys.push(d);
+      deviceKeysSet.add(d);
     });
 
     config.environmentalDevices?.forEach((d) => {
-      deviceKeys.push(d.deviceKey);
+      if (d.deviceKey) deviceKeysSet.add(d.deviceKey);
     });
 
     config.accessoryDeviceKeys?.forEach((d) => {
-      deviceKeys.push(d);
+      deviceKeysSet.add(d);
     });
 
     if (config.audioCodecKey) {
-      deviceKeys.push(config.audioCodecKey);
+      deviceKeysSet.add(config.audioCodecKey);
     }
 
     if (config.videoCodecKey) {
-      deviceKeys.push(config.videoCodecKey);
+      deviceKeysSet.add(config.videoCodecKey);
     }
 
     if (config.matrixRoutingKey) {
-      deviceKeys.push(config.matrixRoutingKey);
+      deviceKeysSet.add(config.matrixRoutingKey);
     }
 
     if (config.roomCombinerKey) {
-      deviceKeys.push(config.roomCombinerKey);
+      deviceKeysSet.add(config.roomCombinerKey);
     }
 
     if (config.endpointKeys) {
       config.endpointKeys.forEach((ek) => {
-        deviceKeys.push(ek);
+        deviceKeysSet.add(ek);
       });
     }
-    
+
     if (config.sourceList) {
       for (const value of Object.values(config.sourceList)) {
         // if the source has a source key, add it to the list of device keys
-        if (value.sourceKey && value.sourceKey !== "$off")
-          deviceKeys.push(value.sourceKey);
+        if (value.sourceKey && value.sourceKey !== '$off')
+          deviceKeysSet.add(value.sourceKey);
       }
     }
 
-    console.log("deviceKeys", deviceKeys);
+    console.log('requesting state for deviceKeys:', deviceKeysSet);
 
-    deviceKeys.forEach((dk) => {
+    deviceKeysSet.forEach((dk) => {
       sendMessage(`/device/${dk}/fullStatus`, { deviceKey: dk });
     });
   }, [config, sendMessage]);
