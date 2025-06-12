@@ -19,25 +19,17 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({
       return;
     }
 
-    const deviceKeys: string[] = [];
-
-    // Helper function to push device keys into the array and avoid duplicates
-    // Also, avoid pushing '$off' as a device key
-    function pushDeviceKey(key: string) {
-      if (key && key !== '$off' && !deviceKeys.includes(key)) {
-        deviceKeys.push(key);
-      }
-    }
+    const deviceKeysSet: Set<string> = new Set<string>();
 
     if (config.destinations) {
       Object.values(config.destinations).forEach((d) => {
-        pushDeviceKey(d);
+        deviceKeysSet.add(d);
       });
     }
 
     if (config.destinationList) {
       Object.values(config.destinationList).forEach((dli) => {
-        pushDeviceKey(dli.sinkKey);
+        deviceKeysSet.add(dli.sinkKey);
       });
     }
 
@@ -46,45 +38,45 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({
         (lcl) => {
           // if the level control has an item key, combine it with the parent device key
           if (lcl.itemKey) {
-            pushDeviceKey(lcl.parentDeviceKey + '--' + lcl.itemKey);
+            deviceKeysSet.add(lcl.parentDeviceKey + '--' + lcl.itemKey);
           } else {
-            pushDeviceKey(lcl.parentDeviceKey);
+            deviceKeysSet.add(lcl.parentDeviceKey);
           }
         }
       );
     }
 
     config.touchpanelKeys?.forEach((d) => {
-      pushDeviceKey(d);
+      deviceKeysSet.add(d);
     });
 
     config.environmentalDevices?.forEach((d) => {
-      if (d.deviceKey) pushDeviceKey(d.deviceKey);
+      if (d.deviceKey) deviceKeysSet.add(d.deviceKey);
     });
 
     config.accessoryDeviceKeys?.forEach((d) => {
-      pushDeviceKey(d);
+      deviceKeysSet.add(d);
     });
 
     if (config.audioCodecKey) {
-      pushDeviceKey(config.audioCodecKey);
+      deviceKeysSet.add(config.audioCodecKey);
     }
 
     if (config.videoCodecKey) {
-      pushDeviceKey(config.videoCodecKey);
+      deviceKeysSet.add(config.videoCodecKey);
     }
 
     if (config.matrixRoutingKey) {
-      pushDeviceKey(config.matrixRoutingKey);
+      deviceKeysSet.add(config.matrixRoutingKey);
     }
 
     if (config.roomCombinerKey) {
-      pushDeviceKey(config.roomCombinerKey);
+      deviceKeysSet.add(config.roomCombinerKey);
     }
 
     if (config.endpointKeys) {
       config.endpointKeys.forEach((ek) => {
-        pushDeviceKey(ek);
+        deviceKeysSet.add(ek);
       });
     }
 
@@ -92,13 +84,13 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({
       for (const value of Object.values(config.sourceList)) {
         // if the source has a source key, add it to the list of device keys
         if (value.sourceKey && value.sourceKey !== '$off')
-          pushDeviceKey(value.sourceKey);
+          deviceKeysSet.add(value.sourceKey);
       }
     }
 
-    console.log('requesting state for deviceKeys:', deviceKeys);
+    console.log('requesting state for deviceKeys:', deviceKeysSet);
 
-    deviceKeys.forEach((dk) => {
+    deviceKeysSet.forEach((dk) => {
       sendMessage(`/device/${dk}/fullStatus`, { deviceKey: dk });
     });
   }, [config, sendMessage]);
