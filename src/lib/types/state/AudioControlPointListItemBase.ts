@@ -7,4 +7,5 @@ export interface AudioControlPointListItemBase {
   includeInUserList: boolean;
   order: number;
   isMic?: boolean;
+  showRawLevel?: boolean;
 }
