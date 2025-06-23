@@ -6,4 +6,5 @@ export interface AudioControlPointListItemBase {
   preferredName: string;
   includeInUserList: boolean;
   order: number;
+  isMic?: boolean;
 }

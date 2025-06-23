@@ -34,6 +34,7 @@ export interface DeviceState extends IKeyName {
 
   /**
    * For future use
+   * @deprecated This property is deprecated and will be removed in future versions.
    */
   state: unknown;
 
