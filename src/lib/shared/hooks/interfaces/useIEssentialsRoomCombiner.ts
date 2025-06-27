@@ -9,7 +9,7 @@ import { useWebsocketContext } from 'src/lib/utils';
  */
 export function useIEssentialsRoomCombiner(key: string): IEssentialsRoomCombinerReturn | undefined {
   const { sendMessage } = useWebsocketContext();
-  const roomCombinerState = useGetDevice(key) as IEssentialsRoomCombinerState | undefined;
+  const roomCombinerState = useGetDevice<IEssentialsRoomCombinerState>(key);
 
   if (!roomCombinerState) return undefined;
 

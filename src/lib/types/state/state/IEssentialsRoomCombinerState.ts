@@ -3,6 +3,7 @@ import { DeviceState } from './DeviceState';
 
 
 export interface IEssentialsRoomCombinerState extends DeviceState {
+  disableAutoMode: boolean;
   isInAutoMode: boolean;
   currentScenario: RoomCombinationScenario;
   rooms: IKeyName[];
