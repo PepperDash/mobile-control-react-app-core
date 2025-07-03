@@ -11,6 +11,28 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
+      - name: Get branch name
+        id: get_branch
+        run: |
+          branch=${GITHUB_REF#refs/heads/}
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+          echo "prerelease=${branch//\//-}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_REF: ${{ github.ref }}
+      - name: Replace branch name in .releaserc.json
+        if: steps.get_branch.outputs.branch != 'main'
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: 'replace-me-feature-branch'
+          replace: '${{ steps.get_branch.outputs.branch }}'
+          include: '.releaserc.json'
+      - name: Replace prerelease name in .releaserc.json
+        if: steps.get_branch.outputs.branch != 'main'
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: 'replace-me-prerelease'
+          replace: '${{ steps.get_branch.outputs.prerelease }}'
+          include: '.releaserc.json'
       - name: install packages
         run: npm ci
       - name: build
