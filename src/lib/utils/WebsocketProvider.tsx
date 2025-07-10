@@ -399,6 +399,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     token,
     waitingToReconnect,
     serverIsRunningOnProcessorHardware,
+    clientId,
   ]);
 
   /**
