@@ -9,6 +9,11 @@
     {
       "name": "development",
       "prerelease": "beta"
+    },
+    {
+      "name": "replace-me-feature-branch",
+      "prerelease": "replace-me-prerelease",
+      "channel": "replace-me-prerelease"
     }
   ]
 }
