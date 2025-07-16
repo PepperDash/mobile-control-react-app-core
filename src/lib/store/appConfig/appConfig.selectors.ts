@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { AppConfigExtras, RootState } from 'src/lib';
+import { AppConfigExtras, RootState } from '../..';
 
 
 const appConfigSlice = (state: RootState) => state.appConfig;

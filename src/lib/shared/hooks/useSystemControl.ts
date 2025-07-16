@@ -1,4 +1,4 @@
-import { useWebsocketContext } from 'src/lib';
+import { useWebsocketContext } from '../..';
 
 export function useSystemControl() {
   const { sendMessage } = useWebsocketContext();

@@ -1,4 +1,4 @@
-import { DeviceState } from 'src/lib';
+import { DeviceState } from './DeviceState';
 import { Volume } from '../volume/volume';
 
 export interface IBasicVolumeWithFeedbackState extends DeviceState {

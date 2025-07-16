@@ -1,4 +1,4 @@
-import { DeviceState } from 'src/lib';
+import { DeviceState } from '../..';
 import { useAppSelector } from '../hooks';
 import { selectAllDevices, selectDeviceByKey } from './devices.selectors';
 

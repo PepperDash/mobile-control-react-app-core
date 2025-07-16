@@ -1,5 +1,5 @@
-import { useRoomVolume } from 'src/lib/store';
-import { RoomVolumeType } from 'src/lib/types';
+import { useRoomVolume } from '../../store';
+import { RoomVolumeType } from '../../types';
 import { useIBasicVolumeWithFeedback } from './interfaces/useIBasicVolumeWithFeedback';
 
 /**

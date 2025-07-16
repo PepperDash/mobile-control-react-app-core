@@ -1,6 +1,6 @@
-import { useGetDevice, useRoomLevelControls } from 'src/lib/store';
-import { LevelControlsState } from 'src/lib/types/state/state/LevelControlsState';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useGetDevice, useRoomLevelControls } from '../../../store';
+import { LevelControlsState } from '../../../types/state/state/LevelControlsState';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook that controls a device that implements the ILevelControls interface

@@ -1,4 +1,4 @@
-import { InterfaceNames } from 'src/lib/shared';
+import { InterfaceNames } from '../../../shared';
 import { IKeyName } from '../../interfaces/IKeyName';
 import { CommunicationMonitorState } from './CommunicationMonitorState';
 

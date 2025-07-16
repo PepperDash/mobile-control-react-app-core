@@ -1,4 +1,4 @@
-import { IKeyName, useWebsocketContext } from 'src/lib';
+import { IKeyName, useWebsocketContext } from '../../..';
 
 /**
  * hook to control a device that implements the IDspPresets interface

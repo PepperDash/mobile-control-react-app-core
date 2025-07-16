@@ -1,7 +1,7 @@
-import { useGetDevice } from 'src/lib/store';
-import { PowerState } from 'src/lib/types';
-import { IHasInputsState } from 'src/lib/types/state/state/IHasInputsState';
-import { IHasSurroundSoundModesState } from 'src/lib/types/state/state/IHasSurroundSoundModesState';
+import { useGetDevice } from '../../../store';
+import { PowerState } from '../../../types';
+import { IHasInputsState } from '../../../types/state/state/IHasInputsState';
+import { IHasSurroundSoundModesState } from '../../../types/state/state/IHasSurroundSoundModesState';
 import { useDeviceIBasicVolumeWithFeedback } from '../useDeviceIBasicVolumeWithFeedback';
 import { IBasicVolumeWithFeedbackReturn } from './useIBasicVolumeWithFeedback';
 import { IHasPowerWithFeedbackProps, useIHasPowerControl } from './useIHasPowerControl';

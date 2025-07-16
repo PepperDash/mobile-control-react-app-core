@@ -1,6 +1,6 @@
-import { useGetDevice } from "src/lib/store";
-import { DisplayState } from "src/lib/types";
-import { IHasInputsState } from 'src/lib/types/state/state/IHasInputsState';
+import { useGetDevice } from "../../../store";
+import { DisplayState } from "../../../types";
+import { IHasInputsState } from '../../../types/state/state/IHasInputsState';
 import {
   IHasPowerWithFeedbackProps,
   useIHasPowerControl,

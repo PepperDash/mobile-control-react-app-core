@@ -1,4 +1,4 @@
-import { useWebsocketContext } from "src/lib/utils";
+import { useWebsocketContext } from "../../../utils";
 
 /**
  * hook to control a room that implements the IRunDefaultPresentRoute interface

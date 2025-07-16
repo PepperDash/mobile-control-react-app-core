@@ -1,5 +1,5 @@
-import { DevicePresetsState, PresetChannel, useGetDevice } from 'src/lib';
-import { useWebsocketContext } from 'src/lib/utils';
+import { DevicePresetsState, PresetChannel, useGetDevice } from '../../..';
+import { useWebsocketContext } from '../../../utils';
 
 
 export function useDevicePresetsModel(key: string): DevicePresetsModelProps | undefined {
