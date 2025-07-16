@@ -1,4 +1,4 @@
-import { IconNames } from 'src/lib/shared/Icons/iconsDictionary';
+import { IconNames } from '../../shared/Icons/iconsDictionary';
 import { Device } from './device';
 
 export interface SourceListItem {

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useWebsocketContext } from '../../utils/useWebsocketContext';
 import { usePressHoldRelease } from './usePressHoldRelease';
 
 /**

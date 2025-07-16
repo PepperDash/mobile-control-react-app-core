@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { RoomConfiguration } from 'src/lib/types/state/state';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { RoomConfiguration } from '../../types/state/state';
+import { useWebsocketContext } from '../../utils/useWebsocketContext';
 
 /**
  * This hook will gather up all the keys for devices in the room

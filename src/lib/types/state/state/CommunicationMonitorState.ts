@@ -1,4 +1,4 @@
-import { DeviceState } from 'src/lib';
+import { DeviceState } from './DeviceState';
 
 export type MonitorStatus = 'StatusUnknown' | 'IsOk' | 'InWarning' | 'InError';
 

@@ -1,5 +1,5 @@
-import { useGetDevice } from 'src/lib/store';
-import { IBasicVolumeWithFeedbackState } from 'src/lib/types/state/state/IBasicVolumeWithFeedbackState';
+import { useGetDevice } from '../../store';
+import { IBasicVolumeWithFeedbackState } from '../../types/state/state/IBasicVolumeWithFeedbackState';
 import { useIBasicVolumeWithFeedback } from './interfaces/useIBasicVolumeWithFeedback';
 
 /**

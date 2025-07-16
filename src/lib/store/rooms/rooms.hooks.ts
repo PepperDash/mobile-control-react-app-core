@@ -1,6 +1,6 @@
-import { selectRoomDisplayStates } from 'src/lib';
-import { RoomVolumeType } from 'src/lib/types';
-import { LevelControlsState, RoomConfiguration, RoomState } from "src/lib/types/state/state";
+import { selectRoomDisplayStates } from '../..';
+import { RoomVolumeType } from '../../types';
+import { LevelControlsState, RoomConfiguration, RoomState } from "../../types/state/state";
 import { useAppSelector } from "../hooks";
 import { selectRoomAdvancedSharingActive, selectRoomAudioControlPointList, selectRoomByKey, selectRoomCodecContentDestinationKey, selectRoomConfiguration, selectRoomDestinationList, selectRoomDestinations, selectRoomEnvironmentalDevices, selectRoomInCall, selectRoomIsCoolingDown, selectRoomIsOn, selectRoomIsWarmingUp, selectRoomLevelControls, selectRoomName, selectRoomProgramAudioDestinationKey, selectRooms, selectRoomShareState, selectRoomSourceList, selectRoomVolume, selectZoomRoomControllerKey } from './rooms.selectors';
 

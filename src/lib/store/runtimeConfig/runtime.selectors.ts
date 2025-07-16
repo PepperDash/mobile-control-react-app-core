@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from 'src/lib';
+import { RootState } from '../..';
 
 
 const runtimeState = (state: RootState) => state.runtimeConfig;

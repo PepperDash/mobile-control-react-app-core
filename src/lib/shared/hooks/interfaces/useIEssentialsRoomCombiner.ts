@@ -1,6 +1,6 @@
-import { useGetDevice } from 'src/lib/store';
-import { IEssentialsRoomCombinerState } from 'src/lib/types/state/state/IEssentialsRoomCombinerState';
-import { useWebsocketContext } from 'src/lib/utils';
+import { useGetDevice } from '../../../store';
+import { IEssentialsRoomCombinerState } from '../../../types/state/state/IEssentialsRoomCombinerState';
+import { useWebsocketContext } from '../../../utils';
 
 /**
  * hook to control a device that implements the IEssentialsRoomCombiner interface

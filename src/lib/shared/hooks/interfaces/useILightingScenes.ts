@@ -1,6 +1,6 @@
-import { useGetDevice } from 'src/lib/store';
-import { LightingScene, LightingState } from 'src/lib/types';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useGetDevice } from '../../../store';
+import { LightingScene, LightingState } from '../../../types';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook to control a device that implements the ILightingScenes interface

@@ -1,5 +1,5 @@
-import { useGetDevice } from 'src/lib';
-import { ITHumiditySensorState } from 'src/lib/types/state/state/IHumiditySensorState';
+import { useGetDevice } from '../../..';
+import { ITHumiditySensorState } from '../../../types/state/state/IHumiditySensorState';
 
 /**
  * A hook that provides access to the humidity sensor state

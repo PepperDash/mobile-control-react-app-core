@@ -1,5 +1,5 @@
-import { ScheduleEvent, ScheduleState, useRoomState } from 'src/lib';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { ScheduleEvent, ScheduleState, useRoomState } from '../../..';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 
 /**

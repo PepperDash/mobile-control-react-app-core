@@ -1,5 +1,5 @@
-import { LevelControlsState, Volume, useGetDevice } from 'src/lib';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { LevelControlsState, Volume, useGetDevice } from '../../..';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook to control a device that implements the IHasSurroundChannels interface

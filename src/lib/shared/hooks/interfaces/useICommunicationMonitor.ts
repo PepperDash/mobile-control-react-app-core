@@ -1,4 +1,4 @@
-import { CommunicationMonitorState, useGetDevice } from 'src/lib';
+import { CommunicationMonitorState, useGetDevice } from '../../..';
 
 
 /**

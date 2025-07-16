@@ -1,6 +1,6 @@
-import { useGetDevice } from "src/lib";
-import { MobileControlTouchpanelState } from "src/lib/types/state/state/MobileControlTouchpanelState";
-import { useWebsocketContext } from "src/lib/utils";
+import { useGetDevice } from "../../..";
+import { MobileControlTouchpanelState } from "../../../types/state/state/MobileControlTouchpanelState";
+import { useWebsocketContext } from "../../../utils";
 
 /**
  * hook that controls a device that implements the ITheme interface

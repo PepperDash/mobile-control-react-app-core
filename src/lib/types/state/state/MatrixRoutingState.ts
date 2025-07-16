@@ -1,4 +1,4 @@
-import { SignalType } from 'src/lib/shared';
+import { SignalType } from '../../../shared';
 import { IKeyName } from '../../interfaces';
 import { IOnline } from '../../interfaces/IOnline';
 import { DeviceState } from './DeviceState';

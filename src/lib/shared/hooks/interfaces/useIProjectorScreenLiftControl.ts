@@ -1,4 +1,4 @@
-import { IProjectorScreenLiftControlState, useGetDevice, useWebsocketContext } from 'src/lib';
+import { IProjectorScreenLiftControlState, useGetDevice, useWebsocketContext } from '../../..';
 
 /**
  * hook to control a device that implements the IProjectorScreenLiftControl interface

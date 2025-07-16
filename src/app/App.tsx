@@ -1,4 +1,4 @@
-import IconLibrary from 'src/lib/shared/Icons/IconLibrary';
+import IconLibrary from '../lib/shared/Icons/IconLibrary';
 import { MobileControlProvider } from '../lib/shared/MobileControlProvider/MobileControlProvider';
 import { MainLayout } from '../lib/shared/layout/habanero/MainLayout/MainLayout';
 
