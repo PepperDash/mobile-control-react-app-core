@@ -12,7 +12,7 @@ export interface CamerasState {
 
   cameraMode: string;
 
-  cameraList: unknown[]; /// ///////////////////////////////////////////
+  cameraList: CameraState[];
 
   selectedCamera?: CameraState;
 }
