@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { DisplayState, RootState, selectAllDevices } from 'src/lib';
+import { DisplayState, RootState, selectAllDevices } from '../..';
 
 
 const roomsState = (state: RootState) => state.rooms;

@@ -1,4 +1,4 @@
-import { SignalType } from 'src/lib/shared';
+import { SignalType } from '../../shared';
 
 
 export interface DestinationListItem {

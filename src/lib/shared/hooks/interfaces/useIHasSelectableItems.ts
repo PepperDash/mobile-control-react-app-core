@@ -1,6 +1,6 @@
-import { DeviceState } from 'src/lib';
-import { useGetDevice } from 'src/lib/store';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { DeviceState } from '../../..';
+import { useGetDevice } from '../../../store';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 
 /**

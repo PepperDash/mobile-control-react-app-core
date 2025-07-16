@@ -1,6 +1,6 @@
-import { useGetDevice } from 'src/lib/store';
-import { RoutingState } from 'src/lib/types';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useGetDevice } from '../../../store';
+import { RoutingState } from '../../../types';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook to control a room that implements the IRunRouteAction interface

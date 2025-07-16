@@ -1,6 +1,6 @@
-import { useRoomState } from 'src/lib';
-import { ITechPasswordState } from 'src/lib/types/state/state/ITechPasswordState';
-import { useWebsocketContext } from 'src/lib/utils';
+import { useRoomState } from '../../..';
+import { ITechPasswordState } from '../../../types/state/state/ITechPasswordState';
+import { useWebsocketContext } from '../../../utils';
 
 /**
  * hook that controls a room that implements the ITechPassword interface

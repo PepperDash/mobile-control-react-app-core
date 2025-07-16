@@ -1,6 +1,6 @@
-import { useGetDevice } from 'src/lib/store';
-import { MatrixRoutingState } from 'src/lib/types/state/state/MatrixRoutingState';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useGetDevice } from '../../../store';
+import { MatrixRoutingState } from '../../../types/state/state/MatrixRoutingState';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 import { SignalType } from './useIRunDirectRouteAction';
 
 /**

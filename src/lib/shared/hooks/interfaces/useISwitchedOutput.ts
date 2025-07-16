@@ -1,6 +1,6 @@
-import { useGetDevice } from 'src/lib/store';
-import { SwitchedOutputState } from 'src/lib/types';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useGetDevice } from '../../../store';
+import { SwitchedOutputState } from '../../../types';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook that controls a device that implements the ISwitchedOutput interface

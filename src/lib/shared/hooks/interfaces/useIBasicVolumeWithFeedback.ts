@@ -1,5 +1,5 @@
-import { Volume } from 'src/lib/types';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { Volume } from '../../../types';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 import { useButtonHeldHeartbeat } from '../useButtonHeldHeartbeat';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 

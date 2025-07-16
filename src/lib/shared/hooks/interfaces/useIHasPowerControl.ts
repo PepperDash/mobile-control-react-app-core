@@ -1,4 +1,4 @@
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook to control a device that implements the IHasPowerControl interface

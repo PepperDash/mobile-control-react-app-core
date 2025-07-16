@@ -1,4 +1,4 @@
-import { DeviceInfo, DeviceInfoState, useGetDevice } from 'src/lib';
+import { DeviceInfo, DeviceInfoState, useGetDevice } from '../../..';
 
 /**
  * hook that returns the info for a device that implements the IDeviceInfo interface

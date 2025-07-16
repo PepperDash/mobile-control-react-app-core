@@ -1,7 +1,7 @@
 
-import { useRoomState } from 'src/lib';
-import { IShutdownPromptTimerState } from 'src/lib/types/state/state/IShutdownPromptTimerState';
-import { useWebsocketContext } from 'src/lib/utils/useWebsocketContext';
+import { useRoomState } from '../../..';
+import { IShutdownPromptTimerState } from '../../../types/state/state/IShutdownPromptTimerState';
+import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook that controls a room that implements the IShutdownPromptTimer interface

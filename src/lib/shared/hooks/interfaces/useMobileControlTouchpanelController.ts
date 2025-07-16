@@ -1,6 +1,6 @@
-import { useGetDevice } from "src/lib/store";
-import { MobileControlTouchpanelState } from "src/lib/types/state/state/MobileControlTouchpanelState";
-import { useWebsocketContext } from "src/lib/utils/useWebsocketContext";
+import { useGetDevice } from "../../../store";
+import { MobileControlTouchpanelState } from "../../../types/state/state/MobileControlTouchpanelState";
+import { useWebsocketContext } from "../../../utils/useWebsocketContext";
 
 /**
  * hook that controls a device that implements the MobileControlTouchpanelController interface

@@ -1,4 +1,4 @@
-import { DeviceState } from 'src/lib';
+import { DeviceState } from './DeviceState';
 import { SourceListItem } from '../sourceListItem';
 
 export interface RoutingState extends DeviceState {

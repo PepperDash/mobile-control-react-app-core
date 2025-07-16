@@ -1,5 +1,5 @@
-import { useGetDevice, useWebsocketContext } from 'src/lib';
-import { ITemperatureSensorState } from 'src/lib/types/state/state/ITemperatureSensorState';
+import { useGetDevice, useWebsocketContext } from '../../..';
+import { ITemperatureSensorState } from '../../../types/state/state/ITemperatureSensorState';
 
 /**
  * A hook that provides access to the temperature sensor state
