@@ -61,14 +61,20 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/mobile-control-react-app-core.es.js",
       "require": "./dist/mobile-control-react-app-core.umd.js"
     },
-    "./dist/style.css": "./dist/mobile-control-react-app-core.css"
+    "./style.css": "./dist/mobile-control-react-app-core.css"
   },
   "main": "./dist/mobile-control-react-app-core.umd.js",
   "module": "./dist/mobile-control-react-app-core.es.js",
   "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/index.d.ts"]
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/PepperDash/mobile-control-react-app-core"
