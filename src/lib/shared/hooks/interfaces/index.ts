@@ -12,6 +12,7 @@ export * from './useIDPad';
 export * from './useIDspPresets';
 export * from './useIDvr';
 export * from './useIEssentialsRoomCombiner';
+export * from './useIHasCameras';
 export * from './useIHasPowerControl';
 export * from './useIHasSelectableItems';
 export * from './useIHumiditySensor';
