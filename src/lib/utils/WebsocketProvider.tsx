@@ -19,7 +19,7 @@ import {
 } from '../store/runtimeConfig/runtimeConfig.slice';
 import { Message, RoomData } from '../types';
 import sessionStorageKeys from '../types/classes/session-storage-keys';
-import WebsocketContext from './WebsocketContext';
+import { WebsocketContext } from './WebsocketContext';
 import { loadValue, saveValue } from './joinParamsService';
 
 /**
@@ -342,30 +342,11 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                   runtimeConfigActions.setUserCode(message.content as UserCode)
                 );
                 break;
-              case '/system/roomCombinationChanged': {
-                console.log('event message received', message);
-
-                const handlers = eventHandlers.current[message.type];
-
-                if (!handlers) {
-                  console.log(
-                    'no handlers found for room combination changed. Reloading application.',
-                    message.type
-                  );
-                  window.location.reload();
-                }
-
-                if (handlers) {
-                  Object.values(handlers).forEach((handler) => {
-                    try {
-                      handler(message);
-                    } catch (err) {
-                      console.error(err);
-                    }
-                  });
-                }
+              case '/system/roomCombinationChanged':
+                // TODO: Revisit if this is the right way to handle combination scenario changes
+                window.location.reload();
                 break;
-              }
+
               default:
                 console.log('unhandled system message', message);
                 break;
