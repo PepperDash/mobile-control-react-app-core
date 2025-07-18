@@ -1,4 +1,4 @@
-import { SourceListItem } from 'src/lib';
+import { SourceListItem } from '../sourceListItem';
 import { IHasCurrentSourceInfoChangeState } from './IHasCurrentSourceInfoChangeState';
 
 /**

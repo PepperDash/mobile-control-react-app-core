@@ -1,4 +1,4 @@
-import { AudioControlPointListItemBase } from '.';
+import { AudioControlPointListItemBase } from './AudioControlPointListItemBase';
 
 export interface LevelControlListItem extends AudioControlPointListItemBase {
   type: LevelControlType;
