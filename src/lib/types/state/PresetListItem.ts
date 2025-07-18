@@ -1,4 +1,3 @@
-import { AudioControlPointListItemBase } from '.';
+import { AudioControlPointListItemBase } from './AudioControlPointListItemBase';
 
-export interface PresetListItem extends AudioControlPointListItemBase {
-}
+export interface PresetListItem extends AudioControlPointListItemBase {}

@@ -1,5 +1,3 @@
-
-
 export * from './appConfig/appConfig.hooks';
 export * from './appConfig/appConfig.selectors';
 export * from './devices/devices.hooks';
@@ -15,3 +13,9 @@ export * from './hooks';
 export * from './ui/ui.slice';
 
 export * from './store';
+
+export { appConfigActions } from './appConfig/appConfig.slice';
+export { devicesActions } from './devices/devices.slice';
+export { roomsActions } from './rooms/rooms.slice';
+export { runtimeConfigActions } from './runtimeConfig/runtimeConfig.slice';
+export { uiActions } from './ui/ui.slice';
