@@ -35,7 +35,7 @@ export default defineConfig((configEnv) => ({
       name: 'pepperdash/mobile-control-react-app-core',
       formats: ['es', 'umd'],
       fileName: (format) => `mobile-control-react-app-core.${format}.js`,
-      cssFileName: 'style.css',
+      cssFileName: 'style',
     },
     rollupOptions: {
       external: [...Object.keys(packageJson.peerDependencies)],
