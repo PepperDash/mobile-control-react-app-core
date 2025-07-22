@@ -32,11 +32,11 @@ export interface DeviceState extends IKeyName {
 
   commMonitor?: CommunicationMonitorState;
 
-  /**
-   * For future use
-   * @deprecated This property is deprecated and will be removed in future versions.
-   */
-  state: unknown;
+  // /**
+  //  * For future use
+  //  * @deprecated This property is deprecated and will be removed in future versions.
+  //  */
+  // state: unknown;
 
   /**
    * For future use
