@@ -1,4 +1,3 @@
-import { DeviceState } from '../..';
 import { ISelectableItem } from '../../interfaces/ISelectableItem';
 import { DeviceState } from './DeviceState';
 
