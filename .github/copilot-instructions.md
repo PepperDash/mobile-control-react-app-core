@@ -98,6 +98,46 @@ Always run before committing:
 - `npm run lint` -- must pass with 0 warnings/errors
 - `npm run build` -- must complete successfully
 
+### Commit Message Format
+This repository uses [Conventional Commits](https://www.conventionalcommits.org/) for automated versioning and changelog generation via semantic-release. All commit messages must follow this format:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+#### Commit Types
+- **feat**: A new feature (triggers minor version bump)
+- **fix**: A bug fix (triggers patch version bump)
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **build**: Changes that affect the build system or external dependencies
+- **ci**: Changes to CI configuration files and scripts
+- **chore**: Other changes that don't modify src or test files
+- **revert**: Reverts a previous commit
+
+#### Breaking Changes
+Add `BREAKING CHANGE:` in the footer or use `!` after the type/scope to indicate breaking changes (triggers major version bump):
+```
+feat!: remove deprecated API endpoints
+
+BREAKING CHANGE: The legacy v1 API has been removed. Use v2 endpoints instead.
+```
+
+#### Examples
+```
+feat(hooks): add useDeviceState hook for device status management
+fix(websocket): resolve connection timeout issues
+docs: update README with Mobile Control setup instructions
+chore(deps): update vite to v6.3.6
+```
+
 ## Common Tasks
 
 ### Adding New Library Components
