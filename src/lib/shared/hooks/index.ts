@@ -5,6 +5,7 @@ export * from './useDeviceIBasicVolumeWithFeedback';
 export * from './useGetAllDeviceStateFromRoomConfiguration';
 export * from './useOverflow';
 export * from './usePressHoldRelease';
+export * from './useRoomIBasicVolume';
 export * from './useRoomIBasicVolumeWithFeedback';
 export * from './useScroll';
 export * from './useSystemControl';
