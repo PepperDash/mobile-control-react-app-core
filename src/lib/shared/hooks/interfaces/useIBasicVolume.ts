@@ -39,6 +39,7 @@ export function useGetIBasicVolume(
   const volumeDown = useButtonHeldHeartbeat(`${path}`, 'volumeDown');
 
   const muteToggle = () => sendMessage(`${path}/muteToggle`, null);
+  
   return {
     volumeUp,
     volumeDown,
