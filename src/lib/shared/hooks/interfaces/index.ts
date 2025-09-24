@@ -2,6 +2,7 @@ export * from "./interfaceNames";
 export * from "./useAvrControl";
 export * from "./useDevicePresetsModel";
 export * from "./useEndpoint";
+export * from "./useIBasicVolume";
 export * from "./useIBasicVolumeWithFeedback";
 export * from "./useIChannel";
 export * from "./useIColor";
