@@ -1,7 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 
-
 const runtimeState = (state: RootState) => state.runtimeConfig;
 
 export const selectWsIsConnected = createSelector(
@@ -47,4 +46,9 @@ export const selectTouchpanelKey = createSelector(
 export const selectIsTouchpanel = createSelector(
   runtimeState,
   (state) => state.touchpanelKey !== ''
+);
+
+export const selectDeviceInterfaceSupport = createSelector(
+  runtimeState,
+  (state) => state.roomData.deviceInterfaceSupport
 );
