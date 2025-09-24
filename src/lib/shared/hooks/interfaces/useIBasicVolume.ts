@@ -10,7 +10,7 @@ import { PressHoldReleaseReturn } from '../usePressHoldRelease';
 export function useIBasicVolume(
   path: string,
 ): IBasicVolumeReturn | undefined {
-  const { sendMessage, sendSimpleMessage } = useWebsocketContext();
+  const { sendMessage } = useWebsocketContext();
 
   const volumeUp = useButtonHeldHeartbeat(`${path}`, 'volumeUp');
   const volumeDown = useButtonHeldHeartbeat(`${path}`, 'volumeDown');
@@ -33,7 +33,7 @@ export interface IBasicVolumeReturn {
 export function useGetIBasicVolumeWithFeedback(
   path: string,
 ): IBasicVolumeReturn | undefined {
-  const { sendMessage, sendSimpleMessage } = useWebsocketContext();
+  const { sendMessage } = useWebsocketContext();
 
   const volumeUp = useButtonHeldHeartbeat(`${path}`, 'volumeUp');
   const volumeDown = useButtonHeldHeartbeat(`${path}`, 'volumeDown');
