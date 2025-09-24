@@ -1,4 +1,4 @@
-import { IKeyName } from "../interfaces";
+import { IKeyName } from '../interfaces';
 
 export interface RoomData {
   clientId: string | number;
@@ -11,6 +11,11 @@ export interface RoomData {
   codeExpires?: Date;
   enableDebug?: boolean;
   qrUrl: string;
+  deviceInterfaceSupport?: { [key: string]: DeviceInterfaceInfo };
+}
+
+export interface DeviceInterfaceInfo extends IKeyName {
+  interfaces: string[];
 }
 
 export interface EssentialsConfig {
@@ -24,6 +29,6 @@ export interface EssentialsConfig {
   devices: EssentialsDevice[];
 }
 
-export interface EssentialsRoom extends IKeyName{}
+export interface EssentialsRoom extends IKeyName {}
 
-export interface EssentialsDevice extends IKeyName{}
+export interface EssentialsDevice extends IKeyName {}
