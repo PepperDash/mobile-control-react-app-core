@@ -30,7 +30,7 @@ export interface IBasicVolumeReturn {
   muteToggle: () => void;
 }
 
-export function useGetIBasicVolumeWithFeedback(
+export function useGetIBasicVolume(
   path: string,
 ): IBasicVolumeReturn | undefined {
   const { sendMessage } = useWebsocketContext();
