@@ -8,7 +8,7 @@ import { IKeyName, useWebsocketContext } from '../../..';
 export function useIDspPresets(key: string) {
     const { sendMessage } = useWebsocketContext();
 
-    const recallPreset = (preset: IKeyName) => {
+    const recallPreset = (preset: IKeyName | string) => {
         sendMessage(`/device/${key}/recallPreset`, preset);
     };
 
