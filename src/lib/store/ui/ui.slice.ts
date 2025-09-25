@@ -8,7 +8,7 @@ const initialState: UiConfigState = {
     showIncomingCallModal: false,
   },
   popoverVisibility: {},
-  syncState: new Set<string>(),
+  syncState: [],
 };
 
 const uiSlice = createSlice({
@@ -65,13 +65,17 @@ const uiSlice = createSlice({
       state.theme = action.payload;
     },
     addSyncState(state, action: PayloadAction<string>) {
-      state.syncState.add(action.payload);
+      if (!state.syncState.includes(action.payload)) {
+        state.syncState.push(action.payload);
+      }
     },
     removeSyncState(state, action: PayloadAction<string>) {
-      state.syncState.delete(action.payload);
+      state.syncState = state.syncState.filter(
+        (item) => item !== action.payload
+      );
     },
     clearSyncState(state) {
-      state.syncState.clear();
+      state.syncState = [];
     },
   },
 });
@@ -87,7 +91,7 @@ export interface UiConfigState {
    * Used as a way to track what components have finished their initial data loading as a rudimentary
    * cache mechanism
    */
-  syncState: Set<string>;
+  syncState: string[];
 }
 
 type modalType = 'showShutdownModal' | 'showIncomingCallModal';

@@ -36,4 +36,4 @@ export const selectShowReconnect = createSelector(
 export const selectTheme = createSelector(uiState, (ui) => ui.theme);
 
 export const selectIsSyncStateValuePresent = (value: string) =>
-  createSelector(uiState, (ui) => ui.syncState.has(value));
+  createSelector(uiState, (ui) => ui.syncState.includes(value));
