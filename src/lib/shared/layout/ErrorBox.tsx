@@ -1,5 +1,9 @@
-import { useState } from "react";
-import { useNavigate, useRouteError, isRouteErrorResponse } from "react-router-dom";
+import { useState } from 'react';
+import {
+  isRouteErrorResponse,
+  useNavigate,
+  useRouteError,
+} from 'react-router-dom';
 
 export const ErrorBox = () => {
   const [showError, setShowError] = useState(false);
@@ -12,7 +16,7 @@ export const ErrorBox = () => {
     errorMessage = error.statusText;
   } else if (error instanceof Error) {
     errorMessage = error.message;
-  } else if (typeof error === 'string') { 
+  } else if (typeof error === 'string') {
     errorMessage = error;
   } else {
     console.error(error);
@@ -26,12 +30,18 @@ export const ErrorBox = () => {
           We are sorry. Something went wrong.
         </span>
       </div>
-      <button className="btn btn-primary p-2" onClick={() => navigate(-1)}>
+      <button
+        className="btn btn-primary p-2"
+        onPointerDown={() => navigate(-1)}
+      >
         Go Back
       </button>
-      <button className="btn btn-primary p-2" onClick={() => setShowError(!showError)}>
+      <button
+        className="btn btn-primary p-2"
+        onPointerDown={() => setShowError(!showError)}
+      >
         {showError ? 'Hide error message' : 'Show error message'}
-      </button>        
+      </button>
       {showError && <p>{errorMessage}</p>}
     </div>
   );
