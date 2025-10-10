@@ -187,6 +187,15 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     serverIsRunningOnProcessorHardware
   );
 
+  function clearStateDataOnDisconnect() {
+    store.dispatch(uiActions.setShowReconnect(true));
+    store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
+    store.dispatch(devicesActions.clearDevices());
+    store.dispatch(roomsActions.clearRooms());
+    store.dispatch(uiActions.clearAllModals());
+    store.dispatch(uiActions.clearSyncState());
+  }
+
   /**
    * Connect to the websocket and get the room data when the apiPath changes
    */
@@ -232,12 +241,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           // No need to set waitingToReconnect, as the useEffect will handle re-triggering connection if necessary.
           // The store will be repopulated by getRoomData on successful reconnection.
           // If immediate clearing of device/room state is desired here, it can be added.
-          store.dispatch(uiActions.setShowReconnect(true));
-          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-          store.dispatch(devicesActions.clearDevices());
-          store.dispatch(roomsActions.clearRooms());
-          store.dispatch(uiActions.clearAllModals());
-          store.dispatch(uiActions.clearSyncState());
+          clearStateDataOnDisconnect();
           return;
         }
 
@@ -255,10 +259,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
               'User code changed. Click reconnect to enter the new code'
             )
           );
-          store.dispatch(uiActions.setShowReconnect(true));
-          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-          store.dispatch(devicesActions.clearDevices());
-          store.dispatch(roomsActions.clearRooms());
+          clearStateDataOnDisconnect();
+
           return;
         }
 
@@ -269,10 +271,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
               'Processor has disconnected. Click Reconnect'
             )
           );
-          store.dispatch(uiActions.setShowReconnect(true));
-          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-          store.dispatch(devicesActions.clearDevices());
-          store.dispatch(roomsActions.clearRooms());
+          clearStateDataOnDisconnect();
+
           return;
         }
 
@@ -283,10 +283,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
               'Room combination changed. Click Reconnect to re-join the room'
             )
           );
-          store.dispatch(uiActions.setShowReconnect(true));
-          store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
-          store.dispatch(devicesActions.clearDevices());
-          store.dispatch(roomsActions.clearRooms());
+          clearStateDataOnDisconnect();
           return;
         }
 
@@ -306,6 +303,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
         store.dispatch(devicesActions.clearDevices());
         store.dispatch(roomsActions.clearRooms());
+        store.dispatch(uiActions.clearAllModals());
+        store.dispatch(uiActions.clearSyncState());
 
         setTimeout(() => setWaitingToReconnect(undefined), 5000);
       };
@@ -332,6 +331,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
               case '/system/roomKey': {
                 store.dispatch(roomsActions.clearRooms());
                 store.dispatch(devicesActions.clearDevices());
+                store.dispatch(uiActions.clearSyncState());
+
                 store.dispatch(
                   runtimeConfigActions.setCurrentRoomKey(
                     message.content as string
