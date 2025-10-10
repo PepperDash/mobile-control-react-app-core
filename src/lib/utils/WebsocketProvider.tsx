@@ -236,6 +236,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
           store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
           store.dispatch(devicesActions.clearDevices());
           store.dispatch(roomsActions.clearRooms());
+          store.dispatch(uiActions.clearAllModals());
+          store.dispatch(uiActions.clearSyncState());
           return;
         }
 
