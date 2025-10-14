@@ -387,8 +387,13 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         clientRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
+  }, [
+    appConfig.apiPath,
+    getRoomData,
+    token,
+    waitingToReconnect,
+    serverIsRunningOnProcessorHardware,
+  ]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes
