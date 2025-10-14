@@ -78,8 +78,6 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       } catch (err) {
         console.log(err);
 
-        if (serverIsRunningOnProcessorHardware) return true;
-
         if (
           err instanceof AxiosError &&
           err.response &&
@@ -104,7 +102,8 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
     },
-    [token, serverIsRunningOnProcessorHardware]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [token]
   );
 
   const reconnect = useCallback(() => {
@@ -178,15 +177,6 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log(
-    'connection dependencies',
-    appConfig.apiPath,
-    getRoomData,
-    token,
-    waitingToReconnect,
-    serverIsRunningOnProcessorHardware
-  );
-
   function clearStateDataOnDisconnect() {
     store.dispatch(uiActions.setShowReconnect(true));
     store.dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
@@ -200,13 +190,6 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * Connect to the websocket and get the room data when the apiPath changes
    */
   useEffect(() => {
-    console.log('🔍 useEffect triggered by dependency change:', {
-      apiPath: appConfig.apiPath,
-      token: token?.substring(0, 10) + '...',
-      waitingToReconnect,
-      serverIsRunningOnProcessorHardware,
-    });
-
     async function joinWebsocket() {
       console.log('Attempting to join websocket...');
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
