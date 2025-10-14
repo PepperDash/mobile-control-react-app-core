@@ -200,6 +200,13 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
    * Connect to the websocket and get the room data when the apiPath changes
    */
   useEffect(() => {
+    console.log('🔍 useEffect triggered by dependency change:', {
+      apiPath: appConfig.apiPath,
+      token: token?.substring(0, 10) + '...',
+      waitingToReconnect,
+      serverIsRunningOnProcessorHardware,
+    });
+
     async function joinWebsocket() {
       console.log('Attempting to join websocket...');
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
@@ -397,13 +404,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         clientRef.current = null;
       }
     };
-  }, [
-    appConfig.apiPath,
-    getRoomData,
-    token,
-    waitingToReconnect,
-    serverIsRunningOnProcessorHardware,
-  ]);
+  }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
 
   /**
    *  Send a status message to the server to get the current state of the room when the roomKey changes
