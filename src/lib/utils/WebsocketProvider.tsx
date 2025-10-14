@@ -194,14 +194,14 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
       console.log('Attempting to join websocket...');
       if (!appConfig.apiPath || waitingToReconnect || !token) return;
 
-      const tokenResult = await getRoomData(appConfig.apiPath);
-
-      if (!tokenResult) return;
-
       if (clientRef.current) {
         console.log('websocket exists');
         return;
       }
+
+      const tokenResult = await getRoomData(appConfig.apiPath);
+
+      if (!tokenResult) return;
 
       console.log('connecting to websocket');
 
