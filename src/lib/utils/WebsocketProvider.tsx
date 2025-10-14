@@ -404,6 +404,7 @@ const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         clientRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appConfig.apiPath, getRoomData, token, waitingToReconnect]);
 
   /**
