@@ -194,6 +194,48 @@ This can now be removed since the middleware handles it automatically. However, 
 
 **Recommendation**: Remove it for cleaner code, but it's not required.
 
+## Automatic Reconnection
+
+### Processor Hardware Support
+
+The middleware now supports **automatic reconnection** for servers running on processor hardware:
+
+**When `serverIsRunningOnProcessorHardware` is `true`:**
+
+- Connection drops (close code 4001) are treated as temporary network issues
+- Shows "Connection lost. Attempting to reconnect..." message
+- Automatically attempts reconnection after 5 seconds
+- Continues reconnecting until successful or manually stopped
+
+**When `serverIsRunningOnProcessorHardware` is `false`:**
+
+- Connection drops (close code 4001) are treated as processor shutdown
+- Shows "Processor has disconnected. Click Reconnect" message
+- Requires manual reconnection by user
+
+**For unexpected disconnects** (other close codes):
+
+- Automatically attempts reconnection after 5 seconds regardless of hardware status
+- This handles network blips, server restarts, etc.
+
+**Implementation Details:**
+
+```typescript
+setTimeout(() => {
+  state.waitingToReconnect = false;
+
+  if (closeEvent.code === 4001 && serverIsRunningOnProcessorHardware) {
+    console.log('Attempting automatic reconnection for processor hardware...');
+    dispatch(wsReconnect());
+  } else if (closeEvent.code !== 4001 && closeEvent.code !== 4002) {
+    console.log(
+      'Attempting automatic reconnection after unexpected disconnect...'
+    );
+    dispatch(wsReconnect());
+  }
+}, 5000);
+```
+
 ## Testing Checklist
 
 When testing this implementation, verify:
@@ -204,6 +246,9 @@ When testing this implementation, verify:
 - [ ] No duplicate room status requests (check network tab)
 - [ ] Console logs show the expected flow
 - [ ] Room state is updated correctly after status response
+- [ ] **Automatic reconnection works when server is on processor hardware**
+- [ ] **Manual reconnection required when server is NOT on processor hardware**
+- [ ] **Unexpected disconnects trigger automatic reconnection**
 
 ## Debug Logging
 
