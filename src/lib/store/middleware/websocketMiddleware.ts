@@ -355,7 +355,10 @@ export const createWebSocketMiddleware = (): Middleware<
       newWs.onmessage = (e) => {
         try {
           const message: Message = JSON.parse(e.data);
-          console.log('WebSocket middleware: Message received', message);
+
+          // only print message in dev mode
+          if (import.meta.env.DEV)
+            console.log('WebSocket middleware: Message received', message);
 
           if (message.type === 'close') {
             newWs.close(4001, message.content as string);
@@ -397,10 +400,13 @@ export const createWebSocketMiddleware = (): Middleware<
                 break;
             }
           } else if (message.type.startsWith('/event/')) {
-            console.log(
-              'WebSocket middleware: Event message received',
-              message
-            );
+            // only print message in dev mode
+            if (import.meta.env.DEV) {
+              console.log(
+                'WebSocket middleware: Event message received',
+                message
+              );
+            }
             const handlers = state.eventHandlers[message.type];
 
             if (!handlers) {
