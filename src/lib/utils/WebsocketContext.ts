@@ -20,3 +20,5 @@ export const WebsocketContext = createContext<WebsocketContextType>({
   removeEventHandler: () => null,
   reconnect: () => null,
 });
+
+export default WebsocketContext;

@@ -1,4 +1,6 @@
-import { uiActions, useAppDispatch, useIsSyncStateValuePresent } from 'src/lib';
+import { useAppDispatch } from '../../store/hooks';
+import { useIsSyncStateValuePresent } from '../../store/ui/ui.hooks';
+import { uiActions } from '../../store/ui/ui.slice';
 
 /**
  * Custom hook to manage synchronization state for a specific component.
