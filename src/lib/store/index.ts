@@ -18,4 +18,7 @@ export { appConfigActions } from './appConfig/appConfig.slice';
 export { devicesActions } from './devices/devices.slice';
 export { roomsActions } from './rooms/rooms.slice';
 export { runtimeConfigActions } from './runtimeConfig/runtimeConfig.slice';
+
+// Export WebSocket middleware actions
+export * from './middleware';
 export { uiActions } from './ui/ui.slice';
