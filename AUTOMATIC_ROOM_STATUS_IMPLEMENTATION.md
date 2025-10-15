@@ -1,11 +1,13 @@
 # Automatic Room Status Request Implementation
 
 ## Overview
+
 This document describes the implementation of automatic room status requests in the WebSocket middleware. This eliminates the need for component-based logic to trigger room status requests and centralizes all WebSocket behavior in the Redux middleware layer.
 
 ## Implementation Approach: State Change Listeners
 
 We chose **Approach 2** (State Change Listeners) over the component-based approach for the following reasons:
+
 - ✅ Centralizes all WebSocket logic in middleware
 - ✅ Eliminates dependency on React component lifecycle
 - ✅ More testable (no need to test React hooks)
@@ -15,6 +17,7 @@ We chose **Approach 2** (State Change Listeners) over the component-based approa
 ## Changes Made
 
 ### 1. Added `requestRoomStatus()` Helper Function
+
 **Location**: `src/lib/store/middleware/websocketMiddleware.ts` (line ~190)
 
 ```typescript
@@ -26,7 +29,7 @@ const requestRoomStatus = (getState: () => LocalRootState) => {
 
   if (!roomKey || !clientId || !isConnected) {
     console.log(
-      "[WebSocket Middleware] Cannot request room status - missing requirements:",
+      '[WebSocket Middleware] Cannot request room status - missing requirements:',
       { roomKey, clientId, isConnected }
     );
     return;
@@ -40,7 +43,8 @@ const requestRoomStatus = (getState: () => LocalRootState) => {
 };
 ```
 
-**Purpose**: 
+**Purpose**:
+
 - Validates that all required state is available (roomKey, clientId, isConnected)
 - Sends a WebSocket message to request room status
 - Includes logging for debugging
@@ -52,21 +56,24 @@ const requestRoomStatus = (getState: () => LocalRootState) => {
 The middleware now listens for three Redux actions that should trigger room status requests:
 
 #### a) `setWebsocketIsConnected` - Connection Established
+
 ```typescript
 if (action.type === runtimeConfigActions.setWebsocketIsConnected.type) {
   const isConnected = (action as AnyAction).payload;
   if (isConnected === true) {
     console.log(
-      "[WebSocket Middleware] Connection established, requesting room status..."
+      '[WebSocket Middleware] Connection established, requesting room status...'
     );
     setTimeout(() => requestRoomStatus(store.getState), 100);
   }
 }
 ```
+
 **Triggers when**: WebSocket connection is successfully established
 **Why needed**: Initial room status request after connecting
 
 #### b) `setRoomData` - Room Data/ClientId Available
+
 ```typescript
 else if (action.type === runtimeConfigActions.setRoomData.type) {
   const state = store.getState() as LocalRootState;
@@ -79,10 +86,12 @@ else if (action.type === runtimeConfigActions.setRoomData.type) {
   }
 }
 ```
+
 **Triggers when**: Room data is received from the `/ui/joinroom` API response (includes clientId)
 **Why needed**: ClientId is required for room status requests; this ensures we have it before requesting
 
 #### c) `setCurrentRoomKey` - Room Changed
+
 ```typescript
 else if (action.type === runtimeConfigActions.setCurrentRoomKey.type) {
   const roomKey = (action as AnyAction).payload;
@@ -96,13 +105,16 @@ else if (action.type === runtimeConfigActions.setCurrentRoomKey.type) {
   }
 }
 ```
+
 **Triggers when**: User navigates to a different room
 **Why needed**: Each room needs its status requested separately
 
 ## Technical Details
 
 ### Why `setTimeout` with 100ms delay?
+
 The 100ms delay ensures that:
+
 1. All Redux state updates have completed
 2. The WebSocket connection is fully ready
 3. Any pending actions in the queue are processed first
@@ -110,9 +122,11 @@ The 100ms delay ensures that:
 This prevents race conditions where we might try to send a message before the connection is fully established or before all required state is set.
 
 ### Type Safety
+
 We use `AnyAction` casting for the Redux action payloads since these actions come from slice reducers (not our custom WebSocket actions). The middleware's switch statement uses type narrowing to safely access the payload.
 
 ### State Path Correction
+
 The WebSocket connection state is accessed via `state.runtimeConfig.websocket.isConnected` (not `state.runtimeConfig.websocketIsConnected`).
 
 ## Flow Diagram
@@ -164,6 +178,7 @@ App Startup
 ## Optional Next Steps
 
 ### Remove Component-Based useEffect (Optional)
+
 The `WebsocketProvider.tsx` still has a useEffect that requests room status:
 
 ```typescript
