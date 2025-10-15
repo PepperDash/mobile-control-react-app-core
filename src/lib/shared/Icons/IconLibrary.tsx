@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NamedIconButton } from "../Buttons";
-import { iconsDictionary } from "./iconsDictionary";
+import { NamedIconButton } from '../Buttons';
+import { iconsDictionary } from './iconsDictionary';
 
 const IconLibrary = () => {
   const [feedback, setFeedback] = useState<boolean>(false);
@@ -10,13 +10,21 @@ const IconLibrary = () => {
   const keys = Object.keys(icons) as Array<keyof typeof icons>;
 
   return (
-      <div className="icon-library">
-        <button onClick={() => setFeedback(!feedback)}>Feedback</button>
-        <button onClick={() => setDisabled(!disabled)}>Disabled</button>
-        {keys.map((key) => {
-          return <NamedIconButton name={key} key={key} disabled={disabled} feedback={feedback} feedbackClassName='icon-feedback' />;
-        })}
-      </div>
+    <div className="icon-library">
+      <button onPointerDown={() => setFeedback(!feedback)}>Feedback</button>
+      <button onPointerDown={() => setDisabled(!disabled)}>Disabled</button>
+      {keys.map((key) => {
+        return (
+          <NamedIconButton
+            name={key}
+            key={key}
+            disabled={disabled}
+            feedback={feedback}
+            feedbackClassName="icon-feedback"
+          />
+        );
+      })}
+    </div>
   );
 };
 

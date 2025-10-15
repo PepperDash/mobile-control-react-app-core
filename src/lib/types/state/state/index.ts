@@ -1,4 +1,3 @@
-export * from './CamerasState';
 export * from './CameraState';
 export * from './CommunicationMonitorState';
 export * from './DeviceInfoState';
@@ -7,7 +6,10 @@ export * from './DeviceState';
 export * from './DisplayState';
 export * from './endpointState';
 export * from './EnvironmentState';
-export * from "./IEssentialsRoomCombinerState";
+export * from './ICurrentSourcesState';
+export * from './IEssentialsRoomCombinerState';
+export * from './IHasCamerasState';
+export * from './IHasCurrentSourceInfoChangeState';
 export * from './IHasInputsState';
 export * from './IHasSelectableItemsState';
 export * from './IHasSurroundChannelsState';
@@ -30,4 +32,3 @@ export * from './ShadeState';
 export * from './ShareState';
 export * from './SurroundSoundModeState';
 export * from './SwitchedOutputState';
-

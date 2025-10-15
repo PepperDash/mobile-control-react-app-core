@@ -28,6 +28,7 @@ const initialState: RuntimeConfigState = {
       rooms: [],
       devices: [],
     },
+    deviceInterfaceSupport: {},
     userCode: '',
     qrUrl: '',
   },

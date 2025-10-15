@@ -5,5 +5,4 @@ export interface Volumes {
   auxFaders: Record<string, Volume>;
 }
 
-export type RoomVolumeType = 'master' | string;
-
+// RoomVolumeType is exported from state/RoomState.ts to avoid duplication
