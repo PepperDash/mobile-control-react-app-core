@@ -66,6 +66,7 @@ interface WebSocketMiddlewareState {
   client: WebSocket | null;
   token: string | null;
   waitingToReconnect: boolean;
+  reconnectTimer: NodeJS.Timeout | null;
   eventHandlers: Record<string, Record<string, (data: Message) => void>>;
 }
 
@@ -80,6 +81,7 @@ export const createWebSocketMiddleware = (): Middleware<
     client: null,
     token: null,
     waitingToReconnect: false,
+    reconnectTimer: null,
     eventHandlers: {},
   };
 
@@ -173,6 +175,37 @@ export const createWebSocketMiddleware = (): Middleware<
   };
 
   /**
+   * Start continuous reconnection attempts
+   */
+  const startReconnectionLoop = (dispatch: Dispatch) => {
+    // Clear any existing reconnection timer
+    if (state.reconnectTimer) {
+      clearTimeout(state.reconnectTimer);
+      state.reconnectTimer = null;
+    }
+
+    console.log('WebSocket middleware: Starting reconnection loop...');
+
+    state.reconnectTimer = setTimeout(() => {
+      state.waitingToReconnect = false;
+      state.reconnectTimer = null;
+      console.log('WebSocket middleware: Attempting automatic reconnection...');
+      dispatch(wsConnect());
+    }, 5000);
+  };
+
+  /**
+   * Stop continuous reconnection attempts
+   */
+  const stopReconnectionLoop = () => {
+    if (state.reconnectTimer) {
+      console.log('WebSocket middleware: Stopping reconnection loop');
+      clearTimeout(state.reconnectTimer);
+      state.reconnectTimer = null;
+    }
+  };
+
+  /**
    * Clear state data on disconnect
    */
   const clearStateDataOnDisconnect = (dispatch: Dispatch) => {
@@ -258,8 +291,10 @@ export const createWebSocketMiddleware = (): Middleware<
       const tokenResult = await getRoomData(apiPath, state.token, dispatch);
 
       if (!tokenResult) {
-        console.log('WebSocket middleware: Failed to get room data');
-        state.waitingToReconnect = false;
+        console.log(
+          'WebSocket middleware: Failed to get room data, will retry...'
+        );
+        startReconnectionLoop(dispatch);
         return;
       }
 
@@ -273,11 +308,14 @@ export const createWebSocketMiddleware = (): Middleware<
 
       newWs.onopen = (ev: Event) => {
         console.log('WebSocket middleware: Connected', ev.type, ev.target);
+        state.waitingToReconnect = false;
+        stopReconnectionLoop();
         dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
       };
 
       newWs.onerror = (err) => {
         console.error('WebSocket middleware: Error', err);
+        // Note: onclose will be called after onerror and will handle cleanup/reconnection
         clearStateDataOnDisconnect(dispatch);
       };
 
@@ -291,14 +329,17 @@ export const createWebSocketMiddleware = (): Middleware<
         // Handle explicit client-side close
         if (closeEvent.code === 4100) {
           console.log('WebSocket middleware: Closed by client (cleanup)');
+          stopReconnectionLoop();
           clearStateDataOnDisconnect(dispatch);
           return;
         }
 
         state.waitingToReconnect = true;
 
+        // Custom close codes that should NOT auto-reconnect
         if (closeEvent.code === 4000) {
           console.log('WebSocket middleware: User code changed');
+          stopReconnectionLoop();
           dispatch(
             runtimeConfigActions.setUserCode({ userCode: '', qrUrl: '' })
           );
@@ -311,19 +352,9 @@ export const createWebSocketMiddleware = (): Middleware<
           return;
         }
 
-        if (closeEvent.code === 4001 && !serverIsRunningOnProcessorHardware) {
-          console.log('WebSocket middleware: Processor disconnected');
-          dispatch(
-            uiActions.setErrorMessage(
-              'Processor has disconnected. Click Reconnect'
-            )
-          );
-          clearStateDataOnDisconnect(dispatch);
-          return;
-        }
-
         if (closeEvent.code === 4002) {
           console.log('WebSocket middleware: Room combination changed');
+          stopReconnectionLoop();
           dispatch(
             uiActions.setErrorMessage(
               'Room combination changed. Click Reconnect to re-join the room'
@@ -333,23 +364,48 @@ export const createWebSocketMiddleware = (): Middleware<
           return;
         }
 
+        // Code 4001 on non-processor hardware should not auto-reconnect
+        if (closeEvent.code === 4001 && !serverIsRunningOnProcessorHardware) {
+          console.log(
+            'WebSocket middleware: Processor disconnected (not on processor hardware)'
+          );
+          stopReconnectionLoop();
+          dispatch(
+            uiActions.setErrorMessage(
+              'Processor has disconnected. Click Reconnect'
+            )
+          );
+          clearStateDataOnDisconnect(dispatch);
+          return;
+        }
+
+        // All other close codes (including 1000 and 4001 on processor hardware) will auto-reconnect
         if (state.client) {
-          console.log('WebSocket middleware: Closed by server');
+          console.log(
+            'WebSocket middleware: Closed by server, will auto-reconnect'
+          );
         } else {
           console.log('WebSocket middleware: Closed by client');
           return;
         }
 
+        // Clear the client reference immediately so reconnection can proceed
+        state.client = null;
+
         console.log('WebSocket middleware: Clearing state on disconnect');
+        dispatch(
+          uiActions.setErrorMessage(
+            'Connection lost. Attempting to reconnect...'
+          )
+        );
         dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
         dispatch(devicesActions.clearDevices());
         dispatch(roomsActions.clearRooms());
         dispatch(uiActions.clearAllModals());
         dispatch(uiActions.clearSyncState());
 
-        setTimeout(() => {
-          state.waitingToReconnect = false;
-        }, 5000);
+        // Start continuous reconnection attempts
+        startReconnectionLoop(dispatch);
       };
 
       newWs.onmessage = (e) => {
@@ -453,6 +509,7 @@ export const createWebSocketMiddleware = (): Middleware<
   const disconnect = () => {
     if (state.client) {
       console.log('WebSocket middleware: Disconnecting');
+      stopReconnectionLoop();
       state.client.close(4100, 'Client requested disconnect');
       state.client = null;
     }
