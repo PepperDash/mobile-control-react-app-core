@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RoomData } from '../../types/index';
+import { DeviceInterfaceInfo, RoomData } from '../../types/index';
 
 const initialState: RuntimeConfigState = {
   apiVersion: '',
@@ -54,6 +54,15 @@ const runtimeConfigSlice = createSlice({
     },
     setRoomData(state, action: PayloadAction<RoomData>) {
       state.roomData = action.payload;
+    },
+    setDeviceInterfaces(
+      state,
+      action: PayloadAction<{ [key: string]: DeviceInterfaceInfo }>
+    ) {
+      state.roomData.deviceInterfaceSupport = {
+        ...state.roomData.deviceInterfaceSupport,
+        ...action.payload,
+      };
     },
     setCurrentRoomKey(state, action: PayloadAction<string>) {
       // clear out any existing room/device data
