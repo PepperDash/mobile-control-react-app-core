@@ -24,7 +24,10 @@ const DisconnectedMessage = () => {
         )}
         {errorMessage && <h5>{errorMessage}</h5>}
         {showReconnect && (
-          <button className="btn btn-secondary btn-lg" onClick={reconnect}>
+          <button
+            className="btn btn-secondary btn-lg"
+            onPointerDown={reconnect}
+          >
             Reconnect
           </button>
         )}

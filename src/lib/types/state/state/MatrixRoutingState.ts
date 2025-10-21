@@ -8,7 +8,12 @@ export interface MatrixRoutingState extends DeviceState {
   outputs: Record<string, OutputSlot>;
 }
 
-export interface InputSlot extends DeviceState, IKeyName, IOnline, IVideoSync, ISlotNumber {
+export interface InputSlot
+  extends DeviceState,
+    IKeyName,
+    IOnline,
+    IVideoSync,
+    ISlotNumber {
   txDeviceKey: string;
   supportedSignalTypes: SignalType;
 }
@@ -16,7 +21,7 @@ export interface InputSlot extends DeviceState, IKeyName, IOnline, IVideoSync, I
 export interface OutputSlot extends IKeyName, ISlotNumber, IOnline {
   rxDeviceKey: string;
 
-  currentRoutes: Record<SignalType, InputSlot>;
+  currentRoutes: Partial<Record<SignalType, InputSlot>>;
 }
 
 export interface IVideoSync {

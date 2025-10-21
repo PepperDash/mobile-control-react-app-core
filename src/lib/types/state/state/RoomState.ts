@@ -1,9 +1,7 @@
- 
-
-import { PresetListItem } from '..';
 import { CameraListItem } from '../CameraListItem';
 import { DestinationListItem } from '../DestinationListItem';
 import { LevelControlListItem } from '../LevelControlListItem';
+import { PresetListItem } from '../PresetListItem';
 import { SourceListItem } from '../sourceListItem';
 import { Volume } from '../volume/volume';
 import { DeviceState } from './DeviceState';
@@ -11,7 +9,7 @@ import { ScheduleEvent } from './ScheduleEvent';
 import { ShareState } from './ShareState';
 
 /** Base device state class */
-export interface RoomState extends DeviceState{
+export interface RoomState extends DeviceState {
   activityMode?: number;
   advancedSharingActive?: boolean;
   configuration?: RoomConfiguration; // update with typed class later
@@ -21,7 +19,7 @@ export interface RoomState extends DeviceState{
   isWarmingUp?: boolean;
   selectedSourceKey?: string;
   share?: ShareState;
-  volumes : Record<string, Volume>;
+  volumes: Record<string, Volume>;
   scheduleEvents: ScheduleEvent[];
 }
 
@@ -76,10 +74,18 @@ export interface AudioControlPointListItem {
 
 export type AccessoryDeviceTypes = 'Camera' | 'ProjectorLift' | 'Screen';
 
-export type EnvironmentalDeviceTypes = 'Lighting' | 'Shade' | 'ShadeController' | 'Relay';
+export type EnvironmentalDeviceTypes =
+  | 'Lighting'
+  | 'Shade'
+  | 'ShadeController'
+  | 'Relay';
 
 export type RoomVolumeType = 'master' | string;
 
-export type DestinationTypes =   "defaultDisplay" | "leftDisplay" | "centerDisplay" | "rightDisplay" | "programAudio" | "codecContent";
-
-
+export type DestinationTypes =
+  | 'defaultDisplay'
+  | 'leftDisplay'
+  | 'centerDisplay'
+  | 'rightDisplay'
+  | 'programAudio'
+  | 'codecContent';

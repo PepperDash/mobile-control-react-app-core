@@ -8,6 +8,7 @@ export * from './usePressHoldRelease';
 export * from './useRoomIBasicVolume';
 export * from './useRoomIBasicVolumeWithFeedback';
 export * from './useScroll';
+export * from './useStateIsSynced';
 export * from './useSystemControl';
 export * from './useTimeAndDate';
 

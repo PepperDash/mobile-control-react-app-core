@@ -1,5 +1,16 @@
 import { useAppSelector } from '../hooks';
-import { selectClientId, selectIsTouchpanel, selectRoomKey, selectRuntimeInfo, selectServerIsRunningOnProcessorHardware, selectSystemUuid, selectTouchpanelKey, selectUserCode, selectWsIsConnected } from './runtime.selectors';
+import {
+  selectClientId,
+  selectDeviceInterfaceSupport,
+  selectIsTouchpanel,
+  selectRoomKey,
+  selectRuntimeInfo,
+  selectServerIsRunningOnProcessorHardware,
+  selectSystemUuid,
+  selectTouchpanelKey,
+  selectUserCode,
+  selectWsIsConnected,
+} from './runtime.selectors';
 
 export const useWsIsConnected = () => useAppSelector(selectWsIsConnected);
 
@@ -11,10 +22,14 @@ export const useSystemUuid = () => useAppSelector(selectSystemUuid);
 
 export const useUserCode = () => useAppSelector(selectUserCode);
 
-export const useServerIsRunningOnProcessorHardware = () => useAppSelector(selectServerIsRunningOnProcessorHardware);
+export const useServerIsRunningOnProcessorHardware = () =>
+  useAppSelector(selectServerIsRunningOnProcessorHardware);
 
 export const useRuntimeInfo = () => useAppSelector(selectRuntimeInfo);
 
 export const useTouchpanelKey = () => useAppSelector(selectTouchpanelKey);
 
 export const useIsTouchpanel = () => useAppSelector(selectIsTouchpanel);
+
+export const useDeviceInterfaceSupport = () =>
+  useAppSelector(selectDeviceInterfaceSupport);
