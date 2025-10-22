@@ -1,6 +1,6 @@
 import { AnyAction, Dispatch, Middleware } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-import { AppConfig, Message, RoomData } from '../../types';
+import { AppConfig, DeviceInterfaceInfo, Message, RoomData } from '../../types';
 import sessionStorageKeys from '../../types/classes/session-storage-keys';
 import { RoomState } from '../../types/state/state';
 import { DeviceState } from '../../types/state/state/DeviceState';
@@ -448,6 +448,20 @@ export const createWebSocketMiddleware = (): Middleware<
               case '/system/roomCombinationChanged':
                 window.location.reload();
                 break;
+              case '/system/deviceInterfaces': {
+                const interfaces: {
+                  deviceInterfaces: { [key: string]: DeviceInterfaceInfo };
+                } = message.content as {
+                  deviceInterfaces: { [key: string]: DeviceInterfaceInfo };
+                };
+
+                dispatch(
+                  runtimeConfigActions.setDeviceInterfaces(
+                    interfaces.deviceInterfaces
+                  )
+                );
+                break;
+              }
               default:
                 console.log(
                   'WebSocket middleware: Unhandled system message',
