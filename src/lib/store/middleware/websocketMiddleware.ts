@@ -220,9 +220,12 @@ export const createWebSocketMiddleware = (): Middleware<
   /**
    * Request room status - automatically called when connection and room data are ready
    */
-  const requestRoomStatus = (getState: () => LocalRootState) => {
+  const requestRoomStatus = (
+    getState: () => LocalRootState,
+    roomKey?: string
+  ) => {
     const rootState = getState();
-    const { roomKey } = rootState.runtimeConfig.roomData;
+    const currentRoomKey = roomKey ?? rootState.runtimeConfig.roomData.roomKey;
     const { clientId } = rootState.runtimeConfig.roomData;
     const isConnected = rootState.runtimeConfig.websocket.isConnected;
 
@@ -240,7 +243,7 @@ export const createWebSocketMiddleware = (): Middleware<
     if (state.client && isConnected) {
       state.client.send(
         JSON.stringify({
-          type: `/room/${roomKey}/status`,
+          type: `/room/${currentRoomKey}/status`,
           clientId,
           content: null,
         })
@@ -703,7 +706,7 @@ export const createWebSocketMiddleware = (): Middleware<
                 roomKey,
                 ', requesting room status...'
               );
-              setTimeout(() => requestRoomStatus(store.getState), 100);
+              setTimeout(() => requestRoomStatus(store.getState, roomKey), 100);
             }
           }
           break;
