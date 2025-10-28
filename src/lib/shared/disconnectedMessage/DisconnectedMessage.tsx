@@ -13,16 +13,14 @@ const DisconnectedMessage = () => {
   const showReconnect = useShowReconnect();
 
   return (
-    <>
-      <div
-        className={`disconnected-message ${classes.mwfit} mx-auto text-center`}
-      >
+    <div className="vh-100 d-flex flex-grow-1 justify-content-center align-items-center">
+      <div className={`${classes.mwfit} mx-auto text-center`}>
         {isConnected === undefined ? (
-          <h1>Connecting...</h1>
+          <h3>Connecting...</h3>
         ) : (
-          <h1>Disconnected</h1>
+          <h3>Disconnected</h3>
         )}
-        {errorMessage && <h5>{errorMessage}</h5>}
+        {errorMessage && <h6>{errorMessage}</h6>}
         {showReconnect && (
           <button
             className="btn btn-secondary btn-lg"
@@ -32,7 +30,7 @@ const DisconnectedMessage = () => {
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
