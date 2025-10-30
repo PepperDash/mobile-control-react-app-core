@@ -313,7 +313,14 @@ export const createWebSocketMiddleware = (): Middleware<
         console.log('WebSocket middleware: Connected', ev.type, ev.target);
         state.waitingToReconnect = false;
         stopReconnectionLoop();
-        dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
+
+        // Delay setting connected state to avoid flashing during failed reconnection attempts
+        setTimeout(() => {
+          // Only set connected if this WebSocket is still the current client
+          if (state.client === newWs && newWs.readyState === WebSocket.OPEN) {
+            dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
+          }
+        }, 100);
       };
 
       newWs.onerror = (err) => {
@@ -367,19 +374,34 @@ export const createWebSocketMiddleware = (): Middleware<
           return;
         }
 
-        // Code 4001 on non-processor hardware should not auto-reconnect
-        if (closeEvent.code === 4001 && !serverIsRunningOnProcessorHardware) {
-          console.log(
-            'WebSocket middleware: Processor disconnected (not on processor hardware)'
-          );
-          stopReconnectionLoop();
-          dispatch(
-            uiActions.setErrorMessage(
-              'Processor has disconnected. Click Reconnect'
-            )
-          );
-          clearStateDataOnDisconnect(dispatch);
-          return;
+        // Handle code 4001 based on touchpanel key presence
+        if (closeEvent.code === 4001) {
+          const currentState = getState() as LocalRootState;
+          const hasTouchpanelKey = !!currentState.runtimeConfig?.touchpanelKey;
+
+          if (hasTouchpanelKey) {
+            console.log(
+              'WebSocket middleware: Code 4001 received with touchpanel key present, will auto-reconnect'
+            );
+            // Will fall through to auto-reconnect logic below
+          } else if (!serverIsRunningOnProcessorHardware) {
+            console.log(
+              'WebSocket middleware: Processor disconnected (no touchpanel key, not on processor hardware)'
+            );
+            stopReconnectionLoop();
+            dispatch(
+              uiActions.setErrorMessage(
+                'Processor has disconnected. Click Reconnect'
+              )
+            );
+            clearStateDataOnDisconnect(dispatch);
+            return;
+          } else {
+            console.log(
+              'WebSocket middleware: Code 4001 on processor hardware (no touchpanel key), will auto-reconnect'
+            );
+            // Will fall through to auto-reconnect logic below
+          }
         }
 
         // All other close codes (including 1000 and 4001 on processor hardware) will auto-reconnect
