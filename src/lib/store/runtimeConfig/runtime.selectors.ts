@@ -52,3 +52,17 @@ export const selectDeviceInterfaceSupport = createSelector(
   runtimeState,
   (state) => state.roomData.deviceInterfaceSupport
 );
+
+export const selectInterfacesForDevice = (deviceKey: string) =>
+  createSelector(
+    selectDeviceInterfaceSupport,
+    (devices) => devices?.[deviceKey].interfaces ?? []
+  );
+
+export const selectDeviceSupportsInterface = (
+  deviceKey: string,
+  interfaceToCheck: string
+) =>
+  createSelector(selectInterfacesForDevice(deviceKey), (interfaces) =>
+    interfaces.includes(interfaceToCheck)
+  );
