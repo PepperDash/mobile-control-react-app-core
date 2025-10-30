@@ -10,21 +10,26 @@ This document describes the automatic reconnection logic implemented in the WebS
 
 The WebSocket middleware uses a simple approach: **auto-reconnect for everything except custom application codes**.
 
-| Close Code               | Scenario                 | Behavior                                   |
-| ------------------------ | ------------------------ | ------------------------------------------ |
-| **4100**                 | Client-initiated cleanup | No reconnection, clean shutdown            |
-| **4000**                 | User code changed        | No reconnection, show error, clear state   |
-| **4002**                 | Room combination changed | No reconnection, manual reconnect required |
-| **4001** (not processor) | Processor shutdown       | No reconnection, manual reconnect required |
-| **All other codes**      | Any disconnect/error     | **Auto-reconnect after 5s**                |
+| Close Code                        | Scenario                 | Behavior                                   |
+| --------------------------------- | ------------------------ | ------------------------------------------ |
+| **4100**                          | Client-initiated cleanup | No reconnection, clean shutdown            |
+| **4000**                          | User code changed        | No reconnection, show error, clear state   |
+| **4002**                          | Room combination changed | No reconnection, manual reconnect required |
+| **4001** (with touchpanel key)    | Connection loss          | **Auto-reconnect after 5s**                |
+| **4001** (no touchpanel, no proc) | Processor shutdown       | No reconnection, manual reconnect required |
+| **4001** (no touchpanel, proc HW) | Connection loss          | **Auto-reconnect after 5s**                |
+| **All other codes**               | Any disconnect/error     | **Auto-reconnect after 5s**                |
 
 **This includes:**
 
 - **1000** (Normal Closure) - Typical processor hardware disconnect
-- **4001** on processor hardware - Connection loss
 - Any network errors, unexpected disconnects, etc.
 
-**Simple rule**: If it's not one of the three custom codes (4000, 4002, 4100) or 4001 on non-processor hardware, it will auto-reconnect.
+**Code 4001 Logic**:
+
+1. **If touchpanel key exists** → Always auto-reconnect (regardless of processor hardware flag)
+2. **If no touchpanel key AND not on processor hardware** → Manual reconnect required
+3. **If no touchpanel key BUT on processor hardware** → Auto-reconnect
 
 ### Processor Hardware Mode
 
@@ -92,38 +97,49 @@ newWs.onopen = (ev: Event) => {
 };
 ```
 
-#### Special Case: Code 4001 on Non-Processor Hardware
+#### Special Case: Code 4001 Based on Touchpanel Key
 
-**Scenario**: Server is on a computer/VM that might be shut down
+**Scenario**: Code 4001 behavior depends on touchpanel key presence and processor hardware flag
 
-- Disconnect code 4001 likely means server is intentionally stopping
-- Auto-reconnection would be futile
-- User should manually reconnect when server restarts
+**Priority Logic**:
 
-**Behavior on disconnect (code 4001 only)**:
-
-1. Show error message: "Processor has disconnected. Click Reconnect"
-2. Clear all state (full cleanup)
-3. Wait for manual user action
-4. **No automatic reconnection**
+1. **Touchpanel key exists** → Always auto-reconnect (best indicator of active touchpanel)
+2. **No touchpanel key + not on processor hardware** → Manual reconnect required
+3. **No touchpanel key + on processor hardware** → Auto-reconnect
 
 **Code**:
 
 ```typescript
-// Code 4001 on non-processor hardware should not auto-reconnect
-if (closeEvent.code === 4001 && !serverIsRunningOnProcessorHardware) {
-  console.log(
-    'WebSocket middleware: Processor disconnected (not on processor hardware)'
-  );
-  dispatch(
-    uiActions.setErrorMessage('Processor has disconnected. Click Reconnect')
-  );
-  clearStateDataOnDisconnect(dispatch);
-  return; // Early exit - no auto-reconnect
+// Handle code 4001 based on touchpanel key presence
+if (closeEvent.code === 4001) {
+  const currentState = getState() as LocalRootState;
+  const hasTouchpanelKey = !!currentState.runtimeConfig?.touchpanelKey;
+
+  if (hasTouchpanelKey) {
+    console.log(
+      'WebSocket middleware: Code 4001 received with touchpanel key present, will auto-reconnect'
+    );
+    // Will fall through to auto-reconnect logic below
+  } else if (!serverIsRunningOnProcessorHardware) {
+    console.log(
+      'WebSocket middleware: Processor disconnected (no touchpanel key, not on processor hardware)'
+    );
+    stopReconnectionLoop();
+    dispatch(
+      uiActions.setErrorMessage('Processor has disconnected. Click Reconnect')
+    );
+    clearStateDataOnDisconnect(dispatch);
+    return;
+  } else {
+    console.log(
+      'WebSocket middleware: Code 4001 on processor hardware (no touchpanel key), will auto-reconnect'
+    );
+    // Will fall through to auto-reconnect logic below
+  }
 }
 ```
 
-**Note**: Code 4001 on processor hardware WILL auto-reconnect (treated like any other disconnect).
+**Touchpanel Key Priority**: The presence of a touchpanel key indicates an active touchpanel connection that should be maintained, so it takes priority over the processor hardware flag for reconnection decisions.
 
 #### When Server is NOT on Processor Hardware (`serverIsRunningOnProcessorHardware: false`)
 
@@ -263,11 +279,38 @@ newWs.onclose = (closeEvent: CloseEvent): void => {
 };
 ```
 
+## Anti-Flashing Mechanism
+
+To prevent the UI from flashing between connected/disconnected states during reconnection attempts, the middleware uses a delayed connection state update:
+
+```typescript
+newWs.onopen = (ev: Event) => {
+  console.log('WebSocket middleware: Connected');
+  state.waitingToReconnect = false;
+  stopReconnectionLoop();
+
+  // Delay setting connected state to avoid flashing during failed reconnection attempts
+  setTimeout(() => {
+    // Only set connected if this WebSocket is still the current client
+    if (state.client === newWs && newWs.readyState === WebSocket.OPEN) {
+      dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
+    }
+  }, 100);
+};
+```
+
+**Why this prevents flashing**:
+
+- WebSocket `onopen` can fire briefly even for connections that will immediately fail
+- Without delay: `onopen` → `isConnected = true` → UI shows children → `onclose` → `isConnected = false` → UI shows DisconnectedMessage (flashing)
+- With delay: `onopen` → wait 100ms → check if still connected → only then set `isConnected = true`
+
 This ensures:
 
 - Only one connection attempt at a time
 - **Client reference is cleared immediately on disconnect**
 - Prevents "already connected" errors on reconnection
+- **No UI flashing during reconnection attempts**
 - No race conditions
 - Clean state management
 
@@ -329,22 +372,33 @@ This is stored in Redux state at `runtimeConfig.serverIsRunningOnProcessorHardwa
 4. **Expected**: Shows "Connection lost..."
 5. **Expected**: Multiple retry attempts until network is back
 
-### Test 3: Code 4001 on Processor Hardware
+### Test 3: Code 4001 with Touchpanel Key Present
 
-1. Set `serverIsRunningOnProcessorHardware: true`
+1. Set touchpanel key in runtime config: `runtimeConfig.touchpanelKey = "some-key"`
 2. Connect to WebSocket
 3. Trigger disconnect with close code 4001
-4. **Expected**: Auto-reconnects after 5s
+4. **Expected**: Auto-reconnects after 5s (regardless of processor hardware flag)
 5. **Expected**: Shows "Connection lost. Attempting to reconnect..."
+6. **Expected**: Continuous retry attempts until successful
 
-### Test 4: Code 4001 on Non-Processor Hardware
+### Test 4: Code 4001 without Touchpanel Key (Processor Hardware)
+
+1. Set `serverIsRunningOnProcessorHardware: true`
+2. Ensure no touchpanel key: `runtimeConfig.touchpanelKey = null`
+3. Connect to WebSocket
+4. Trigger disconnect with close code 4001
+5. **Expected**: Auto-reconnects after 5s
+6. **Expected**: Shows "Connection lost. Attempting to reconnect..."
+
+### Test 5: Code 4001 without Touchpanel Key (Non-Processor Hardware)
 
 1. Set `serverIsRunningOnProcessorHardware: false`
-2. Connect to WebSocket
-3. Stop server with close code 4001
-4. **Expected**: Shows "Processor has disconnected. Click Reconnect"
-5. **Expected**: No auto-reconnect attempts
-6. **Expected**: Manual reconnect button works when server is back
+2. Ensure no touchpanel key: `runtimeConfig.touchpanelKey = null`
+3. Connect to WebSocket
+4. Stop server with close code 4001
+5. **Expected**: Shows "Processor has disconnected. Click Reconnect"
+6. **Expected**: No auto-reconnect attempts
+7. **Expected**: Manual reconnect button works when server is back
 
 ### Test 5: User Code Changed (Code 4000)
 
