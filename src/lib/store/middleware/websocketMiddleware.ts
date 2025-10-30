@@ -391,7 +391,7 @@ export const createWebSocketMiddleware = (): Middleware<
             stopReconnectionLoop();
             dispatch(
               uiActions.setErrorMessage(
-                'Processor has disconnected. Click Reconnect'
+                'Processor has disconnected. Click Reconnect to continue.'
               )
             );
             clearStateDataOnDisconnect(dispatch);
