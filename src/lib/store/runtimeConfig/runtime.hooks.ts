@@ -2,6 +2,8 @@ import { useAppSelector } from '../hooks';
 import {
   selectClientId,
   selectDeviceInterfaceSupport,
+  selectDeviceSupportsInterface,
+  selectInterfacesForDevice,
   selectIsTouchpanel,
   selectRoomKey,
   selectRuntimeInfo,
@@ -33,3 +35,11 @@ export const useIsTouchpanel = () => useAppSelector(selectIsTouchpanel);
 
 export const useDeviceInterfaceSupport = () =>
   useAppSelector(selectDeviceInterfaceSupport);
+
+export const useInterfacesForDevice = (deviceKey: string) =>
+  useAppSelector(selectInterfacesForDevice(deviceKey));
+
+export const useDeviceSupportsInterface = (
+  deviceKey: string,
+  interfaceToCheck: string
+) => useAppSelector(selectDeviceSupportsInterface(deviceKey, interfaceToCheck));
