@@ -56,7 +56,7 @@ export const selectDeviceInterfaceSupport = createSelector(
 export const selectInterfacesForDevice = (deviceKey: string) =>
   createSelector(
     selectDeviceInterfaceSupport,
-    (devices) => devices?.[deviceKey].interfaces ?? []
+    (devices) => devices?.[deviceKey]?.interfaces ?? []
   );
 
 export const selectDeviceSupportsInterface = (
