@@ -6,6 +6,7 @@ import { useRef } from 'react';
  * @param onPress function to call when the pointer is pressed
  * @param onRelease function to call when the pointer is released
  * @param onHold function to call when the pointer is held
+ * @param onPressedButNotHeld function to call when the button is pressed and released before the hold time elapses
  * @param holdTimeMs time in milliseconds to hold before onHold is called 
  * @returns an object that can be easily applied to a button or other element using a spread operator to attach to the element events
  * @example
@@ -13,6 +14,7 @@ import { useRef } from 'react';
  *  onPress: () => console.log('pressed'),
  *  onRelease: () => console.log('released'),
  *  onHold: () => console.log('held'),
+ *  onPressedButNotHeld: () => console.log('short press'),
  *  holdTimeMs: 2000
  * });
  * 
@@ -23,17 +25,21 @@ export function usePressHoldRelease({
   onPress,
   onRelease,
   onHold,
+  onPressedButNotHeld,
   holdTimeMs = 500,
 }: PressHoldReleaseParams) {
   const holdTimer = useRef<NodeJS.Timeout | null>(null);
   const pressed = useRef(false);
+  const held = useRef(false);
 
   function onPointerDown() {
 
     pressed.current = true;
+    held.current = false;
     onPress?.();
 
     holdTimer.current = setTimeout(() => {
+      held.current = true;
       onHold?.();
       holdTimer.current = null;
     }, holdTimeMs);
@@ -42,9 +48,13 @@ export function usePressHoldRelease({
   function onPointerUp() {
     pressed.current = false;
     onRelease?.();
+
     if (holdTimer.current) {
       clearTimeout(holdTimer.current);
       holdTimer.current = null;
+      if (!held.current) {
+        onPressedButNotHeld?.();
+      }
     }
   }
 
@@ -65,6 +75,7 @@ interface PressHoldReleaseParams {
   onPress?: () => void;
   onRelease?: () => void;
   onHold?: () => void;
+  onPressedButNotHeld?: () => void;
   /** Defaults to 500ms */
   holdTimeMs?: number;
 }
