@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 import { useButtonHeldHeartbeat } from '../useButtonHeldHeartbeat';
 import { PressHoldReleaseReturn } from '../usePressHoldRelease';
@@ -7,21 +8,21 @@ import { PressHoldReleaseReturn } from '../usePressHoldRelease';
  * @param path path prefix to for the device. i.e. /device/{key} or /room/{key}
  * @returns
  */
-export function useIBasicVolume(
-  path: string,
-): IBasicVolumeReturn | undefined {
+export function useIBasicVolume(path: string): IBasicVolumeReturn | undefined {
   const { sendMessage } = useWebsocketContext();
 
   const volumeUp = useButtonHeldHeartbeat(`${path}`, 'volumeUp');
   const volumeDown = useButtonHeldHeartbeat(`${path}`, 'volumeDown');
 
-  const muteToggle = () => sendMessage(`${path}/muteToggle`, null);
+  return useMemo(() => {
+    const muteToggle = () => sendMessage(`${path}/muteToggle`, null);
 
-  return {
-    volumeUp,
-    volumeDown,
-    muteToggle,
-  };
+    return {
+      volumeUp,
+      volumeDown,
+      muteToggle,
+    };
+  }, [path, sendMessage, volumeUp, volumeDown]);
 }
 
 export interface IBasicVolumeReturn {
@@ -31,18 +32,20 @@ export interface IBasicVolumeReturn {
 }
 
 export function useGetIBasicVolume(
-  path: string,
+  path: string
 ): IBasicVolumeReturn | undefined {
   const { sendMessage } = useWebsocketContext();
 
   const volumeUp = useButtonHeldHeartbeat(`${path}`, 'volumeUp');
   const volumeDown = useButtonHeldHeartbeat(`${path}`, 'volumeDown');
 
-  const muteToggle = () => sendMessage(`${path}/muteToggle`, null);
-  
-  return {
-    volumeUp,
-    volumeDown,
-    muteToggle,
-  };
+  return useMemo(() => {
+    const muteToggle = () => sendMessage(`${path}/muteToggle`, null);
+
+    return {
+      volumeUp,
+      volumeDown,
+      muteToggle,
+    };
+  }, [path, sendMessage, volumeUp, volumeDown]);
 }
