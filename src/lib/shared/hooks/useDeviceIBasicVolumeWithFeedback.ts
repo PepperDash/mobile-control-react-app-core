@@ -4,14 +4,13 @@ import { useIBasicVolumeWithFeedback } from './interfaces/useIBasicVolumeWithFee
 
 /**
  *  Wrapper hook for a device volume
- * @param deviceKey 
- * @returns 
+ * @param deviceKey
+ * @returns
  */
-export function useDeviceIBasicVolumeWithFeedback(deviceKey: string ) {
+export function useDeviceIBasicVolumeWithFeedback(deviceKey: string) {
   const volumeState = useGetDevice<IBasicVolumeWithFeedbackState>(deviceKey);
 
   const path = `/device/${deviceKey}`;
 
   return useIBasicVolumeWithFeedback(path, volumeState?.volume);
 }
-

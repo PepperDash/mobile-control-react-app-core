@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Volume } from '../../../types';
 import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 import { IBasicVolumeReturn, useIBasicVolume } from './useIBasicVolume';
@@ -15,25 +16,31 @@ export function useIBasicVolumeWithFeedback(
   const { sendMessage, sendSimpleMessage } = useWebsocketContext();
 
   const baseVolume = useIBasicVolume(path);
-  if(!baseVolume) {
+
+  return useMemo(() => {
+    if (!baseVolume) {
       console.log('baseVolume is undefined');
       return undefined;
-  }
-  if (!volumeState) {
-    console.log('volumeState is undefined');
-    return undefined;
-  }
-  const setLevel = (value: number) => sendSimpleMessage(`${path}/level`, value);
-  const muteOn = () => sendMessage(`${path}/muteOn`, null);
-  const muteOff = () => sendMessage(`${path}/muteOff`, null);
+    }
 
-  return {
-    ...baseVolume,
-    volumeState,
-    setLevel,
-    muteOn,
-    muteOff,
-  };
+    if (!volumeState) {
+      console.log('volumeState is undefined');
+      return undefined;
+    }
+
+    const setLevel = (value: number) =>
+      sendSimpleMessage(`${path}/level`, value);
+    const muteOn = () => sendMessage(`${path}/muteOn`, null);
+    const muteOff = () => sendMessage(`${path}/muteOff`, null);
+
+    return {
+      ...baseVolume,
+      volumeState,
+      setLevel,
+      muteOn,
+      muteOff,
+    };
+  }, [baseVolume, volumeState, path, sendMessage, sendSimpleMessage]);
 }
 
 export interface IBasicVolumeWithFeedbackReturn extends IBasicVolumeReturn {
@@ -42,7 +49,9 @@ export interface IBasicVolumeWithFeedbackReturn extends IBasicVolumeReturn {
   muteOn: () => void;
   muteOff: () => void;
 }
-
+/**
+ * @deprecated use useIBasicVolumeWithFeedback instead
+ */
 export function useGetIBasicVolumeWithFeedback(
   path: string,
   volumeState: Volume | undefined
@@ -50,24 +59,28 @@ export function useGetIBasicVolumeWithFeedback(
   const { sendMessage, sendSimpleMessage } = useWebsocketContext();
 
   const baseVolume = useIBasicVolume(path);
-  if(!baseVolume) {
+
+  return useMemo(() => {
+    if (!baseVolume) {
       console.log('baseVolume is undefined');
       return undefined;
-  }
-  if(!volumeState) {
+    }
+    if (!volumeState) {
       console.log('volumeState is undefined');
       return undefined;
-  }
+    }
 
-  const setLevel = (value: number) => sendSimpleMessage(`${path}/level`, value);
-  const muteOn = () => sendMessage(`${path}/muteOn`, null);
-  const muteOff = () => sendMessage(`${path}/muteOff`, null);
+    const setLevel = (value: number) =>
+      sendSimpleMessage(`${path}/level`, value);
+    const muteOn = () => sendMessage(`${path}/muteOn`, null);
+    const muteOff = () => sendMessage(`${path}/muteOff`, null);
 
-  return {
-    ...baseVolume,
-    volumeState,
-    setLevel,
-    muteOn,
-    muteOff,
-  };
+    return {
+      ...baseVolume,
+      volumeState,
+      setLevel,
+      muteOn,
+      muteOff,
+    };
+  }, [baseVolume, volumeState, path, sendMessage, sendSimpleMessage]);
 }
