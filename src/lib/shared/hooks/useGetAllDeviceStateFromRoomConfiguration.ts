@@ -1,11 +1,15 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { RoomConfiguration } from '../../types/state/state';
 import { useWebsocketContext } from '../../utils/useWebsocketContext';
 
 /**
  * This hook will gather up all the keys for devices in the room
- * and  send messages to the websocket to get the iniital state
- * for each device
+ * and send messages to the websocket to get the initial state
+ * for each device.
+ *
+ * @param config - Room configuration containing device keys
+ * @param requestStatus - Whether to request device status (default: true)
+ * @returns Set of device keys found in the configuration
  */
 export const useGetAllDeviceStateFromRoomConfiguration = (
   {
@@ -17,22 +21,23 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
 ) => {
   const { sendMessage } = useWebsocketContext();
 
-  return useMemo(() => {
-    if (!config) {
-      return;
-    }
+  // Step 1: Memoize the collection of device keys (pure computation)
+  const deviceKeysSet = useMemo(() => {
+    const keys: Set<string> = new Set<string>();
 
-    const deviceKeysSet: Set<string> = new Set<string>();
+    if (!config) {
+      return keys;
+    }
 
     if (config.destinations) {
       Object.values(config.destinations).forEach((d) => {
-        deviceKeysSet.add(d);
+        keys.add(d);
       });
     }
 
     if (config.destinationList) {
       Object.values(config.destinationList).forEach((dli) => {
-        deviceKeysSet.add(dli.sinkKey);
+        keys.add(dli.sinkKey);
       });
     }
 
@@ -41,45 +46,45 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
         (lcl) => {
           // if the level control has an item key, combine it with the parent device key
           if (lcl.itemKey) {
-            deviceKeysSet.add(lcl.parentDeviceKey + '--' + lcl.itemKey);
+            keys.add(lcl.parentDeviceKey + '--' + lcl.itemKey);
           } else {
-            deviceKeysSet.add(lcl.parentDeviceKey);
+            keys.add(lcl.parentDeviceKey);
           }
         }
       );
     }
 
     config.touchpanelKeys?.forEach((d) => {
-      deviceKeysSet.add(d);
+      keys.add(d);
     });
 
     config.environmentalDevices?.forEach((d) => {
-      if (d.deviceKey) deviceKeysSet.add(d.deviceKey);
+      if (d.deviceKey) keys.add(d.deviceKey);
     });
 
     config.accessoryDeviceKeys?.forEach((d) => {
-      deviceKeysSet.add(d);
+      keys.add(d);
     });
 
     if (config.audioCodecKey) {
-      deviceKeysSet.add(config.audioCodecKey);
+      keys.add(config.audioCodecKey);
     }
 
     if (config.videoCodecKey) {
-      deviceKeysSet.add(config.videoCodecKey);
+      keys.add(config.videoCodecKey);
     }
 
     if (config.matrixRoutingKey) {
-      deviceKeysSet.add(config.matrixRoutingKey);
+      keys.add(config.matrixRoutingKey);
     }
 
     if (config.roomCombinerKey) {
-      deviceKeysSet.add(config.roomCombinerKey);
+      keys.add(config.roomCombinerKey);
     }
 
     if (config.endpointKeys) {
       config.endpointKeys.forEach((ek) => {
-        deviceKeysSet.add(ek);
+        keys.add(ek);
       });
     }
 
@@ -87,18 +92,23 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
       for (const value of Object.values(config.sourceList)) {
         // if the source has a source key, add it to the list of device keys
         if (value.sourceKey && value.sourceKey !== '$off')
-          deviceKeysSet.add(value.sourceKey);
+          keys.add(value.sourceKey);
       }
     }
 
-    console.log('requesting state for deviceKeys:', deviceKeysSet);
+    return keys;
+  }, [config]);
 
-    if (!requestStatus) return deviceKeysSet;
+  // Step 2: Send messages as a side effect (happens after render)
+  useEffect(() => {
+    if (!requestStatus || deviceKeysSet.size === 0) return;
+
+    console.log('requesting state for deviceKeys:', deviceKeysSet);
 
     deviceKeysSet.forEach((dk) => {
       sendMessage(`/device/${dk}/fullStatus`, { deviceKey: dk });
     });
+  }, [deviceKeysSet, requestStatus, sendMessage]);
 
-    return deviceKeysSet;
-  }, [config, sendMessage, requestStatus]);
+  return deviceKeysSet;
 };
