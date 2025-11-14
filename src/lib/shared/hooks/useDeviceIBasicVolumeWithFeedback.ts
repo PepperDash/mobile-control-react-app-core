@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useGetDevice } from '../../store';
 import { IBasicVolumeWithFeedbackState } from '../../types/state/state/IBasicVolumeWithFeedbackState';
 import { useIBasicVolumeWithFeedback } from './interfaces/useIBasicVolumeWithFeedback';
@@ -12,5 +13,10 @@ export function useDeviceIBasicVolumeWithFeedback(deviceKey: string) {
 
   const path = `/device/${deviceKey}`;
 
-  return useIBasicVolumeWithFeedback(path, volumeState?.volume);
+  const volume = useMemo(() => {
+    if (!volumeState) return undefined;
+    return volumeState.volume;
+  }, [volumeState]);
+
+  return useIBasicVolumeWithFeedback(path, volume);
 }
