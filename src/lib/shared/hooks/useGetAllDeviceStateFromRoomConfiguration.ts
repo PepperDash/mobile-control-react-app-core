@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { RoomConfiguration } from '../../types/state/state';
 import { useWebsocketContext } from '../../utils/useWebsocketContext';
 
@@ -24,11 +24,11 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
 
   // Step 1: Memoize the collection of device keys (pure computation)
   const deviceKeysSet = useMemo(() => {
-    const keys: Set<string> = new Set<string>();
-
     if (!config) {
-      return keys;
+      return undefined;
     }
+
+    const keys: Set<string> = new Set<string>();
 
     if (config.destinations) {
       Object.values(config.destinations).forEach((d) => {
@@ -101,8 +101,13 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
   }, [config]);
 
   // Step 2: Create a stable callback for requesting device status
-  const requestDeviceStatus = useCallback(() => {
-    if (!requestStatus || deviceKeysSet.size === 0 || hasRequestedRef.current) {
+  useEffect(() => {
+    if (
+      !requestStatus ||
+      !deviceKeysSet ||
+      deviceKeysSet.size === 0 ||
+      hasRequestedRef.current
+    ) {
       return;
     }
 
@@ -114,13 +119,6 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
 
     hasRequestedRef.current = true;
   }, [deviceKeysSet, requestStatus, sendMessage]);
-
-  // Step 3: Request device status when deviceKeysSet changes
-  useEffect(() => {
-    // Reset the ref when deviceKeysSet changes (new room/config)
-    hasRequestedRef.current = false;
-    requestDeviceStatus();
-  }, [requestDeviceStatus]);
 
   return deviceKeysSet;
 };
