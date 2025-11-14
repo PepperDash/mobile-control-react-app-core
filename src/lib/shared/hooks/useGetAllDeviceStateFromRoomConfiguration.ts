@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import { RoomConfiguration } from '../../types/state/state';
 import { useWebsocketContext } from '../../utils/useWebsocketContext';
 
@@ -7,14 +7,17 @@ import { useWebsocketContext } from '../../utils/useWebsocketContext';
  * and  send messages to the websocket to get the iniital state
  * for each device
  */
-export const useGetAllDeviceStateFromRoomConfiguration = ({
-  config,
-}: {
-  config: RoomConfiguration | undefined;
-}) => {
+export const useGetAllDeviceStateFromRoomConfiguration = (
+  {
+    config,
+  }: {
+    config: RoomConfiguration | undefined;
+  },
+  requestStatus: boolean = true
+) => {
   const { sendMessage } = useWebsocketContext();
 
-  useEffect(() => {
+  return useMemo(() => {
     if (!config) {
       return;
     }
@@ -90,8 +93,12 @@ export const useGetAllDeviceStateFromRoomConfiguration = ({
 
     console.log('requesting state for deviceKeys:', deviceKeysSet);
 
+    if (!requestStatus) return deviceKeysSet;
+
     deviceKeysSet.forEach((dk) => {
       sendMessage(`/device/${dk}/fullStatus`, { deviceKey: dk });
     });
-  }, [config, sendMessage]);
+
+    return deviceKeysSet;
+  }, [config, sendMessage, requestStatus]);
 };
