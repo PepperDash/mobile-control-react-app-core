@@ -262,7 +262,8 @@ export const createWebSocketMiddleware = (): Middleware<
 
     const rootState = getState();
     const { apiPath } = rootState.appConfig.config;
-    const { serverIsRunningOnProcessorHardware } = rootState.runtimeConfig;
+    const { serverIsRunningOnProcessorHardware, roomData } =
+      rootState.runtimeConfig;
 
     if (!apiPath || !state.token) {
       console.log(
@@ -304,7 +305,7 @@ export const createWebSocketMiddleware = (): Middleware<
       console.log('WebSocket middleware: Connecting to websocket');
 
       const wsPath = apiPath.replace('http', 'ws');
-      const url = `${wsPath}/ui/join/${state.token}`;
+      const url = `${wsPath}/ui/join/${state.token}?clientId=${roomData.clientId}`;
 
       const newWs = new WebSocket(url);
       state.client = newWs;
