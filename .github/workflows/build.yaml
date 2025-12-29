@@ -2,6 +2,9 @@ name: Build Mobile-Control-Core
 
 on: push
 
+permissions:
+  id-token: write
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,16 +26,16 @@ jobs:
         if: steps.get_branch.outputs.branch != 'main'
         uses: jacobtomlinson/gha-find-replace@master
         with:
-          find: 'replace-me-feature-branch'
-          replace: '${{ steps.get_branch.outputs.branch }}'
-          include: '.releaserc.json'
+          find: "replace-me-feature-branch"
+          replace: "${{ steps.get_branch.outputs.branch }}"
+          include: ".releaserc.json"
       - name: Replace prerelease name in .releaserc.json
         if: steps.get_branch.outputs.branch != 'main'
         uses: jacobtomlinson/gha-find-replace@master
         with:
-          find: 'replace-me-prerelease'
-          replace: '${{ steps.get_branch.outputs.prerelease }}'
-          include: '.releaserc.json'
+          find: "replace-me-prerelease"
+          replace: "${{ steps.get_branch.outputs.prerelease }}"
+          include: ".releaserc.json"
       - name: install packages
         run: npm ci
       - name: build
