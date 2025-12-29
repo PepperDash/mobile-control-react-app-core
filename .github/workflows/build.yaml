@@ -3,8 +3,10 @@ name: Build Mobile-Control-Core
 on: push
 
 permissions:
-  id-token: write
   contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -52,7 +54,5 @@ jobs:
           --package=@semantic-release/github \
           -- semantic-release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
