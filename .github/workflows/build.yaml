@@ -55,4 +55,5 @@ jobs:
           --package=@semantic-release/github \
           -- semantic-release --debug
         env:
+          NPM_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
