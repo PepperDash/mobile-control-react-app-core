@@ -10,6 +10,10 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PepperDash/mobile-control-react-app-core"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
@@ -79,10 +83,6 @@
         "./dist/index.d.ts"
       ]
     }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PepperDash/mobile-control-react-app-core.git"
   },
   "bugs": {
     "url": "https://github.com/PepperDash/mobile-control-react-app-core"
