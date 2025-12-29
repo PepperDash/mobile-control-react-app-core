@@ -12,6 +12,7 @@ export interface RoomData {
   enableDebug?: boolean;
   qrUrl: string;
   deviceInterfaceSupport?: { [key: string]: DeviceInterfaceInfo };
+  webSocketUrl?: string;
 }
 
 export interface DeviceInterfaceInfo extends IKeyName {
