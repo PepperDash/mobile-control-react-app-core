@@ -15,7 +15,7 @@ jobs:
       - name: set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: lts/*
       - name: Get branch name
         id: get_branch
         run: |
@@ -55,4 +55,3 @@ jobs:
           -- semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
