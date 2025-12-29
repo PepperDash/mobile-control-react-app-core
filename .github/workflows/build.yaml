@@ -53,6 +53,6 @@ jobs:
           --package=conventional-changelog-conventionalcommits \
           --package=@semantic-release/npm \
           --package=@semantic-release/github \
-          -- semantic-release --verbose
+          -- semantic-release --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
