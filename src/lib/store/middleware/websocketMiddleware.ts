@@ -134,7 +134,7 @@ export const createWebSocketMiddleware = (): Middleware<
     apiPath: string,
     token: string,
     dispatch: Dispatch
-  ): Promise<boolean> => {
+  ): Promise<RoomData | null> => {
     try {
       const res = await httpClient.get<RoomData>(
         `${apiPath}/ui/joinroom?token=${token}`
@@ -142,10 +142,10 @@ export const createWebSocketMiddleware = (): Middleware<
 
       if (res.status === 200 && res.data) {
         dispatch(runtimeConfigActions.setRoomData(res.data));
-        return true;
+        return res.data;
       }
 
-      return false;
+      return null;
     } catch (err) {
       console.log(err);
 
@@ -160,7 +160,7 @@ export const createWebSocketMiddleware = (): Middleware<
             `Token ${token} is invalid. Unable to join room`
           )
         );
-        return false;
+        return null;
       }
 
       console.error('Error getting room data', err);
@@ -170,7 +170,7 @@ export const createWebSocketMiddleware = (): Middleware<
       } else {
         dispatch(uiActions.setErrorMessage('Error getting room data'));
       }
-      return false;
+      return null;
     }
   };
 
@@ -262,8 +262,7 @@ export const createWebSocketMiddleware = (): Middleware<
 
     const rootState = getState();
     const { apiPath } = rootState.appConfig.config;
-    const { serverIsRunningOnProcessorHardware, roomData } =
-      rootState.runtimeConfig;
+    const { serverIsRunningOnProcessorHardware } = rootState.runtimeConfig;
 
     if (!apiPath || !state.token) {
       console.log(
@@ -292,9 +291,9 @@ export const createWebSocketMiddleware = (): Middleware<
     state.waitingToReconnect = true;
 
     try {
-      const tokenResult = await getRoomData(apiPath, state.token, dispatch);
+      const roomData = await getRoomData(apiPath, state.token, dispatch);
 
-      if (!tokenResult) {
+      if (!roomData) {
         console.log(
           'WebSocket middleware: Failed to get room data, will retry...'
         );
