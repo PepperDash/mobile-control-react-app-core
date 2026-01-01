@@ -225,13 +225,14 @@ export const createWebSocketMiddleware = (): Middleware<
     roomKey?: string
   ) => {
     const rootState = getState();
+
     const currentRoomKey = roomKey ?? rootState.runtimeConfig.roomData.roomKey;
     const { clientId } = rootState.runtimeConfig.roomData;
     const isConnected = rootState.runtimeConfig.websocket.isConnected;
 
-    if (!roomKey || !isConnected || !clientId) {
+    if (!currentRoomKey || !isConnected || !clientId) {
       console.log('WebSocket middleware: Cannot request room status', {
-        hasRoomKey: !!roomKey,
+        hasRoomKey: !!currentRoomKey,
         isConnected,
         hasClientId: !!clientId,
       });
