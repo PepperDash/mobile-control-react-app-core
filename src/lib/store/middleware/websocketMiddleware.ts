@@ -239,7 +239,10 @@ export const createWebSocketMiddleware = (): Middleware<
       return;
     }
 
-    console.log('WebSocket middleware: Requesting status from room:', roomKey);
+    console.log(
+      'WebSocket middleware: Requesting status from room:',
+      currentRoomKey
+    );
 
     if (state.client && isConnected) {
       state.client.send(
