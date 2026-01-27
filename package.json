@@ -77,13 +77,6 @@
   "main": "./dist/mobile-control-react-app-core.umd.js",
   "module": "./dist/mobile-control-react-app-core.es.js",
   "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/index.d.ts"
-      ]
-    }
-  },
   "bugs": {
     "url": "https://github.com/PepperDash/mobile-control-react-app-core"
   },
