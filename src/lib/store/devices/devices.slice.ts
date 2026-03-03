@@ -19,7 +19,7 @@ const devicesSlice = createSlice({
       // and avoids doing a deep copy of the object
       const content = action.payload.content as DeviceState;
 
-      // Get existing room state
+      // Get existing device state
       const existingState = state[key] ?? {};
 
       // merge new state with existing (replace arrays instead of merging them)
@@ -28,7 +28,7 @@ const devicesSlice = createSlice({
         existingState,
         content,
         (_objValue, srcValue) => {
-          if (Array.isArray(srcValue)) return srcValue;
+          if (Array.isArray(srcValue)) return srcValue.slice();
           return undefined; // fallback to default merge behavior
         },
       );
