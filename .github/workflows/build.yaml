@@ -16,7 +16,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: "https://registry.npmjs.org"
       - name: Get branch name
         id: get_branch
         run: |
@@ -39,13 +38,11 @@ jobs:
           find: "replace-me-prerelease"
           replace: "${{ steps.get_branch.outputs.prerelease }}"
           include: ".releaserc.json"
-      - name: install packages
-        run: npm ci
-      - name: build
-        run: npm run build
-      - name: Deploy to npm
+      - name: install packages & build
         run: |
-          DEBUG=semantic-release:* npx --package=semantic-release \
+          npm ci
+          npm run build
+          npx --package=semantic-release \
           --package=@semantic-release/commit-analyzer \
           --package=@semantic-release/release-notes-generator \
           --package=@semantic-release/changelog \
@@ -53,9 +50,7 @@ jobs:
           --package=conventional-changelog-conventionalcommits \
           --package=@semantic-release/npm \
           --package=@semantic-release/github \
-          -- semantic-release --debug
+          -- semantic-release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
