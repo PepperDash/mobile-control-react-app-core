@@ -231,6 +231,10 @@ export const createWebSocketMiddleware = (): Middleware<
     const essentialsVersion =
       rootState.runtimeConfig.roomData.config?.runtimeInfo.essentialsVersion;
 
+    console.log('WebSocket middleware: Essentials version', {
+      essentialsVersion,
+    });
+
     const isEssentialsV3 = essentialsVersion?.startsWith('3.');
 
     if (!roomKey || !isConnected || !clientId) {
