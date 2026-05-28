@@ -15,7 +15,7 @@ Guide for authoring new interface hooks in `src/lib/shared/hooks/interfaces/`.
 
 - File: `useI{EssentialsInterfaceName}.ts`
 - Function: `useI{EssentialsInterfaceName}(key: string)`
-- Return interface: `I{EssentialsInterfaceName}Return`
+- Return interface: `I{EssentialsInterfaceName}Return` (new hooks use `*Return`; legacy hooks in this directory may use `*Props` — do not rename existing interfaces)
 - The name must match the C# interface in [Essentials](https://github.com/PepperDash/Essentials) (e.g., `IHasPowerControl` → `useIHasPowerControl`)
 
 ---

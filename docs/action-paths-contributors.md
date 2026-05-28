@@ -67,6 +67,8 @@ sequenceDiagram
     MW->>WS: new WebSocket("{apiPath}/ui/join/{token}?clientId={clientId}")
     WS-->>MW: onopen
     MW->>MW: dispatch(runtimeConfigActions.setWebsocketIsConnected(true))
+    MW->>MW: Listener observes setWebsocketIsConnected/setRoomData
+    MW->>MW: requestRoomStatus()
     MW->>WS: send { type: "/room/{roomKey}/status", clientId, content: null }
     WS->>ES: Initial room status request
     ES-->>WS: /room/{roomKey} state message
@@ -140,7 +142,9 @@ const sendMessage = (messageType, content, getState) => {
 
 ## State Cleared on Disconnect
 
-When the socket closes (except code 4100), the middleware dispatches:
+The middleware has two distinct disconnect paths based on close code:
+
+**No-reconnect path** (codes `4100`, `4000`, `4002`, and `4001` without a touchpanel key on non-processor hardware) — calls `clearStateDataOnDisconnect()`, which dispatches:
 
 - `uiActions.setShowReconnect(true)`
 - `runtimeConfigActions.setWebsocketIsConnected(false)`
@@ -148,6 +152,16 @@ When the socket closes (except code 4100), the middleware dispatches:
 - `roomsActions.clearRooms()`
 - `uiActions.clearAllModals()`
 - `uiActions.clearSyncState()`
+
+**Auto-reconnect path** (normal closes such as `1000`, and `4001` with a touchpanel key or running on processor hardware) — does **not** dispatch `setShowReconnect(true)`. It dispatches:
+
+- `runtimeConfigActions.setWebsocketIsConnected(false)`
+- `devicesActions.clearDevices()`
+- `roomsActions.clearRooms()`
+- `uiActions.clearAllModals()`
+- `uiActions.clearSyncState()`
+
+…and then starts the reconnection loop.
 
 ---
 

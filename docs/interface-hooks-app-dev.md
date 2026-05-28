@@ -97,7 +97,7 @@ function TransportBar({ deviceKey }: { deviceKey: string }) {
 
 | Hook                                                  | Key Type               | Returns                                       | Actions                                                                                         |
 | ----------------------------------------------------- | ---------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `useIBasicVolume(path)`                               | path string            | `IBasicVolumeReturn`                          | `volumeUp`, `volumeDown` (PHR), `muteToggle`                                                    |
+| `useIBasicVolume(path)`                               | path string            | `IBasicVolumeReturn \| undefined`             | `volumeUp`, `volumeDown` (PHR), `muteToggle`                                                    |
 | `useIBasicVolumeWithFeedback(path, volumeState)`      | path + Volume          | `IBasicVolumeWithFeedbackReturn \| undefined` | + `setLevel(number)`, `muteOn`, `muteOff`; includes `volumeState`                               |
 | `useILevelControls(key)`                              | device or room key     | `ILevelControlsReturn \| undefined`           | `setLevel(levelKey, value)`, `muteToggle(levelKey)`, `muteOn`, `muteOff`; includes `levelState` |
 | `useDeviceIBasicVolume(deviceKey)`                    | device key             | `IBasicVolumeReturn \| undefined`             | Convenience wrapper — builds path as `/device/{key}`                                            |
@@ -111,13 +111,13 @@ function TransportBar({ deviceKey }: { deviceKey: string }) {
 
 ### Transport / Media Playback
 
-| Hook                         | Key Type   | Returns                   | Actions                                                                                        |
-| ---------------------------- | ---------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
-| `useITransport(key)`         | device key | `ITransportProps`         | `play`, `pause`, `stop`, `prevTrack`, `nextTrack`, `rewind`, `fastForward`, `record` (all PHR) |
-| `useIChannel(key)`           | device key | `IChannelMessengerProps`  | `channelUp`, `channelDown`, `lastChannel`, `guide`, `info`, `exit` (all PHR)                   |
-| `useIDvr(key)`               | device key | `IDvrProps`               | `dvrList`, `record` (both PHR)                                                                 |
-| `useINumeric(key)`           | device key | `INumericProps`           | `digit0`–`digit9`, `keypadAccessoryButton1`, `keypadAccessoryButton2` (all PHR)                |
-| `useISetTopBoxControls(key)` | device key | `ISetTopBoxControlsProps` | `dvrList`, `replay` (both PHR)                                                                 |
+| Hook                         | Key Type   | Returns                               | Actions                                                                                        |
+| ---------------------------- | ---------- | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `useITransport(key)`         | device key | `ITransportProps \| undefined`        | `play`, `pause`, `stop`, `prevTrack`, `nextTrack`, `rewind`, `fastForward`, `record` (all PHR) |
+| `useIChannel(key)`           | device key | `IChannelMessengerProps \| undefined` | `channelUp`, `channelDown`, `lastChannel`, `guide`, `info`, `exit` (all PHR)                   |
+| `useIDvr(key)`               | device key | `IDvrProps \| undefined`              | `dvrList`, `record` (both PHR)                                                                 |
+| `useINumeric(key)`           | device key | `INumericProps`                       | `digit0`–`digit9`, `keypadAccessoryButton1`, `keypadAccessoryButton2` (all PHR)                |
+| `useISetTopBoxControls(key)` | device key | `ISetTopBoxControlsProps`             | `dvrList`, `replay` (both PHR)                                                                 |
 
 ---
 

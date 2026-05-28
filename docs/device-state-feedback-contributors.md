@@ -103,7 +103,7 @@ setDeviceState(state, action: PayloadAction<Message>) {
 
 **Source:** `src/lib/store/rooms/rooms.slice.ts`
 
-Identical merge strategy to `setDeviceState`. Key extracted from the last segment of `message.type`.
+Similar merge strategy to `setDeviceState`: room state is deep-merged by key, and arrays in new content replace existing arrays rather than being merged element-by-element. The key is extracted from the last segment of `message.type`. Note: unlike the devices slice which clones incoming arrays with `.slice()`, the rooms slice returns the array reference directly.
 
 **Additional behavior:** `setRoomState` is also called for `fullStatus` responses from the room.
 

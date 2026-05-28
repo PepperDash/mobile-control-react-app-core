@@ -86,12 +86,18 @@ function RoomPower({ roomKey }: { roomKey: string }) {
 ## Reading Connection State
 
 ```tsx
-import { useRuntimeConfig } from 'mobile-control-react-app-core';
+import {
+  useRoomKey,
+  useWsIsConnected,
+  useClientId,
+  useSystemUuid,
+} from 'mobile-control-react-app-core';
 
-// Individual selectors from runtimeConfig hooks
-const roomKey = useCurrentRoomKey();
+// Individual hooks from runtimeConfig
+const roomKey = useRoomKey();
 const isConnected = useWsIsConnected();
-const roomData = useRoomData();      // clientId, config, deviceInterfaceSupport
+const clientId = useClientId();       // clientId for the current session
+const systemUuid = useSystemUuid();   // unique identifier for the Crestron processor
 ```
 
 ---
