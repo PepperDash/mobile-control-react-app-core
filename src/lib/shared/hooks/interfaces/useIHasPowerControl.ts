@@ -1,30 +1,34 @@
+import { useGetDevice } from 'src/lib';
+import { PowerState } from 'src/lib/types';
 import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * hook to control a device that implements the IHasPowerControl interface
  * @param key key of the device
- * @returns 
+ * @returns
  */
 export function useIHasPowerControl(key: string): IHasPowerWithFeedbackProps {
   const { sendMessage } = useWebsocketContext();
+  const powerState = useGetDevice<PowerState>(key)?.powerState;
 
   const powerOn = () => {
-      sendMessage(`/device/${key}/powerOn`, null);
+    sendMessage(`/device/${key}/powerOn`, null);
   };
 
   const powerOff = () => {
-      sendMessage(`/device/${key}/powerOff`, null);
+    sendMessage(`/device/${key}/powerOff`, null);
   };
 
   const powerToggle = () => {
-      sendMessage(`/device/${key}/powerToggle`, null);
-  }
+    sendMessage(`/device/${key}/powerToggle`, null);
+  };
 
-  return { powerOn, powerOff, powerToggle };
+  return { powerOn, powerOff, powerToggle, powerState };
 }
 
 export interface IHasPowerWithFeedbackProps {
   powerOn: () => void;
   powerOff: () => void;
   powerToggle: () => void;
+  powerState?: boolean;
 }
