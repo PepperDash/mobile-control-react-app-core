@@ -7,7 +7,9 @@ import { useWebsocketContext } from '../../../utils/useWebsocketContext';
  * @param key key of the device
  * @returns
  */
-export function useIHasCameraMute(key: string): IHasCameraMuteProps {
+export function useIHasCameraMute(
+  key: string,
+): IHasCameraMuteProps | undefined {
   const { sendMessage } = useWebsocketContext();
   const cameraIsMuted = useGetDevice<IHasCameraMuteState>(key)?.cameraIsMuted;
 
@@ -22,6 +24,8 @@ export function useIHasCameraMute(key: string): IHasCameraMuteProps {
   const cameraMuteToggle = () => {
     sendMessage(`/device/${key}/cameraMuteToggle`, null);
   };
+
+  if (!cameraIsMuted) return undefined;
 
   return { cameraMuteOn, cameraMuteOff, cameraMuteToggle, cameraIsMuted };
 }

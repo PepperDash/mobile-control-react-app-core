@@ -7,7 +7,9 @@ import { useWebsocketContext } from '../../../utils/useWebsocketContext';
  * @param key key of the device
  * @returns
  */
-export function useIHasCameraPresets(key: string): IHasCameraPresetsProps {
+export function useIHasCameraPresets(
+  key: string,
+): IHasCameraPresetsProps | undefined {
   const { sendMessage } = useWebsocketContext();
   const presets = useGetDevice<IHasCameraPresetsState>(key)?.presets;
 
@@ -18,6 +20,8 @@ export function useIHasCameraPresets(key: string): IHasCameraPresetsProps {
   const savePreset = (preset: number) => {
     sendMessage(`/device/${key}/savePreset`, preset);
   };
+
+  if (!presets) return undefined;
 
   return { recallPreset, savePreset, presets };
 }
