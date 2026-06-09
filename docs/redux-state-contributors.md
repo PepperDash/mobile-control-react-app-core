@@ -166,13 +166,14 @@ setRoomState(state, action: PayloadAction<Message>) {
 Identical logic to `setRoomState`: key extraction from the type string + `mergeWith` array replacement. The only difference is the key maps to `state.devices` rather than `state.rooms`.
 
 ```typescript
-// Key extraction: "/device/Speaker1/volumeUp" → "volumeUp"?
-// No — the middleware dispatches the full message. The *device key* is
-// the segment immediately after "/device/":
+// Key extraction: "/device/Speaker1" → "Speaker1"
+// lastIndexOf('/') always extracts the *last* path segment as the store key.
+// If a message type ever includes a trailing segment (e.g. "/device/Speaker1/volumeUp"),
+// this logic would store under "volumeUp" instead of "Speaker1".
+// In practice, Essentials sends device state as "/device/{deviceKey}" with no trailing segment,
+// so the last segment is the device key. Confirm in websocketMiddleware.ts if routing logic changes.
 const key = type.slice(type.lastIndexOf('/') + 1);
 ```
-
-> Wait — that extracts the *command* segment, not the device key. The middleware handles routing: a `/device/Speaker1/volume` message dispatches `setDeviceState` with the full type, and the reducer uses the *last* segment as the store key. In practice, Essentials sends device state as `/device/{deviceKey}` (no trailing command), so the last segment **is** the device key. Confirm in `websocketMiddleware.ts` if the routing logic changes.
 
 **Actions:** `devicesActions.setDeviceState`, `devicesActions.clearDevices`
 

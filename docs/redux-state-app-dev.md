@@ -198,7 +198,7 @@ import { MobileControlProvider } from 'mobile-control-react-app-core';
 
 function Root() {
   return (
-    <MobileControlProvider config={appConfig}>
+    <MobileControlProvider>
       <App />
     </MobileControlProvider>
   );

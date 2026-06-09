@@ -107,11 +107,11 @@ sequenceDiagram
 Use nested `Routes` inside your app component to add navigable pages. The `Suspense` wrapper handles lazy-loaded pages:
 
 ```tsx
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-const RoomPage = () => import('./pages/RoomPage');
-const SettingsPage = () => import('./pages/SettingsPage');
+const RoomPage = lazy(() => import('./pages/RoomPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 function MyRoomUI() {
   return (
@@ -124,6 +124,8 @@ function MyRoomUI() {
   );
 }
 ```
+
+> **Why `lazy` is required:** `() => import(...)` returns a Promise, not a React component. Without `lazy`, rendering `<RoomPage />` will throw at runtime. The `Suspense` boundary only works with `lazy`-wrapped components — it suspends rendering until the dynamic import resolves, then renders the component.
 
 These paths are relative to the `basename`. The full URLs would be:
 - `http://{host}/mc/app/` → `RoomPage`
@@ -150,7 +152,7 @@ function SettingsButton() {
 
 ## Error Handling
 
-The library exports `ErrorBox`, a pre-built error boundary component for use as the `errorElement` in your route config. It displays the error, provides a "Go Back" button, and a "Reconnect" button.
+The library exports `ErrorBox`, a pre-built error boundary component for use as the `errorElement` in your route config. It displays the error, provides a "Go Back" button, and a toggle to show or hide the error details.
 
 ```tsx
 import { ErrorBox } from 'mobile-control-react-app-core';

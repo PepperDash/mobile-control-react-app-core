@@ -181,6 +181,8 @@ This works because the parent router (`createBrowserRouter` in `index.tsx`) uses
 
 ## Dependency Note
 
-`react-router-dom` is listed as both a `dependency` and `peerDependency` in `package.json` at `^6.21.3`. It is a peer dependency so consuming apps can control the exact version, but it is also a direct dependency so the library's own components (`ErrorBox`) and the reference app function without extra install steps.
+`react-router-dom` is listed as both a `devDependency` and `peerDependency` in `package.json` at `^6.21.3`. The `devDependency` makes it available during library development and for the local reference app — it is **not** bundled or shipped to consumers. The `peerDependency` declaration is what signals to consuming apps that they must provide `react-router-dom` themselves.
+
+> **Why this matters:** Misidentifying a `devDependency` as a direct `dependency` could lead a consuming app developer to skip adding `react-router-dom` to their own `dependencies`, assuming the library ships it. It doesn't — omitting it from the consumer's install will cause silent runtime failures.
 
 When bumping the React Router version, update both entries in `package.json` and verify `ErrorBox` and `RoomBusiness` against any breaking changes in the React Router v6 changelog.
