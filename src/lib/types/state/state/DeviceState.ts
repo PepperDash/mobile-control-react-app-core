@@ -27,6 +27,7 @@ export interface DeviceState extends IKeyName {
 
   /**
    * The interfaces implmented on this instance of the device
+   * @deprecated This property is deprecated and will be removed in future versions. Instead use the `useDeviceSupportsInterface` hook to check for interface support on a device.
    */
   interfaces: InterfaceNames[];
 
