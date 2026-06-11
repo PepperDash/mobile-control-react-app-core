@@ -1,34 +1,39 @@
 import { useMemo } from 'react';
-import { DeviceState } from 'src/lib';
+import { DeviceState, useGetDevice } from 'src/lib';
 import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
  * Hook to control a device that implements the IHasDialer interface.
  * Provides methods for dialing, sending DTMF tones, and ending calls.
- * @param path path prefix for the device, e.g. /device/{key}
+ * @param key path prefix for the device, e.g. /device/{key}
  * @returns
  */
-export function useIHasDialer(path: string): IHasDialerReturn {
+export function useIHasDialer(key: string): IHasDialerReturn | undefined {
   const { sendMessage } = useWebsocketContext();
+  const state = useGetDevice<IHasDialerState>(key);
 
   return useMemo(() => {
-    const dial = (number: string) =>
-      sendMessage(`${path}/dial`, { value: number });
+    if (!state) return undefined;
 
-    const endAllCalls = () => sendMessage(`${path}/endAllCalls`, null);
+    const dial = (number: string) =>
+      sendMessage(`/device/${key}/dial`, { value: number });
+
+    const endAllCalls = () => sendMessage(`/device/${key}/endAllCalls`, null);
 
     const sendDtmf = (digit: string) =>
-      sendMessage(`${path}/dtmf`, { value: digit });
+      sendMessage(`/device/${key}/dtmf`, { value: digit });
 
     return {
+      state,
       dial,
       endAllCalls,
       sendDtmf,
     };
-  }, [path, sendMessage]);
+  }, [key, sendMessage, state]);
 }
 
 export interface IHasDialerReturn {
+  state: IHasDialerState;
   dial: (number: string) => void;
   endAllCalls: () => void;
   sendDtmf: (digit: string) => void;

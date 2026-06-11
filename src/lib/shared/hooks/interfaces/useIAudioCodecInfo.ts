@@ -9,12 +9,12 @@ import { DeviceState, useGetDevice } from '../../..';
 export function useIAudioCodecInfo(
   key: string,
 ): IAudioCodecInfoReturn | undefined {
-  const device = useGetDevice<IAudioCodecInfoState>(key);
+  const state = useGetDevice<IAudioCodecInfoState>(key);
 
-  if (!device) return undefined;
+  if (!state) return undefined;
 
   return {
-    phoneNumber: device.phoneNumber,
+    state,
   };
 }
 
@@ -23,5 +23,5 @@ export interface IAudioCodecInfoState extends DeviceState {
 }
 
 export interface IAudioCodecInfoReturn {
-  phoneNumber?: string;
+  state: IAudioCodecInfoState;
 }
