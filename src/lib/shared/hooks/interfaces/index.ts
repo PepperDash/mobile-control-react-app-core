@@ -16,6 +16,7 @@ export * from './useIEssentialsRoomCombiner';
 export * from './useIHasCameraMute';
 export * from './useIHasCameraPresets';
 export * from './useIHasCameras';
+export * from './useIHasDialer';
 export * from './useIHasPowerControl';
 export * from './useIHasSelectableItems';
 export * from './useIHumiditySensor';

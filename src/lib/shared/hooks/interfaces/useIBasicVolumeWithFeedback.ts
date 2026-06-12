@@ -11,7 +11,7 @@ import { IBasicVolumeReturn, useIBasicVolume } from './useIBasicVolume';
  */
 export function useIBasicVolumeWithFeedback(
   path: string,
-  volumeState: Volume | undefined
+  volumeState: Volume | undefined,
 ): IBasicVolumeWithFeedbackReturn | undefined {
   const { sendMessage, sendSimpleMessage } = useWebsocketContext();
 
@@ -54,7 +54,7 @@ export interface IBasicVolumeWithFeedbackReturn extends IBasicVolumeReturn {
  */
 export function useGetIBasicVolumeWithFeedback(
   path: string,
-  volumeState: Volume | undefined
+  volumeState: Volume | undefined,
 ): IBasicVolumeWithFeedbackReturn | undefined {
   const { sendMessage, sendSimpleMessage } = useWebsocketContext();
 
@@ -62,11 +62,11 @@ export function useGetIBasicVolumeWithFeedback(
 
   return useMemo(() => {
     if (!baseVolume) {
-      console.log('baseVolume is undefined');
+      // console.log('baseVolume is undefined');
       return undefined;
     }
     if (!volumeState) {
-      console.log('volumeState is undefined');
+      // console.log('volumeState is undefined');
       return undefined;
     }
 

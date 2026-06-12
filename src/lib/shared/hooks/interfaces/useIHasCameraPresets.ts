@@ -1,15 +1,16 @@
-import { useGetDevice } from 'src/lib';
-import { CameraPresetItem, IHasCameraPresetsState } from 'src/lib/types';
+import { useGetDevice } from '../../..';
+import { CameraPresetItem, IHasCameraPresetsState } from '../../../types';
 import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
- * Hook to control a device that implements the IHasCameraPresets interface
+ * Hook to control a device that implements the IHasCameraPresets interface.
+ * Provides methods for recalling and saving camera presets.
  * @param key key of the device
  * @returns
  */
 export function useIHasCameraPresets(
   key: string,
-): IHasCameraPresetsProps | undefined {
+): IHasCameraPresetsReturn | undefined {
   const { sendMessage } = useWebsocketContext();
   const presets = useGetDevice<IHasCameraPresetsState>(key)?.presets;
 
@@ -26,8 +27,8 @@ export function useIHasCameraPresets(
   return { recallPreset, savePreset, presets };
 }
 
-export interface IHasCameraPresetsProps {
+export interface IHasCameraPresetsReturn {
   recallPreset: (preset: number) => void;
   savePreset: (preset: number) => void;
-  presets?: CameraPresetItem[];
+  presets: CameraPresetItem[];
 }
