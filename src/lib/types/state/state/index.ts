@@ -8,6 +8,7 @@ export * from './endpointState';
 export * from './EnvironmentState';
 export * from './ICurrentSourcesState';
 export * from './IEssentialsRoomCombinerState';
+export * from './IHasCameraPresetsState';
 export * from './IHasCamerasState';
 export * from './IHasCurrentSourceInfoChangeState';
 export * from './IHasInputsState';
