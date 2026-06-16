@@ -11,6 +11,7 @@ export * from './useIChannel';
 export * from './useIColor';
 export * from './useICommunicationMonitor';
 export * from './useIDeviceInfoMessenger';
+export * from './useIDialerCallStatus';
 export * from './useIDPad';
 export * from './useIDspPresets';
 export * from './useIDvr';
