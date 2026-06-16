@@ -20,7 +20,10 @@ export function useIAudioCodecPhonebook(
     const setEntry = (index: number, name: string, number: string) =>
       sendMessage(`${path}/setEntry`, { index, name, number });
 
-    return { setEntry };
+    const dialEntry = (index: number) =>
+      sendMessage(`${path}/dialEntry`, { value: index });
+
+    return { setEntry, dialEntry };
   }, [key, sendMessage]);
 
   if (!device) return undefined;
@@ -43,4 +46,5 @@ export interface IAudioCodecPhonebookState extends DeviceState {
 export interface IAudioCodecPhonebookReturn {
   phonebookEntries: PhonebookEntry[];
   setEntry: (index: number, name: string, number: string) => void;
+  dialEntry: (index: number) => void;
 }

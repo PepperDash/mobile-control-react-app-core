@@ -3,6 +3,8 @@ export * from './useAvrControl';
 export * from './useCameraBase';
 export * from './useDevicePresetsModel';
 export * from './useEndpoint';
+export * from './useIAudioCodecInfo';
+export * from './useIAudioCodecPhonebook';
 export * from './useIBasicVolume';
 export * from './useIBasicVolumeWithFeedback';
 export * from './useIChannel';
