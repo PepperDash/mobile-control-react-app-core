@@ -24,10 +24,10 @@ export function useIHasDialer(key: string): IHasDialerReturn | undefined {
       sendMessage(`/device/${key}/dtmf`, { value: digit });
 
     const acceptCall = (callItem: ActiveCallItem) =>
-      sendMessage(`/device/${key}/acceptCall`, { value: callItem });
+      sendMessage(`/device/${key}/acceptCall`, callItem);
 
     const rejectCall = (callItem: ActiveCallItem) =>
-      sendMessage(`/device/${key}/rejectCall`, { value: callItem });
+      sendMessage(`/device/${key}/rejectCall`, callItem);
 
     return {
       state,
