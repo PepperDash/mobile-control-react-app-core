@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { DeviceState, useGetDevice } from 'src/lib';
+import { ActiveCallItem, DeviceState, useGetDevice } from 'src/lib';
 import { useWebsocketContext } from '../../../utils/useWebsocketContext';
 
 /**
@@ -23,11 +23,19 @@ export function useIHasDialer(key: string): IHasDialerReturn | undefined {
     const sendDtmf = (digit: string) =>
       sendMessage(`/device/${key}/dtmf`, { value: digit });
 
+    const acceptCall = (callItem: ActiveCallItem) =>
+      sendMessage(`/device/${key}/acceptCall`, { value: callItem });
+
+    const rejectCall = (callItem: ActiveCallItem) =>
+      sendMessage(`/device/${key}/rejectCall`, { value: callItem });
+
     return {
       state,
       dial,
       endAllCalls,
       sendDtmf,
+      acceptCall,
+      rejectCall,
     };
   }, [key, sendMessage, state]);
 }
@@ -37,8 +45,11 @@ export interface IHasDialerReturn {
   dial: (number: string) => void;
   endAllCalls: () => void;
   sendDtmf: (digit: string) => void;
+  acceptCall: (callItem: ActiveCallItem) => void;
+  rejectCall: (callItem: ActiveCallItem) => void;
 }
 
 export interface IHasDialerState extends DeviceState {
   isInCall: boolean;
+  callItem?: ActiveCallItem;
 }
