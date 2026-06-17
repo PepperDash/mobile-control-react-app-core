@@ -57,6 +57,7 @@ export interface ActiveCallItem {
   id?: string;
   isOnHold?: boolean;
   duration?: string;
+  isActiveCall?: boolean;
 }
 
 export interface IDialerCallStatusState extends DeviceState {
