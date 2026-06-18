@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { DeviceState, useGetDevice } from '../../..';
 import { useWebsocketContext } from '../../../utils/useWebsocketContext';
+import { CodecDirectory, DirectoryContact } from './useIHasDirectory';
 
 /**
  * Hook to interact with a Zoom Room device.
@@ -64,26 +65,8 @@ export interface ContactMethod {
   contactMethodType?: string;
 }
 
-export interface DirectoryContact {
-  contactId?: string;
-  name?: string;
-  title?: string;
-  contactMethods?: ContactMethod[];
-}
-
 export interface InvitableDirectoryContact extends DirectoryContact {
   isInvitableContact?: boolean;
-}
-
-export interface DirectoryFolder {
-  name?: string;
-  folderId?: string;
-}
-
-export interface CodecDirectory {
-  contacts?: DirectoryContact[];
-  folders?: DirectoryFolder[];
-  resultsFolderId?: string;
 }
 
 export interface ZoomRoomState extends DeviceState {
