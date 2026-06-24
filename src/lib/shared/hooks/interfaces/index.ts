@@ -10,6 +10,7 @@ export * from './useIBasicVolumeWithFeedback';
 export * from './useIChannel';
 export * from './useIColor';
 export * from './useICommunicationMonitor';
+export * from './useICurrentSources';
 export * from './useIDeviceInfoMessenger';
 export * from './useIDialerCallStatus';
 export * from './useIDPad';

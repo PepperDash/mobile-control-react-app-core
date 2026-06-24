@@ -1,23 +1,24 @@
 export type InterfaceNames =
-| "IBasicVolumeWithFeedback"
-  | "ICommunicationMonitor"
-  | "IDeviceInfoProvider"
-  | "IHasCurrentSourceInfoChange"
-  | "IHasInputs"
-  | "IHasPowerControl"
-  | "IHasPowerControlWithFeedback"
-  | "IHasSurroundChannels"
-  | "ILevelControls"
-  | "IMatrixRouting"
-  | "IRouting"
-  | "IRouting"
-  | "IRoutingFeedback"
-  | "IRoutingInputs"
-  | "IRoutingOutputs"
-  | "IRoutingSink"
-  | "IRoutingSinkWithSwitching"
-  | "IRunDirectRouteAction"
-  | "IRunDirectRouteAction"
-  | "IRunRouteAction"
-  | "IRunRouteActoin"
+  | 'IBasicVolumeWithFeedback'
+  | 'ICommunicationMonitor'
+  | 'ICurrentSources'
+  | 'IDeviceInfoProvider'
+  | 'IHasCurrentSourceInfoChange'
+  | 'IHasInputs'
+  | 'IHasPowerControl'
+  | 'IHasPowerControlWithFeedback'
+  | 'IHasSurroundChannels'
+  | 'ILevelControls'
+  | 'IMatrixRouting'
+  | 'IRouting'
+  | 'IRouting'
+  | 'IRoutingFeedback'
+  | 'IRoutingInputs'
+  | 'IRoutingOutputs'
+  | 'IRoutingSink'
+  | 'IRoutingSinkWithSwitching'
+  | 'IRunDirectRouteAction'
+  | 'IRunDirectRouteAction'
+  | 'IRunRouteAction'
+  | 'IRunRouteActoin'
   | string;
