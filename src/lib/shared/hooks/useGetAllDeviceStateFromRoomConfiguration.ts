@@ -4,8 +4,8 @@ import { useWebsocketContext } from '../../utils/useWebsocketContext';
 
 /**
  * This hook will gather up all the keys for devices in the room
- * and send messages to the websocket to get the initial state
- * for each device.
+ * and send a single batch message to the websocket to get the initial state
+ * for all devices at once.
  *
  * @param config - Room configuration containing device keys
  * @param requestStatus - Whether to request device status (default: true)
@@ -17,7 +17,7 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
   }: {
     config: RoomConfiguration | undefined;
   },
-  requestStatus: boolean = true
+  requestStatus: boolean = true,
 ) => {
   const { sendMessage } = useWebsocketContext();
   const hasRequestedRef = useRef(false);
@@ -51,7 +51,7 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
           } else {
             keys.add(lcl.parentDeviceKey);
           }
-        }
+        },
       );
     }
 
@@ -100,7 +100,7 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
     return keys;
   }, [config]);
 
-  // Step 2: Create a stable callback for requesting device status
+  // Step 2: Send a single batch request for all device states
   useEffect(() => {
     if (
       !requestStatus ||
@@ -111,11 +111,11 @@ export const useGetAllDeviceStateFromRoomConfiguration = (
       return;
     }
 
-    console.log('requesting state for deviceKeys:', deviceKeysSet);
+    const deviceKeys = Array.from(deviceKeysSet);
 
-    deviceKeysSet.forEach((dk) => {
-      sendMessage(`/device/${dk}/fullStatus`, { deviceKey: dk });
-    });
+    console.log('requesting batch state for deviceKeys:', deviceKeys);
+
+    sendMessage('/system/batchDeviceFullStatus', { deviceKeys });
 
     hasRequestedRef.current = true;
   }, [deviceKeysSet, requestStatus, sendMessage]);

@@ -509,6 +509,9 @@ export const createWebSocketMiddleware = (): Middleware<
                 );
                 break;
               }
+              case '/system/initialSyncComplete':
+                dispatch(uiActions.addSyncState('initialSyncComplete'));
+                break;
               default:
                 console.log(
                   'WebSocket middleware: Unhandled system message',

@@ -32,3 +32,6 @@ export const useTheme = () => useAppSelector(selectTheme);
 
 export const useIsSyncStateValuePresent = (value: string) =>
   useAppSelector(selectIsSyncStateValuePresent(value));
+
+export const useIsInitialSyncComplete = () =>
+  useAppSelector(selectIsSyncStateValuePresent('initialSyncComplete'));
