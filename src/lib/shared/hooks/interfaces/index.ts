@@ -35,6 +35,7 @@ export * from './useIHasPresentationOnlyMeeting';
 export * from './useIHasSelectableItems';
 export * from './useIHasSelfviewPosition';
 export * from './useIHasSelfviewSize';
+export * from './useIHasStartMeeting';
 export * from './useIHasSurroundChannels';
 export * from './useIHasZoomRoomLayouts';
 export * from './useILevelControls';
