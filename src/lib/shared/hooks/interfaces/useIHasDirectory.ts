@@ -19,6 +19,9 @@ export function useIHasDirectory(key: string): IHasDirectoryReturn | undefined {
 
     const getDirectory = () => sendMessage(`${path}/getDirectory`, null);
 
+    const setDirectoryToRoot = () =>
+      sendMessage(`${path}/setCurrentDirectoryToRoot`, null);
+
     const directoryById = (folderId: string) =>
       sendMessage(`${path}/directoryById`, { value: folderId });
 
@@ -27,12 +30,17 @@ export function useIHasDirectory(key: string): IHasDirectoryReturn | undefined {
 
     const directoryBack = () => sendMessage(`${path}/directoryBack`, null);
 
+    const getDirectoryParentFolderContents = () =>
+      sendMessage(`${path}/getDirectoryParentFolderContents`, null);
+
     return {
       state,
       getDirectory,
+      setDirectoryToRoot,
       directoryById,
       directorySearch,
       directoryBack,
+      getDirectoryParentFolderContents,
     };
   }, [key, sendMessage, state]);
 }
@@ -68,12 +76,16 @@ export interface IHasDirectoryState extends DeviceState {
   hasDirectory?: boolean;
   hasDirectorySearch?: boolean;
   directorySelectedFolderName?: string;
+  directorySelectedFolderIsNotRoot?: boolean;
+  directoryRoot?: CodecDirectory;
 }
 
 export interface IHasDirectoryReturn {
   state: IHasDirectoryState;
   getDirectory: () => void;
+  setDirectoryToRoot: () => void;
   directoryById: (folderId: string) => void;
   directorySearch: (searchString: string) => void;
   directoryBack: () => void;
+  getDirectoryParentFolderContents: () => void;
 }
