@@ -34,6 +34,7 @@ export * from './useIHasParticipantVideoMute';
 export * from './useIHasPhoneDialing';
 export * from './useIHasPowerControl';
 export * from './useIHasPresentationOnlyMeeting';
+export * from './useIHasScheduleAwareness';
 export * from './useIHasSelectableItems';
 export * from './useIHasSelfviewPosition';
 export * from './useIHasSelfviewSize';
