@@ -8,6 +8,7 @@ export * from './useIAudioCodecPhonebook';
 export * from './useIBasicVolume';
 export * from './useIBasicVolumeWithFeedback';
 export * from './useIChannel';
+export * from './useICodecCallControls';
 export * from './useIColor';
 export * from './useICommunicationMonitor';
 export * from './useICurrentSources';
