@@ -30,6 +30,7 @@ export * from './useIHasMeetingRecording';
 export * from './useIHasParticipantAudioMute';
 export * from './useIHasParticipantPinUnpin';
 export * from './useIHasParticipants';
+export * from './useIHasParticipantVideoMute';
 export * from './useIHasPhoneDialing';
 export * from './useIHasPowerControl';
 export * from './useIHasPresentationOnlyMeeting';
