@@ -20,8 +20,9 @@ export function useIHasZoomRoomLayouts(
 
     const path = `/device/${key}`;
 
-    const selectLayout = (layout: string) =>
-      sendMessage(`${path}/selectLayout`, { value: layout });
+    const selectLayout = (
+      layout: 'None' | 'Gallery' | 'Speaker' | 'Strip' | 'ShareAll' | 'Dynamic',
+    ) => sendMessage(`${path}/selectLayout`, { value: layout });
 
     const participantsNextPage = () =>
       sendMessage(`${path}/participantsNextPage`, null);
@@ -43,7 +44,13 @@ export function useIHasZoomRoomLayouts(
 }
 
 export interface ZoomRoomLayoutState {
-  availableLayouts?: number;
+  availableLayouts?:
+    | 'None'
+    | 'Gallery'
+    | 'Speaker'
+    | 'Strip'
+    | 'ShareAll'
+    | 'Dynamic';
   layoutViewIsOnFirstPage?: boolean;
   layoutViewIsOnLastPage?: boolean;
   canSwapContentWithThumbnail?: boolean;
@@ -56,7 +63,9 @@ export interface IHasZoomRoomLayoutsState extends DeviceState {
 
 export interface IHasZoomRoomLayoutsReturn {
   state: IHasZoomRoomLayoutsState;
-  selectLayout: (layout: string) => void;
+  selectLayout: (
+    layout: 'None' | 'Gallery' | 'Speaker' | 'Strip' | 'ShareAll' | 'Dynamic',
+  ) => void;
   participantsNextPage: () => void;
   participantsPreviousPage: () => void;
   swapContentWithThumbnail: () => void;
