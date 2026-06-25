@@ -20,9 +20,8 @@ export function useIHasZoomRoomLayouts(
 
     const path = `/device/${key}`;
 
-    const selectLayout = (
-      layout: 'None' | 'Gallery' | 'Speaker' | 'Strip' | 'ShareAll' | 'Dynamic',
-    ) => sendMessage(`${path}/selectLayout`, { value: layout });
+    const selectLayout = (layout: string) =>
+      sendMessage(`${path}/selectLayout`, { value: layout });
 
     const participantsNextPage = () =>
       sendMessage(`${path}/participantsNextPage`, null);
@@ -62,9 +61,7 @@ export interface IHasZoomRoomLayoutsState extends DeviceState {
 
 export interface IHasZoomRoomLayoutsReturn {
   state: IHasZoomRoomLayoutsState;
-  selectLayout: (
-    layout: 'None' | 'Gallery' | 'Speaker' | 'Strip' | 'ShareAll' | 'Dynamic',
-  ) => void;
+  selectLayout: (layout: string) => void;
   participantsNextPage: () => void;
   participantsPreviousPage: () => void;
   swapContentWithThumbnail: () => void;
