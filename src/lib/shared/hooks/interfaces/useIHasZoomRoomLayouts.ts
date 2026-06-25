@@ -43,14 +43,13 @@ export function useIHasZoomRoomLayouts(
   }, [key, sendMessage, state]);
 }
 
+export interface LayoutOption {
+  command: string;
+  label: string;
+}
+
 export interface ZoomRoomLayoutState {
-  availableLayouts?:
-    | 'None'
-    | 'Gallery'
-    | 'Speaker'
-    | 'Strip'
-    | 'ShareAll'
-    | 'Dynamic';
+  availableLayouts?: LayoutOption[];
   layoutViewIsOnFirstPage?: boolean;
   layoutViewIsOnLastPage?: boolean;
   canSwapContentWithThumbnail?: boolean;
