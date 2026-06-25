@@ -21,6 +21,7 @@ export * from './useIHasCameraAutoMode';
 export * from './useIHasCameraMute';
 export * from './useIHasCameraPresets';
 export * from './useIHasCameras';
+export * from './useIHasCodecLayouts';
 export * from './useIHasCodecRoomPresetsActions';
 export * from './useIHasDialer';
 export * from './useIHasDirectory';
