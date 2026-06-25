@@ -26,6 +26,9 @@ export function useICodecCallControls(
     const dialMeeting = (meeting: Meeting) =>
       sendMessage(`${path}/dialMeeting`, meeting);
 
+    const dialNumber = (number: string, password?: string) =>
+      sendMessage(`${path}/dialNumber`, { number, password });
+
     const endCallById = (callId: string) =>
       sendMessage(`${path}/endCallById`, { value: callId });
 
@@ -39,6 +42,7 @@ export function useICodecCallControls(
       state,
       getCallControlsStatus,
       dialMeeting,
+      dialNumber,
       endCallById,
       acceptById,
       rejectById,
@@ -54,6 +58,7 @@ export interface ICodecCallControlsReturn {
   state: ICodecCallControlsState;
   getCallControlsStatus: () => void;
   dialMeeting: (meeting: Meeting) => void;
+  dialNumber: (number: string, password?: string) => void;
   endCallById: (callId: string) => void;
   acceptById: (callId: string) => void;
   rejectById: (callId: string) => void;
