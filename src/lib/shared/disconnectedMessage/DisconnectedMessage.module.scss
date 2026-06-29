@@ -1,3 +1,36 @@
-.mwfit {
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  height: 100%;
+}
+
+.content {
   max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.error {
+  margin-top: 0.25rem;
+}
+
+.reconnectButton {
+  display: inline-block;
+  padding: 16px 48px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  background-color: #6c757d;
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #5a6268;
+  }
 }
