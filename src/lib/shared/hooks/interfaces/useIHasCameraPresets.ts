@@ -15,11 +15,11 @@ export function useIHasCameraPresets(
   const presets = useGetDevice<IHasCameraPresetsState>(key)?.presets;
 
   const recallPreset = (preset: number) => {
-    sendMessage(`/device/${key}/recallPreset`, preset);
+    sendMessage(`/device/${key}/recallPreset`, { value: preset });
   };
 
   const savePreset = (preset: number) => {
-    sendMessage(`/device/${key}/savePreset`, preset);
+    sendMessage(`/device/${key}/storePreset`, { value: preset });
   };
 
   if (!presets) return undefined;
