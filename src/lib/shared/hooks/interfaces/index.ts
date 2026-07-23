@@ -26,6 +26,7 @@ export * from './useIHasCodecLayouts';
 export * from './useIHasCodecRoomPresetsActions';
 export * from './useIHasDialer';
 export * from './useIHasDirectory';
+export * from './useIHasMeetingInfo';
 export * from './useIHasMeetingLock';
 export * from './useIHasMeetingRecording';
 export * from './useIHasParticipantAudioMute';
