@@ -82,7 +82,7 @@ export function useInitialize(): () => Promise<boolean> {
       dispatch(
         uiActions.setErrorMessage(describeRequestError(error, configUrl))
       );
-      return true;
+      return false;
     }
 
     if (configData) {
@@ -105,6 +105,6 @@ export function useInitialize(): () => Promise<boolean> {
       }
     }
 
-    return true;
+    return configData !== undefined;
   };
 }

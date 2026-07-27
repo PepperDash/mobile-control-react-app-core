@@ -36,17 +36,21 @@ Use the provided hooks to link buttons and UI elements to the Mobile Control API
 ### Steps
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Create a local config file by copying the default:
+
    ```
    /public/_local-config/_config.default.json  →  /public/_local-config/_config.local.json
    ```
+
    Update the `apiPath` value to the IP address and port of your test processor. **Do not commit this file** — it is gitignored.
 
    Example `_config.local.json`:
+
    ```json
    {
      "apiPath": "http://192.168.1.22:50010/mc/api",
@@ -66,6 +70,7 @@ Use the provided hooks to link buttons and UI elements to the Mobile Control API
    ```
 
 3. Start the development server:
+
    ```bash
    npm run dev
    ```
@@ -73,10 +78,13 @@ Use the provided hooks to link buttons and UI elements to the Mobile Control API
 4. Open the printed local URL in a browser (e.g. `http://localhost:5173/mc/app`). You will see a disconnected message until a token is provided.
 
 5. Get a connection token from the Crestron processor by running the console command:
+
    ```
    mobileinfo:[programSlot]
    ```
+
    Example output:
+
    ```
     mobileadduiclient:1 room1 1234567890abcdefghijk
     mobileinfo
@@ -99,6 +107,7 @@ Use the provided hooks to link buttons and UI elements to the Mobile Control API
     Connected: False
     Duration: Not Connected
    ```
+
    Copy the token value for the client instance you want to connect to.
 
 6. Append the token to the URL and reload:

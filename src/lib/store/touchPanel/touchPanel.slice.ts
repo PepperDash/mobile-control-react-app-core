@@ -18,7 +18,6 @@ const touchPanelSlice = createSlice({
   reducers: {
     setControlSystemOnline: (state, action: PayloadAction<boolean>) => {
       state.online = action.payload;
-      console.log(`Control System ${state.online ? 'online' : 'offline'}`);
     },
     setMcAppUrl: (state, action: PayloadAction<string>) => {
       state.mcAppUrl = action.payload;

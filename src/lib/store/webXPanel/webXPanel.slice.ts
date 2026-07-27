@@ -34,53 +34,40 @@ const webXPanelSlice = createSlice({
   initialState,
   reducers: {
     setWebXPanelOnline: (state: IWebXPanel, action: PayloadAction<boolean>) => {
-      state.online = action.payload;
-      console.log(`WebXPanel ${state.online ? 'Online' : 'Offline'}`);
+      state.online = action.payload;      
     },
     setWebXPanelConfig: (
       state: IWebXPanel,
       action: PayloadAction<Partial<WebXPanelConfigParams>>
     ) => {
-      state.config = action.payload;
-      console.log('WebXPanel Config: ', state.config);
+      state.config = action.payload;      
     },
     setWebXPanelVersion: (state: IWebXPanel, action: PayloadAction<string>) => {
-      state.version = action.payload;
-      console.log(`WebXPanel Version: ${state.version}`);
+      state.version = action.payload;      
     },
     setWebXPanelBuildDate: (
       state: IWebXPanel,
       action: PayloadAction<string>
     ) => {
-      state.buildDate = action.payload;
-      console.log(`WebXPanel Build Date: ${state.buildDate}`);
+      state.buildDate = action.payload;      
     },
     setWebXPanelIsActive: (
       state: IWebXPanel,
       action: PayloadAction<boolean>
     ) => {
-      state.isActive = action.payload;
-      console.log(`WebXPanel isActive: ${state.isActive}`);
+      state.isActive = action.payload;      
     },
     setWebXPanelWsConnected: (
       state: IWebXPanel,
       action: PayloadAction<boolean>
     ) => {
-      state.wsConnected = action.payload;
-      console.log(
-        `WebXPanel WebSocket ${
-          state.wsConnected ? 'Connected' : 'Disconnected'
-        }`
-      );
+      state.wsConnected = action.payload;      
     },
     setWebXPanelCipConnected: (
       state: IWebXPanel,
       action: PayloadAction<boolean>
     ) => {
-      state.cipConnected = action.payload;
-      console.log(
-        `WebXPanel CIP ${state.cipConnected ? 'Connected' : 'Disconnected'}`
-      );
+      state.cipConnected = action.payload;      
     },
     setWebXPanelError: (state: IWebXPanel, action: PayloadAction<string>) => {
       state.lastError = action.payload;

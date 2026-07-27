@@ -62,9 +62,9 @@ export const wsRemoveEventHandler = (eventType: string, key: string) => ({
 export const wsReconnect = () => ({ type: WS_RECONNECT });
 
 /**
- * Case-insensitive check for the `zoomRoom` URL query parameter. Mirrors the
- * `zoomRoom` param already used to gate the WebXPanel Zoom handshake (see
- * services/webXPanel/webXPanel.ts) — when present, this app is running as a
+ * Case-insensitive check for the `zoomRoom` URL query parameter (e.g.
+ * `?zoomRoom=true`). Mirrors `isZoomRoomRequested()` in
+ * services/webXPanel/webXPanel.ts — when true, this app is running as a
  * Zoom Room Controller (ZRC) device panel, and the join token must be parsed
  * from the MC app URL delivered via serial join 1 rather than this page's own
  * window.location.
@@ -73,8 +73,8 @@ const isZoomRoom = (): boolean => {
   try {
     const qp = new URLSearchParams(window.location.search);
     for (const [key, value] of qp) {
-      if (key.toLowerCase() === 'zoomroom' && value) {
-        return true;
+      if (key.toLowerCase() === 'zoomroom') {
+        return value.toLowerCase() === 'true';
       }
     }
   } catch {
@@ -93,11 +93,14 @@ const isZoomRoom = (): boolean => {
  * visible in the UI instead of only in the console.
  */
 const describeRequestError = (err: unknown, url?: string): string => {
-  const target = url ?? (err instanceof AxiosError ? err.config?.url : undefined);
+  const target =
+    url ?? (err instanceof AxiosError ? err.config?.url : undefined);
 
   if (err instanceof AxiosError) {
     if (err.response) {
-      return `Request to ${target ?? 'server'} failed: ${err.response.status} ${err.response.statusText}`;
+      return `Request to ${target ?? 'server'} failed: ${err.response.status} ${
+        err.response.statusText
+      }`;
     }
 
     return (
@@ -198,7 +201,9 @@ export const createWebSocketMiddleware = (): Middleware<
       } catch (error) {
         console.error('Error getting config', error);
         dispatch(uiActions.setConnectionStage('error'));
-        dispatch(uiActions.setErrorMessage(describeRequestError(error, configUrl)));
+        dispatch(
+          uiActions.setErrorMessage(describeRequestError(error, configUrl))
+        );
         return true;
       }
 

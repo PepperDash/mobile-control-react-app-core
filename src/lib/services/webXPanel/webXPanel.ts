@@ -221,9 +221,7 @@ export const initWebXPanel = (): void => {
 
   const config = getConfigFromQuery();
   console.log('WebXPanel config', config);
-
-  // CrComLib is required by all apps (including non-WebXPanel/browser runs), so
-  // expose it globally regardless of whether WebXPanel is active.
+  
   window.CrComLib = CrComLib;
 
   // Since `forceDeviceXPanel` is derived from the same `?zoomRoom=true` param

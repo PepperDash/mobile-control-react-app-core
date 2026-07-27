@@ -66,6 +66,12 @@ export const requestZoomWebSocketToken = (
     };
 
     const handleMessage = (event: MessageEvent) => {
+      // Only accept messages posted by the hosting frame; anything else could
+      // be spoofed by another frame/script on the page.
+      if (event.source !== window.parent) {
+        return;
+      }
+
       let data: ZoomShellMessage;
       try {
         data = JSON.parse(event.data);
@@ -82,8 +88,22 @@ export const requestZoomWebSocketToken = (
       switch (data.message) {
         case READY_ACK: {
           console.log(`[CZL] received '${READY_ACK}'`);
-          const url = new URL(data.data as string);
-          targetOrigin = `${url.protocol}//${url.hostname}`;
+          if (typeof data.data !== 'string') {
+            console.warn(
+              `[CZL] '${READY_ACK}' message missing a valid origin URL; ignoring`
+            );
+            break;
+          }
+          let url: URL;
+          try {
+            url = new URL(data.data);
+          } catch {
+            console.warn(
+              `[CZL] '${READY_ACK}' message contained an invalid origin URL: ${data.data}`
+            );
+            break;
+          }
+          targetOrigin = url.origin;
           window.parent.postMessage(
             JSON.stringify({ message: GET_TOKEN }),
             targetOrigin

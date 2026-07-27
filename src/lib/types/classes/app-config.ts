@@ -14,7 +14,7 @@ export interface AppConfig {
   modes: { [key: string]: unknown };
 }
 
-// This data should move to a websocket message so as not to requre the local config file to be updated
+// This data should move to a websocket message so as not to require the local config file to be updated
 export interface AppConfigExtras extends AppConfig {
   partnerMetadata?: PartnerMetadata[];
   roomCombineStyles: {
