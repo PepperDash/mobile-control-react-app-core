@@ -44,8 +44,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "declarationMap": true,
-    "baseUrl": ".",
-    "typeRoots": ["node_modules/@types", "src/lib/index.d.ts"]
+    "baseUrl": "."
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
