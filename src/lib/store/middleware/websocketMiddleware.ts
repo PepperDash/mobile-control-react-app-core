@@ -84,6 +84,37 @@ const isZoomRoom = (): boolean => {
 };
 
 /**
+ * Case-insensitive check for the `xPanel` URL query parameter (e.g.
+ * `?xPanel=true`). Mirrors `isXPanelRequested()` in
+ * services/webXPanel/webXPanel.ts — signals the app is running as a plain
+ * WebXPanel device panel (no Zoom Room cross-frame handshake), but otherwise
+ * needs the same join token via serial join 1 as Zoom Room mode.
+ */
+const isXPanel = (): boolean => {
+  try {
+    const qp = new URLSearchParams(window.location.search);
+    for (const [key, value] of qp) {
+      if (key.toLowerCase() === 'xpanel') {
+        return value.toLowerCase() === 'true';
+      }
+    }
+  } catch {
+    // `window` may be unavailable in a non-browser context.
+  }
+  return false;
+};
+
+/**
+ * True when the app is running as a WebXPanel device panel of any kind —
+ * either a Zoom Room Controller (`?zoomRoom=true`) or a plain WebXPanel
+ * (`?xPanel=true`). In both cases the join token must be parsed from the MC
+ * app URL delivered via serial join 1 rather than this page's own
+ * window.location, and the local config is fetched relative to `./` rather
+ * than the app's base path.
+ */
+const isDevicePanel = (): boolean => isZoomRoom() || isXPanel();
+
+/**
  * Builds a user-facing error message for a failed HTTP request. Axios (and
  * the browser XHR/fetch APIs underneath it) do not expose SSL/TLS
  * certificate error details to JS, so a request that fails with no response
@@ -183,7 +214,7 @@ export const createWebSocketMiddleware = (): Middleware<
         basePath.length = 2;
       }
 
-      const baseURL = isZoomRoom() ? './' : `/${basePath.join('/')}`;
+      const baseURL = isDevicePanel() ? './' : `/${basePath.join('/')}`;
       const configUrl = `${baseURL}/_local-config/_config.local.json`;
 
       // Get the local config and set it in the store
@@ -786,7 +817,7 @@ export const createWebSocketMiddleware = (): Middleware<
           // Initialize config first (parallel with token resolution below)
           await initialize(store.dispatch);
 
-          if (isZoomRoom()) {
+          if (isDevicePanel()) {
             // Token comes from the MC app URL delivered via serial join 1,
             // not from this page's own window.location
             const mcAppUrl = (store.getState() as LocalRootState).touchPanel
@@ -795,7 +826,7 @@ export const createWebSocketMiddleware = (): Middleware<
 
             if (!joinToken) {
               console.log(
-                'WebSocket middleware: Zoom Room mode - no token available yet from mcAppUrl, waiting for join 1 update'
+                'WebSocket middleware: Device panel mode - no token available yet from mcAppUrl, waiting for join 1 update'
               );
               state.token = null;
               store.dispatch(uiActions.setConnectionStage('waiting-for-token'));
@@ -803,7 +834,7 @@ export const createWebSocketMiddleware = (): Middleware<
             }
 
             console.log(
-              'WebSocket middleware: Using token parsed from mcAppUrl (Zoom Room)'
+              'WebSocket middleware: Using token parsed from mcAppUrl (device panel mode)'
             );
             state.token = joinToken;
             // sessionStorage isn't available on Crestron panels, not sure on other devices that run Zoom Room Controller and allow loading Zoom Room Control Applications
@@ -901,11 +932,12 @@ export const createWebSocketMiddleware = (): Middleware<
               setTimeout(() => requestRoomStatus(store.getState, roomKey), 100);
             }
           } else if (action.type === touchPanelActions.setMcAppUrl.type) {
-            // Zoom Room mode: the join token lives in the MC app URL delivered
-            // via serial join 1. It may arrive after the initial WS_CONNECT
-            // attempt, or be rotated while already connected — (re)connect
-            // using the latest token in either case.
-            if (isZoomRoom()) {
+            // Device panel mode (Zoom Room or plain WebXPanel): the join token
+            // lives in the MC app URL delivered via serial join 1. It may
+            // arrive after the initial WS_CONNECT attempt, or be rotated while
+            // already connected — (re)connect using the latest token in either
+            // case.
+            if (isDevicePanel()) {
               const mcAppUrl = (action as AnyAction).payload as
                 | string
                 | undefined;

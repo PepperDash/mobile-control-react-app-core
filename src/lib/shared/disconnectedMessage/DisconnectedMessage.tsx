@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ConnectionStage,
-  isZoomRoomRequested,
+  isWebXPanelRequested,
   useConnectionStage,
   useError,
   useShowReconnect,
@@ -71,7 +71,7 @@ const DisconnectedMessage = () => {
           {elapsedSeconds > 0 && ` (${elapsedSeconds}s)`}
         </p>
         {errorMessage && <h5 className="mt-1">{errorMessage}</h5>}
-        {isZoomRoomRequested() && (
+        {isWebXPanelRequested() && (
           <div className="mt-3">
             <p className="mb-0">
               <small>

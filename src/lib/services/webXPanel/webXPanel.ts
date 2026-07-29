@@ -24,8 +24,9 @@ const getParam = (qp: URLSearchParams, name: string): string | undefined => {
  * `?zoomRoom=true`). This single param signals the app was loaded as a Zoom
  * Room Controller (ZRC) device panel — e.g. after the touchpanel wrapper app
  * navigates window.location to the MC app's join-1 URL, which carries this
- * param — and gates both `initWebXPanel()` below and `forceDeviceXPanel`,
- * since both only matter in that same ZRC context.
+ * param — and additionally gates the Zoom cross-frame handshake in
+ * `initWebXPanel()` below. See `isXPanelRequested()` and
+ * `isWebXPanelRequested()` for the plain-WebXPanel (non-Zoom) counterpart.
  */
 export const isZoomRoomRequested = (): boolean => {
   try {
@@ -38,18 +39,44 @@ export const isZoomRoomRequested = (): boolean => {
 };
 
 /**
+ * Case-insensitive check for the `xPanel` URL query parameter (e.g.
+ * `?xPanel=true`). Signals the app should run as a plain WebXPanel device
+ * panel — the same connection config sourced from the URL and MC token via
+ * serial join 1 as `?zoomRoom=true` — but WITHOUT the Zoom Room cross-frame
+ * handshake (`requestZoomWebSocketToken`) that only makes sense inside a Zoom
+ * Room Controller (ZRC) web view.
+ */
+export const isXPanelRequested = (): boolean => {
+  try {
+    const qp = new URLSearchParams(window.location.search);
+    return getParam(qp, 'xPanel')?.toLowerCase() === 'true';
+  } catch {
+    // `window` may be unavailable in a non-browser context.
+    return false;
+  }
+};
+
+/**
+ * True when the app should run as a WebXPanel device panel at all — either as
+ * a Zoom Room Controller (`?zoomRoom=true`) or as a plain WebXPanel
+ * (`?xPanel=true`). Both cases need the real (non-stub) WebXPanel connection
+ * and the connection config sourced from the URL; only the Zoom Room case
+ * additionally performs the Zoom cross-frame handshake.
+ */
+export const isWebXPanelRequested = (): boolean =>
+  isZoomRoomRequested() || isXPanelRequested();
+
+/**
  * Decides whether to force the active ("device") WebXPanel.
  *
  * When this app is hosted inside a container webview (e.g. the Zoom Room
  * Controller), `runsInContainerApp()` returns true and the library would hand
  * back the inactive WebXPanel *stub* (`isActive: false`, no-op `initialize`).
- * Forcing the active panel is only ever needed in that same ZRC context that
- * `?zoomRoom=true` signals, so this is derived from `isZoomRoomRequested()`
- * rather than a separate query param — a single `?zoomRoom=true` is enough to
- * get both the Zoom handshake and the real (non-stub) WebXPanel connection
- * working.
+ * Forcing the active panel is only ever needed when `isWebXPanelRequested()`
+ * is true (`?zoomRoom=true` or `?xPanel=true`), so a single one of those
+ * params is enough to get the real (non-stub) WebXPanel connection working.
  */
-export const forceDeviceXPanel = isZoomRoomRequested();
+export const forceDeviceXPanel = isWebXPanelRequested();
 const isBrowser = forceDeviceXPanel || !runsInContainerApp();
 const webXpanelParams = getWebXPanel(isBrowser);
 
@@ -196,24 +223,31 @@ const registerEventListeners = (): void => {
 
 /**
  * Initializes WebXPanel using config read from the launch URL. Only runs when
- * the URL has `?zoomRoom=true` (case-insensitive key), which signals the app
- * is loaded as a Zoom Room Controller (ZRC) device panel — otherwise this is a
- * no-op. Always attempts the Zoom websocket-token handshake first: in a Zoom
- * Room the ZRC host answers and supplies the token; anywhere else the
- * handshake simply times out and WebXPanel is initialized anyway (falling
- * back to its default `tokenUrl`). Registers connection-lifecycle listeners
- * that mirror status/errors into the `webXPanel` Redux slice for diagnostics
- * (see `registerEventListeners`), but otherwise has no Redux dependency.
- * Idempotent — subsequent calls are ignored — so it is safe to invoke as
- * early as possible in app startup, which matters so the Zoom handshake
- * registers its `message` listener before the host shell posts its ack.
+ * `isWebXPanelRequested()` is true — i.e. the URL has `?zoomRoom=true` or
+ * `?xPanel=true` (case-insensitive keys) — otherwise this is a no-op.
+ *
+ * In Zoom Room mode (`?zoomRoom=true`) the Zoom websocket-token handshake is
+ * attempted first: the ZRC host answers and supplies the token; anywhere else
+ * the handshake simply times out and WebXPanel is initialized anyway
+ * (falling back to its default `tokenUrl`). In plain WebXPanel mode
+ * (`?xPanel=true`, no `zoomRoom`) the Zoom cross-frame handshake is skipped
+ * entirely and WebXPanel is initialized directly — everything else (forcing
+ * the active panel, config from the URL, MC token via serial join 1) is the
+ * same as Zoom Room mode.
+ *
+ * Registers connection-lifecycle listeners that mirror status/errors into the
+ * `webXPanel` Redux slice for diagnostics (see `registerEventListeners`), but
+ * otherwise has no Redux dependency. Idempotent — subsequent calls are
+ * ignored — so it is safe to invoke as early as possible in app startup,
+ * which matters so the Zoom handshake registers its `message` listener before
+ * the host shell posts its ack.
  */
 export const initWebXPanel = (): void => {
   if (initialized) {
     return;
   }
 
-  if (!isZoomRoomRequested()) {
+  if (!isWebXPanelRequested()) {
     return;
   }
 
@@ -224,40 +258,46 @@ export const initWebXPanel = (): void => {
   
   window.CrComLib = CrComLib;
 
-  // Since `forceDeviceXPanel` is derived from the same `?zoomRoom=true` param
-  // that gated this function, `WebXPanel` here is always the real panel — not
-  // the container stub — so both the Zoom handshake and `WebXPanel.initialize`
-  // actually run.
+  // Since `forceDeviceXPanel` is derived from the same `isWebXPanelRequested()`
+  // check that gated this function, `WebXPanel` here is always the real panel
+  // — not the container stub — so `WebXPanel.initialize` actually runs.
   enableDebugging();
   setLogLevel(LogLevel.DEBUG);
 
   // WebXPanel is only relevant when running as a WebXPanel.
   window.WebXPanel = WebXPanel;
 
-  console.log('[CZL] Starting Zoom token handshake');
-  // Retrieve the websocket token from the Zoom shell and assign it to
-  // WebXPanel before initializing, so it can authenticate. Posting
-  // `ch5-zoom-lib-ready` here is also what tells the ZRC host the project has
-  // loaded. When not running in a Zoom Room nothing answers, so the handshake
-  // times out and WebXPanel is initialized via the `.catch` below (falling
-  // back to its default `tokenUrl`). Once the CIP connection comes up, the MC
-  // token itself arrives via serial join 1 (Csig s/1), handled by the
-  // touchpanel/joins redux plugin (store/plugins/trilist.ts) and consumed in
-  // websocketMiddleware.ts.
-  requestZoomWebSocketToken(WebXPanel)
-    .then(() => {
-      console.log('[CZL] Zoom token retrieved successfully');
-      WebXPanel.initialize(config);
-    })
-    .catch((error: unknown) => {
-      // The handshake timed out (or otherwise failed). Initialize anyway so
-      // WebXPanel falls back to fetching the token from its default tokenUrl.
-      console.warn(
-        '[CZL] Zoom token handshake failed; initializing WebXPanel anyway',
-        error
-      );
-      WebXPanel.initialize(config);
-    });
+  if (isZoomRoomRequested()) {
+    console.log('[CZL] Starting Zoom token handshake');
+    // Retrieve the websocket token from the Zoom shell and assign it to
+    // WebXPanel before initializing, so it can authenticate. Posting
+    // `ch5-zoom-lib-ready` here is also what tells the ZRC host the project has
+    // loaded. When not running in a Zoom Room nothing answers, so the handshake
+    // times out and WebXPanel is initialized via the `.catch` below (falling
+    // back to its default `tokenUrl`). Once the CIP connection comes up, the MC
+    // token itself arrives via serial join 1 (Csig s/1), handled by the
+    // touchpanel/joins redux plugin (store/plugins/trilist.ts) and consumed in
+    // websocketMiddleware.ts.
+    requestZoomWebSocketToken(WebXPanel)
+      .then(() => {
+        console.log('[CZL] Zoom token retrieved successfully');
+        WebXPanel.initialize(config);
+      })
+      .catch((error: unknown) => {
+        // The handshake timed out (or otherwise failed). Initialize anyway so
+        // WebXPanel falls back to fetching the token from its default tokenUrl.
+        console.warn(
+          '[CZL] Zoom token handshake failed; initializing WebXPanel anyway',
+          error
+        );
+        WebXPanel.initialize(config);
+      });
+  } else {
+    // Plain WebXPanel mode (`?xPanel=true`, no Zoom Room): no cross-frame
+    // handshake to perform, so initialize directly. The MC token still
+    // arrives separately via serial join 1, same as Zoom Room mode.
+    WebXPanel.initialize(config);
+  }
 
   registerEventListeners();
 };
