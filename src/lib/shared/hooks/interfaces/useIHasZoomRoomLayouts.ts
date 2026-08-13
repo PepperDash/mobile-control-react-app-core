@@ -32,12 +32,20 @@ export function useIHasZoomRoomLayouts(
     const swapContentWithThumbnail = () =>
       sendMessage(`${path}/swapContentWithThumbnail`, null);
 
+    const setVideoOrder = (value: string) =>
+      sendMessage(`${path}/setVideoOrder`, { value });
+
+    const setThumbnailsPosition = (value: string) =>
+      sendMessage(`${path}/setThumbnailsPosition`, { value });
+
     return {
       state,
       selectLayout,
       participantsNextPage,
       participantsPreviousPage,
       swapContentWithThumbnail,
+      setVideoOrder,
+      setThumbnailsPosition,
     };
   }, [key, sendMessage, state]);
 }
@@ -53,6 +61,10 @@ export interface ZoomRoomLayoutState {
   layoutViewIsOnLastPage?: boolean;
   canSwapContentWithThumbnail?: boolean;
   contentSwappedWithThumbnail?: boolean;
+  videoOrder?: string;
+  availableVideoOrders?: LayoutOption[];
+  thumbnailsPosition?: string;
+  availableThumbnailsPositions?: LayoutOption[];
 }
 
 export interface IHasZoomRoomLayoutsState extends DeviceState {
@@ -65,4 +77,6 @@ export interface IHasZoomRoomLayoutsReturn {
   participantsNextPage: () => void;
   participantsPreviousPage: () => void;
   swapContentWithThumbnail: () => void;
+  setVideoOrder: (value: string) => void;
+  setThumbnailsPosition: (value: string) => void;
 }
