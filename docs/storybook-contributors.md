@@ -40,6 +40,7 @@ Or, better for consumers, export a small factory that assembles a store with no 
 ```ts
 // src/lib/testing/createMockStore.ts
 import { configureStore } from '@reduxjs/toolkit';
+import type { RootState } from '../store';
 import { appConfigReducer } from '../store/appConfig/appConfig.slice';
 import { devicesReducer } from '../store/devices/devices.slice';
 import { roomsReducer } from '../store/rooms/rooms.slice';

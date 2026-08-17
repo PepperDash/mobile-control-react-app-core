@@ -125,19 +125,23 @@ import { devicesActions } from 'mobile-control-react-app-core';
 import { createMockStore } from './mockStore';
 import DisplayStatus from './DisplayStatus';
 
-const store = createMockStore();
-
-// Same action, same shape, the WS middleware would dispatch on a real message
-store.dispatch(
-  devicesActions.setDeviceState({
-    type: '/device/display-1',
-    content: { powerState: true },
-  }),
-);
-
 export default {
   component: DisplayStatus,
-  decorators: [(Story) => <Provider store={store}><Story /></Provider>],
+  decorators: [
+    (Story) => {
+      const store = createMockStore();
+
+      // Same action, same shape, the WS middleware would dispatch on a real message
+      store.dispatch(
+        devicesActions.setDeviceState({
+          type: '/device/display-1',
+          content: { powerState: true },
+        }),
+      );
+
+      return <Provider store={store}><Story /></Provider>;
+    },
+  ],
 } as Meta<typeof DisplayStatus>;
 
 type Story = StoryObj<typeof DisplayStatus>;
