@@ -4,7 +4,7 @@
 
 > **A note on naming:** Consuming apps refer to this as the "render props" pattern, but it is not the classic React render-prop API (a component that accepts a `render`/`children` function). It is a **Wrapper / Render component split** — one component owns data-sync concerns, and a second, separate component owns presentation. This document uses "render props" only because that is the established name for it across PepperDash Mobile Control apps; the mechanics described below are what actually happens.
 
-This pattern is not part of `mobile-control-react-app-core` itself — the library only provides the building blocks (selector hooks, `useWebsocketContext`, `useStateIsSynced`). The pattern is a convention that consuming apps follow when building screens on top of those building blocks. The examples below are `Audio`/`AudioWrapper` and `DisplayControls`/`DisplayControlsWrapper` from `mobile-control-cisco-navigator-momentum-ui` (the same shape [Issue #97](https://github.com/PepperDash/mobile-control-react-app-core/issues/97) asks for from the KPMG app; this repo has the Cisco Navigator app checked out, and it uses the identical pattern with components of the same names).
+This pattern is not part of `mobile-control-react-app-core` itself — the library only provides the building blocks (selector hooks, `useWebsocketContext`, `useStateIsSynced`). The pattern is a convention that consuming apps follow when building screens on top of those building blocks. The examples below are adapted from the `Audio`/`AudioWrapper` and `DisplayControls`/`DisplayControlsWrapper` components in the separate `mobile-control-cisco-navigator-momentum-ui` consuming app (the same shape [Issue #97](https://github.com/PepperDash/mobile-control-react-app-core/issues/97) asks for from the KPMG app).
 
 ---
 
@@ -135,8 +135,9 @@ export const DisplayControlsWrapper = ({ className }: DisplayControlsProps) => {
 
     deviceKeysSet.forEach((dk) => {
       sendMessage(`/device/${dk}/fullStatus`, { deviceKey: dk });
-      setSyncStateRequested();
     });
+
+    setSyncStateRequested();
   }, [config, deviceInterfaceSupport]);
 
   return <DisplayControls className={className} />;
@@ -148,7 +149,7 @@ The Wrapper combines two sources — `config.accessoryDeviceKeys` filtered by in
 Here is the Render half in full:
 
 ```tsx
-// DisplaysControls.tsx — the Render component
+// DisplayControls.tsx — the Render component
 const DisplayControls = ({ className }: DisplayControlsProps) => {
   const [selectedDisplay, setSelectedDisplay] = useState<DisplayState>();
   const roomKey = useRoomKey();
