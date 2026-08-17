@@ -37,16 +37,17 @@ Messages sent while disconnected are dropped (logged as a warning) rather than q
 Essentials pushes one-off events (as opposed to persistent [device/room state](./device-state-feedback-app-dev.md)) as `/event/*` messages — button presses forwarded from a panel, momentary notifications, etc. Register a handler for the types you care about:
 
 ```tsx
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { useWebsocketContext } from '@pepperdash/mobile-control-react-app-core';
 
 const { addEventHandler, removeEventHandler } = useWebsocketContext();
+const handlerKey = useId();
 
 useEffect(() => {
   const handler = (message) => console.log('Event received', message);
-  addEventHandler('/event/someEvent', 'my-component-key', handler);
-  return () => removeEventHandler('/event/someEvent', 'my-component-key');
-}, [addEventHandler, removeEventHandler]);
+  addEventHandler('/event/someEvent', handlerKey, handler);
+  return () => removeEventHandler('/event/someEvent', handlerKey);
+}, [addEventHandler, handlerKey, removeEventHandler]);
 ```
 
 The `key` argument namespaces your handler among others registered for the same event type — use something stable and unique per registration (e.g. a component instance id) so `removeEventHandler` cleans up the right one.
