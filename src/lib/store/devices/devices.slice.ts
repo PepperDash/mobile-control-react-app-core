@@ -27,7 +27,11 @@ const devicesSlice = createSlice({
         {},
         existingState,
         content,
-        (_objValue, srcValue) => {
+        (objValue, srcValue) => {
+          // Partial updates: a null/undefined incoming value means "no change", so keep the
+          // existing value instead of letting the default merge overwrite it (lodash skips
+          // undefined but overwrites with null).
+          if (srcValue == null) return objValue;
           if (Array.isArray(srcValue)) return srcValue.slice();
           return undefined; // fallback to default merge behavior
         },
