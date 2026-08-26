@@ -46,6 +46,7 @@ export * from './useIHasZoomRoomLayouts';
 export * from './useILevelControls';
 export * from './useILightingScenes';
 export * from './useIMatrixRouting';
+export * from './useINamedRoutingSlots';
 export * from './useIMcCiscoCodecUserInterfaceAppControl';
 export * from './useINumeric';
 export * from './useIProjectorScreenLiftControl';
