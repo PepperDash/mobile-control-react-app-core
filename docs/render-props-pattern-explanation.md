@@ -43,7 +43,7 @@ This is the same idea as a container/presentational split, but the "container" h
 
 ## Walkthrough: `AudioWrapper` / `Audio`
 
-From `mobile-control-cisco-navigator-momentum-ui`:
+_Example adapted from the separate [`mobile-control-cisco-navigator-momentum-ui`](https://github.com/PepperDash/mobile-control-cisco-navigator-momentum-ui) consuming app:_
 
 ```tsx
 // AudioWrapper.tsx — the Wrapper
@@ -100,6 +100,8 @@ const Audio = ({ className }: AudioProps) => {
 ---
 
 ## Walkthrough: `DisplayControlsWrapper` / `DisplayControls`
+
+_Another example from the same separate app:_
 
 This example shows the "which device keys are relevant" step in more depth — it is not always as simple as reading one list off of `config`:
 
