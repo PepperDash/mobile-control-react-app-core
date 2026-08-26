@@ -186,11 +186,11 @@ Because state merges incrementally in the same order the real middleware applies
 
 ## Summary
 
-| Component depends on…        | What the story needs                                                             |
-| ----------------------------- | ---------------------------------------------------------------------------------- |
-| Only `props`                  | Nothing extra — render directly.                                                   |
-| `useWebsocketContext` (commands only) | Nothing extra — the context's no-op defaults make buttons safely clickable. |
+| Component depends on…                              | What the story needs                                                                                                      |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Only `props`                                       | Nothing extra — render directly.                                                                                          |
+| `useWebsocketContext` (commands only)              | Nothing extra — the context's no-op defaults make buttons safely clickable.                                               |
 | Redux store (`useGetDevice`, `useRoomState`, etc.) | A `Provider` wrapping a fresh `configureStore`, seeded via `devicesActions.setDeviceState` / `roomsActions.setRoomState`. |
-| A specific real-world scenario | The same store setup, seeded by replaying a captured sequence of state messages. |
+| A specific real-world scenario                     | The same store setup, seeded by replaying a captured sequence of state messages.                                          |
 
 Never wrap a story in `MobileControlProvider` or the real exported `store` — both assume (and attempt) a live WebSocket connection.
