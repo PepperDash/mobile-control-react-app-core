@@ -13,6 +13,7 @@ import {
   RuntimeConfigState,
   UserCode,
 } from '../runtimeConfig/runtimeConfig.slice';
+import { ITouchPanel, touchPanelActions } from '../touchPanel/touchPanel.slice';
 import { uiActions, UiConfigState } from '../ui/ui.slice';
 
 const httpClient = axios.create();
@@ -24,6 +25,7 @@ type LocalRootState = {
   rooms: Record<string, RoomState>;
   devices: Record<string, DeviceState>;
   ui: UiConfigState;
+  touchPanel: ITouchPanel;
 };
 
 /**
@@ -60,6 +62,116 @@ export const wsRemoveEventHandler = (eventType: string, key: string) => ({
 export const wsReconnect = () => ({ type: WS_RECONNECT });
 
 /**
+ * Case-insensitive check for the `zoomRoom` URL query parameter (e.g.
+ * `?zoomRoom=true`). Mirrors `isZoomRoomRequested()` in
+ * services/webXPanel/webXPanel.ts — when true, this app is running as a
+ * Zoom Room Controller (ZRC) device panel, and the join token must be parsed
+ * from the MC app URL delivered via serial join 1 rather than this page's own
+ * window.location.
+ */
+const isZoomRoom = (): boolean => {
+  try {
+    const qp = new URLSearchParams(window.location.search);
+    for (const [key, value] of qp) {
+      if (key.toLowerCase() === 'zoomroom') {
+        return value.toLowerCase() === 'true';
+      }
+    }
+  } catch {
+    // `window` may be unavailable in a non-browser context.
+  }
+  return false;
+};
+
+/**
+ * Case-insensitive check for the `xPanel` URL query parameter (e.g.
+ * `?xPanel=true`). Mirrors `isXPanelRequested()` in
+ * services/webXPanel/webXPanel.ts — signals the app is running as a plain
+ * WebXPanel device panel (no Zoom Room cross-frame handshake), but otherwise
+ * needs the same join token via serial join 1 as Zoom Room mode.
+ */
+const isXPanel = (): boolean => {
+  try {
+    const qp = new URLSearchParams(window.location.search);
+    for (const [key, value] of qp) {
+      if (key.toLowerCase() === 'xpanel') {
+        return value.toLowerCase() === 'true';
+      }
+    }
+  } catch {
+    // `window` may be unavailable in a non-browser context.
+  }
+  return false;
+};
+
+/**
+ * True when the app is running as a WebXPanel device panel of any kind —
+ * either a Zoom Room Controller (`?zoomRoom=true`) or a plain WebXPanel
+ * (`?xPanel=true`). In both cases the join token must be parsed from the MC
+ * app URL delivered via serial join 1 rather than this page's own
+ * window.location, and the local config is fetched relative to `./` rather
+ * than the app's base path.
+ */
+const isDevicePanel = (): boolean => isZoomRoom() || isXPanel();
+
+/**
+ * Builds a user-facing error message for a failed HTTP request. Axios (and
+ * the browser XHR/fetch APIs underneath it) do not expose SSL/TLS
+ * certificate error details to JS, so a request that fails with no response
+ * (AxiosError with no `response`) is most commonly caused by an untrusted /
+ * self-signed certificate on an https:// endpoint, a CSP/mixed-content
+ * block, or the server being unreachable. Surface that possibility so it's
+ * visible in the UI instead of only in the console.
+ */
+const describeRequestError = (err: unknown, url?: string): string => {
+  const target =
+    url ?? (err instanceof AxiosError ? err.config?.url : undefined);
+
+  if (err instanceof AxiosError) {
+    if (err.response) {
+      return `Request to ${target ?? 'server'} failed: ${err.response.status} ${
+        err.response.statusText
+      }`;
+    }
+
+    return (
+      `Network error contacting ${target ?? 'server'}: ${err.message}. ` +
+      'If the URL uses https://, this is often caused by an untrusted/' +
+      'self-signed SSL certificate, a CSP/mixed-content block, or the ' +
+      'server being unreachable.'
+    );
+  }
+
+  if (err instanceof Error) {
+    return err.message;
+  }
+
+  return String(err);
+};
+
+/**
+ * Parses the `token` query parameter out of the MC app URL delivered via
+ * serial join 1 (Csig s/1). Used when running as a Zoom Room device panel so
+ * the WebSocket/API calls authenticate using the token embedded in that URL
+ * instead of the token on this page's own window.location.
+ */
+const getTokenFromMcAppUrl = (mcAppUrl?: string): string | null => {
+  if (!mcAppUrl) {
+    return null;
+  }
+
+  try {
+    return new URL(mcAppUrl).searchParams.get('token');
+  } catch {
+    const queryIndex = mcAppUrl.indexOf('?');
+    if (queryIndex === -1) {
+      return null;
+    }
+    return new URLSearchParams(mcAppUrl.substring(queryIndex)).get('token');
+  }
+};
+
+/**
  * WebSocket middleware state
  */
 interface WebSocketMiddlewareState {
@@ -89,10 +201,12 @@ export const createWebSocketMiddleware = (): Middleware<
    * Initialize the app configuration
    */
   const initialize = async (dispatch: Dispatch): Promise<boolean> => {
+    dispatch(uiActions.setConnectionStage('loading-config'));
+
     try {
       const basePath = location.pathname
         .split('/')
-        .filter((path) => path.length > 0);
+        .filter((path) => path.length > 0 && !path.includes('.'));
 
       if (basePath.length >= 5) {
         basePath.length = 5;
@@ -100,28 +214,55 @@ export const createWebSocketMiddleware = (): Middleware<
         basePath.length = 2;
       }
 
-      const baseURL = `/${basePath.join('/')}`;
+      const baseURL = isDevicePanel() ? './' : `/${basePath.join('/')}`;
+      const configUrl = `${baseURL}/_local-config/_config.local.json`;
 
       // Get the local config and set it in the store
-      const configRes = await httpClient.get<AppConfig>(
-        '/_local-config/_config.local.json',
-        { baseURL }
-      );
-
-      if (configRes.status === 200 && configRes.data) {
-        const apiPath = configRes.data.apiPath;
-        dispatch(appConfigActions.setAppConfig(configRes.data));
-
-        // Get the runtime version info and set it in the store
-        const versionRes = await httpClient.get<RuntimeConfigState>(
-          `${apiPath}/version`
+      let configData: AppConfig | undefined;
+      try {
+        const configRes = await httpClient.get<AppConfig>(
+          '/_local-config/_config.local.json',
+          { baseURL }
         );
-        if (versionRes.status === 200 && versionRes.data) {
-          dispatch(runtimeConfigActions.setRuntimeConfig(versionRes.data));
+
+        if (configRes.status === 200 && configRes.data) {
+          configData = configRes.data;
+          dispatch(appConfigActions.setAppConfig(configData));
+        }
+      } catch (error) {
+        console.error('Error getting config', error);
+        dispatch(uiActions.setConnectionStage('error'));
+        dispatch(
+          uiActions.setErrorMessage(describeRequestError(error, configUrl))
+        );
+        return true;
+      }
+
+      if (configData) {
+        const apiPath = configData.apiPath;
+        dispatch(uiActions.setConnectionStage('loading-version'));
+        try {
+          // Get the runtime version info and set it in the store
+          const versionRes = await httpClient.get<RuntimeConfigState>(
+            `${apiPath}/version`
+          );
+          if (versionRes.status === 200 && versionRes.data) {
+            dispatch(runtimeConfigActions.setRuntimeConfig(versionRes.data));
+          }
+        } catch (error) {
+          console.error('Error getting version info', error);
+          dispatch(uiActions.setConnectionStage('error'));
+          dispatch(
+            uiActions.setErrorMessage(
+              describeRequestError(error, `${apiPath}/version`)
+            )
+          );
         }
       }
     } catch (error) {
       console.error('Error getting config', error);
+      dispatch(uiActions.setConnectionStage('error'));
+      dispatch(uiActions.setErrorMessage(describeRequestError(error)));
     }
 
     return true;
@@ -155,6 +296,7 @@ export const createWebSocketMiddleware = (): Middleware<
         err.response.status === 498
       ) {
         console.error('Invalid token. Unable to join room');
+        dispatch(uiActions.setConnectionStage('error'));
         dispatch(
           uiActions.setErrorMessage(
             `Token ${token} is invalid. Unable to join room`
@@ -164,12 +306,12 @@ export const createWebSocketMiddleware = (): Middleware<
       }
 
       console.error('Error getting room data', err);
-
-      if (err instanceof Error) {
-        dispatch(uiActions.setErrorMessage(err.message));
-      } else {
-        dispatch(uiActions.setErrorMessage('Error getting room data'));
-      }
+      dispatch(uiActions.setConnectionStage('error'));
+      dispatch(
+        uiActions.setErrorMessage(
+          describeRequestError(err, `${apiPath}/ui/joinroom`)
+        )
+      );
       return null;
     }
   };
@@ -272,6 +414,26 @@ export const createWebSocketMiddleware = (): Middleware<
           hasToken: !!state.token,
         }
       );
+
+      // Without an apiPath or token there is nothing further this middleware
+      // can do on its own, and previously this returned silently, leaving
+      // the UI stuck on "Connecting..." with no indication of why. Surface
+      // the reason so it's visible instead of only in the console.
+      if (!apiPath) {
+        dispatch(uiActions.setConnectionStage('error'));
+        dispatch(
+          uiActions.setErrorMessage(
+            'Unable to connect: app configuration failed to load (no apiPath). Check that _local-config/_config.local.json is reachable and valid.'
+          )
+        );
+      } else {
+        dispatch(uiActions.setConnectionStage('waiting-for-token'));
+        dispatch(
+          uiActions.setErrorMessage(
+            'No connection token found. Reopen this app using a valid Mobile Control link (with a ?token= parameter).'
+          )
+        );
+      }
       return;
     }
 
@@ -289,6 +451,7 @@ export const createWebSocketMiddleware = (): Middleware<
 
     // Mark as connecting to prevent concurrent attempts
     state.waitingToReconnect = true;
+    dispatch(uiActions.setConnectionStage('loading-room'));
 
     try {
       const roomData = await getRoomData(apiPath, state.token, dispatch);
@@ -297,11 +460,13 @@ export const createWebSocketMiddleware = (): Middleware<
         console.log(
           'WebSocket middleware: Failed to get room data, will retry...'
         );
+        dispatch(uiActions.setConnectionStage('retrying'));
         startReconnectionLoop(dispatch);
         return;
       }
 
       console.log('WebSocket middleware: Connecting to websocket');
+      dispatch(uiActions.setConnectionStage('connecting-websocket'));
 
       const wsPath = apiPath.replace('http', 'ws');
       const url = `${wsPath}/ui/join/${state.token}?clientId=${roomData.clientId}`;
@@ -319,12 +484,14 @@ export const createWebSocketMiddleware = (): Middleware<
           // Only set connected if this WebSocket is still the current client
           if (state.client === newWs && newWs.readyState === WebSocket.OPEN) {
             dispatch(runtimeConfigActions.setWebsocketIsConnected(true));
+            dispatch(uiActions.setConnectionStage('connected'));
           }
         }, 100);
       };
 
       newWs.onerror = (err) => {
         console.error('WebSocket middleware: Error', err);
+        dispatch(uiActions.setConnectionStage('error'));
         // Note: onclose will be called after onerror and will handle cleanup/reconnection
         clearStateDataOnDisconnect(dispatch);
       };
@@ -340,7 +507,12 @@ export const createWebSocketMiddleware = (): Middleware<
         if (closeEvent.code === 4100) {
           console.log('WebSocket middleware: Closed by client (cleanup)');
           stopReconnectionLoop();
-          clearStateDataOnDisconnect(dispatch);
+          // Skip cleanup if a newer connection has already taken over (e.g. a
+          // token rotation triggered an immediate reconnect) so this stale
+          // close event doesn't clobber the new connection's state.
+          if (state.client === newWs) {
+            clearStateDataOnDisconnect(dispatch);
+          }
           return;
         }
 
@@ -353,6 +525,7 @@ export const createWebSocketMiddleware = (): Middleware<
           dispatch(
             runtimeConfigActions.setUserCode({ userCode: '', qrUrl: '' })
           );
+          dispatch(uiActions.setConnectionStage('error'));
           dispatch(
             uiActions.setErrorMessage(
               'User code changed. Click reconnect to enter the new code'
@@ -365,6 +538,7 @@ export const createWebSocketMiddleware = (): Middleware<
         if (closeEvent.code === 4002) {
           console.log('WebSocket middleware: Room combination changed');
           stopReconnectionLoop();
+          dispatch(uiActions.setConnectionStage('error'));
           dispatch(
             uiActions.setErrorMessage(
               'Room combination changed. Click Reconnect to re-join the room'
@@ -389,6 +563,7 @@ export const createWebSocketMiddleware = (): Middleware<
               'WebSocket middleware: Processor disconnected (no touchpanel key, not on processor hardware)'
             );
             stopReconnectionLoop();
+            dispatch(uiActions.setConnectionStage('error'));
             dispatch(
               uiActions.setErrorMessage(
                 'Processor has disconnected. Click Reconnect to continue.'
@@ -418,6 +593,7 @@ export const createWebSocketMiddleware = (): Middleware<
         state.client = null;
 
         console.log('WebSocket middleware: Clearing state on disconnect');
+        dispatch(uiActions.setConnectionStage('retrying'));
         dispatch(
           uiActions.setErrorMessage(
             'Connection lost. Attempting to reconnect...'
@@ -537,6 +713,8 @@ export const createWebSocketMiddleware = (): Middleware<
       state.waitingToReconnect = false;
     } catch (error) {
       console.error('WebSocket middleware: Connection error', error);
+      dispatch(uiActions.setConnectionStage('error'));
+      dispatch(uiActions.setErrorMessage(describeRequestError(error)));
       state.waitingToReconnect = false;
       state.client = null;
     }
@@ -636,22 +814,45 @@ export const createWebSocketMiddleware = (): Middleware<
     (async () => {
       switch (typedAction.type) {
         case WS_CONNECT: {
-          // Get token from URL or session storage
-          const qp = new URLSearchParams(window.location.search);
-          let joinToken = qp.get('token');
-
-          if (joinToken) {
-            console.log('WebSocket middleware: Saving token');
-            saveValue(sessionStorageKeys.uuid, joinToken);
-          } else {
-            joinToken = loadValue(sessionStorageKeys.uuid);
-            console.log('WebSocket middleware: Loading token');
-          }
-
-          state.token = joinToken;
-
-          // Initialize config
+          // Initialize config first (parallel with token resolution below)
           await initialize(store.dispatch);
+
+          if (isDevicePanel()) {
+            // Token comes from the MC app URL delivered via serial join 1,
+            // not from this page's own window.location
+            const mcAppUrl = (store.getState() as LocalRootState).touchPanel
+              ?.mcAppUrl;
+            const joinToken = getTokenFromMcAppUrl(mcAppUrl);
+
+            if (!joinToken) {
+              console.log(
+                'WebSocket middleware: Device panel mode - no token available yet from mcAppUrl, waiting for join 1 update'
+              );
+              state.token = null;
+              store.dispatch(uiActions.setConnectionStage('waiting-for-token'));
+              break;
+            }
+
+            console.log(
+              'WebSocket middleware: Using token parsed from mcAppUrl (device panel mode)'
+            );
+            state.token = joinToken;
+            // sessionStorage isn't available on Crestron panels, not sure on other devices that run Zoom Room Controller and allow loading Zoom Room Control Applications
+          } else {
+            // Get token from URL or session storage
+            const qp = new URLSearchParams(window.location.search);
+            let joinToken = qp.get('token');
+
+            if (joinToken) {
+              console.log('WebSocket middleware: Saving token');
+              saveValue(sessionStorageKeys.uuid, joinToken);
+            } else {
+              joinToken = loadValue(sessionStorageKeys.uuid);
+              console.log('WebSocket middleware: Loading token');
+            }
+
+            state.token = joinToken;
+          }
 
           // Connect
           await connect(store.dispatch, store.getState);
@@ -729,6 +930,38 @@ export const createWebSocketMiddleware = (): Middleware<
                 ', requesting room status...'
               );
               setTimeout(() => requestRoomStatus(store.getState, roomKey), 100);
+            }
+          } else if (action.type === touchPanelActions.setMcAppUrl.type) {
+            // Device panel mode (Zoom Room or plain WebXPanel): the join token
+            // lives in the MC app URL delivered via serial join 1. It may
+            // arrive after the initial WS_CONNECT attempt, or be rotated while
+            // already connected — (re)connect using the latest token in either
+            // case.
+            if (isDevicePanel()) {
+              const mcAppUrl = (action as AnyAction).payload as
+                | string
+                | undefined;
+              const joinToken = getTokenFromMcAppUrl(mcAppUrl);
+
+              if (joinToken && joinToken !== state.token) {
+                if (state.client) {
+                  console.log(
+                    '[WebSocket Middleware] Token rotated in mcAppUrl, reconnecting with new token...'
+                  );
+                  disconnect();
+                } else {
+                  console.log(
+                    '[WebSocket Middleware] Token now available from mcAppUrl, connecting...'
+                  );
+                }
+
+                // Clear any pending scheduled retry so we connect immediately
+                // with the new token rather than waiting for it to elapse.
+                stopReconnectionLoop();
+                state.waitingToReconnect = false;
+                state.token = joinToken;
+                await connect(store.dispatch, store.getState);
+              }
             }
           }
           break;
