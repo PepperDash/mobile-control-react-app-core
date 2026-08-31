@@ -229,6 +229,24 @@ export const createWebSocketMiddleware = (): Middleware<
   };
 
   /**
+   * Resolves which room to ask for status.
+   *
+   * `runtimeConfig.currentRoomKey` is what the UI renders (see selectRoomKey/useRoomKey), and it
+   * is the one the room combiner remaps: joining with a token for `roomB` while rooms A/B/C are
+   * combined returns `roomB` from /ui/joinroom but pushes `/system/roomKey` = `roomABC`. Falling
+   * back to `roomData.roomKey` first meant the two triggers below that pass no key asked for the
+   * pre-combination room, so the room the UI was rendering never received any state.
+   */
+  const resolveRoomKey = (
+    getState: () => LocalRootState,
+    roomKey?: string,
+  ): string => {
+    const { runtimeConfig } = getState();
+
+    return roomKey || runtimeConfig.currentRoomKey || runtimeConfig.roomData.roomKey;
+  };
+
+  /**
    * Request room status - automatically called when connection and room data are ready.
    * Returns true once the request was actually sent, false if a precondition wasn't ready yet
    * (caller decides whether to retry).
@@ -238,7 +256,7 @@ export const createWebSocketMiddleware = (): Middleware<
     roomKey?: string,
   ): boolean => {
     const rootState = getState();
-    const currentRoomKey = roomKey ?? rootState.runtimeConfig.roomData.roomKey;
+    const currentRoomKey = resolveRoomKey(getState, roomKey);
     const { clientId } = rootState.runtimeConfig.roomData;
     const isConnected = rootState.runtimeConfig.websocket.isConnected;
     const essentialsVersion =
@@ -315,8 +333,7 @@ export const createWebSocketMiddleware = (): Middleware<
     getState: () => LocalRootState,
     roomKey?: string,
   ) => {
-    const targetRoomKey =
-      roomKey ?? getState().runtimeConfig.roomData.roomKey;
+    const targetRoomKey = resolveRoomKey(getState, roomKey);
 
     // A retry cycle for this same room is already in flight - let it continue rather than
     // resetting its deadline every time one of the three triggers fires.
@@ -331,7 +348,7 @@ export const createWebSocketMiddleware = (): Middleware<
     const attempt = () => {
       state.roomStatusRetryTimer = null;
 
-      if (requestRoomStatus(getState, roomKey)) {
+      if (requestRoomStatus(getState, targetRoomKey)) {
         clearRoomStatusRetry();
         return;
       }
