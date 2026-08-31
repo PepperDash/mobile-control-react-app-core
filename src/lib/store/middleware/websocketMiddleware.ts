@@ -68,7 +68,14 @@ interface WebSocketMiddlewareState {
   waitingToReconnect: boolean;
   reconnectTimer: NodeJS.Timeout | null;
   eventHandlers: Record<string, Record<string, (data: Message) => void>>;
+  roomStatusRetryTimer: NodeJS.Timeout | null;
+  roomStatusRetryDeadline: number | null;
+  roomStatusRetryRoomKey: string | undefined;
 }
+
+// Bounded retry window for the initial room-status request (see scheduleRoomStatusRequest).
+const ROOM_STATUS_RETRY_INTERVAL_MS = 1500;
+const ROOM_STATUS_RETRY_TIMEOUT_MS = 15000;
 
 /**
  * Creates the WebSocket middleware
@@ -83,6 +90,9 @@ export const createWebSocketMiddleware = (): Middleware<
     waitingToReconnect: false,
     reconnectTimer: null,
     eventHandlers: {},
+    roomStatusRetryTimer: null,
+    roomStatusRetryDeadline: null,
+    roomStatusRetryRoomKey: undefined,
   };
 
   /**
@@ -209,6 +219,7 @@ export const createWebSocketMiddleware = (): Middleware<
    * Clear state data on disconnect
    */
   const clearStateDataOnDisconnect = (dispatch: Dispatch) => {
+    clearRoomStatusRetry();
     dispatch(uiActions.setShowReconnect(true));
     dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
     dispatch(devicesActions.clearDevices());
@@ -218,12 +229,14 @@ export const createWebSocketMiddleware = (): Middleware<
   };
 
   /**
-   * Request room status - automatically called when connection and room data are ready
+   * Request room status - automatically called when connection and room data are ready.
+   * Returns true once the request was actually sent, false if a precondition wasn't ready yet
+   * (caller decides whether to retry).
    */
   const requestRoomStatus = (
     getState: () => LocalRootState,
     roomKey?: string,
-  ) => {
+  ): boolean => {
     const rootState = getState();
     const currentRoomKey = roomKey ?? rootState.runtimeConfig.roomData.roomKey;
     const { clientId } = rootState.runtimeConfig.roomData;
@@ -237,40 +250,105 @@ export const createWebSocketMiddleware = (): Middleware<
 
     const isEssentialsV3 = essentialsVersion?.startsWith('3.');
 
-    if (!roomKey || !isConnected || !clientId) {
+    // Bug fix: this previously checked the raw (often-undefined) `roomKey` parameter instead of
+    // the computed `currentRoomKey`, which made two of the three callers below permanently no-op.
+    if (!currentRoomKey || !isConnected || !clientId || !state.client) {
       console.log('WebSocket middleware: Cannot request room status', {
-        hasRoomKey: !!roomKey,
+        hasRoomKey: !!currentRoomKey,
         isConnected,
         hasClientId: !!clientId,
       });
+      return false;
+    }
+
+    console.log(
+      'WebSocket middleware: Requesting status from room:',
+      currentRoomKey,
+    );
+
+    if (isEssentialsV3) {
+      console.log(
+        'WebSocket middleware: Essentials V3 detected, requesting additional status...',
+      );
+
+      state.client.send(
+        JSON.stringify({
+          type: `/room/${currentRoomKey}/fullStatus`,
+          clientId,
+          content: null,
+        }),
+      );
+    } else {
+      state.client.send(
+        JSON.stringify({
+          type: `/room/${currentRoomKey}/status`,
+          clientId,
+          content: null,
+        }),
+      );
+    }
+
+    return true;
+  };
+
+  /**
+   * Clears any pending room-status retry timer/deadline without touching the connection.
+   */
+  const clearRoomStatusRetry = () => {
+    if (state.roomStatusRetryTimer) {
+      clearTimeout(state.roomStatusRetryTimer);
+      state.roomStatusRetryTimer = null;
+    }
+    state.roomStatusRetryDeadline = null;
+    state.roomStatusRetryRoomKey = undefined;
+  };
+
+  /**
+   * Requests room status, retrying on a short interval if a precondition (isConnected/clientId/
+   * roomKey) wasn't ready yet. Bounded to ROOM_STATUS_RETRY_TIMEOUT_MS - if it still hasn't
+   * succeeded by then, forces a full reconnect (closes the socket so the existing onclose
+   * teardown/auto-reconnect logic runs) rather than retrying silently forever, since that would
+   * just mask a genuine failure instead of ever recovering.
+   */
+  const scheduleRoomStatusRequest = (
+    dispatch: Dispatch,
+    getState: () => LocalRootState,
+    roomKey?: string,
+  ) => {
+    const targetRoomKey =
+      roomKey ?? getState().runtimeConfig.roomData.roomKey;
+
+    // A retry cycle for this same room is already in flight - let it continue rather than
+    // resetting its deadline every time one of the three triggers fires.
+    if (state.roomStatusRetryTimer && state.roomStatusRetryRoomKey === targetRoomKey) {
       return;
     }
 
-    console.log('WebSocket middleware: Requesting status from room:', roomKey);
+    clearRoomStatusRetry();
+    state.roomStatusRetryRoomKey = targetRoomKey;
+    state.roomStatusRetryDeadline = Date.now() + ROOM_STATUS_RETRY_TIMEOUT_MS;
 
-    if (state.client && isConnected) {
-      if (isEssentialsV3) {
-        console.log(
-          'WebSocket middleware: Essentials V3 detected, requesting additional status...',
-        );
+    const attempt = () => {
+      state.roomStatusRetryTimer = null;
 
-        state.client.send(
-          JSON.stringify({
-            type: `/room/${currentRoomKey}/fullStatus`,
-            clientId,
-            content: null,
-          }),
-        );
-      } else {
-        state.client.send(
-          JSON.stringify({
-            type: `/room/${currentRoomKey}/status`,
-            clientId,
-            content: null,
-          }),
-        );
+      if (requestRoomStatus(getState, roomKey)) {
+        clearRoomStatusRetry();
+        return;
       }
-    }
+
+      if (Date.now() >= (state.roomStatusRetryDeadline ?? 0)) {
+        console.error(
+          'WebSocket middleware: Room status request never succeeded within the retry window - forcing reconnect',
+        );
+        clearRoomStatusRetry();
+        state.client?.close(1000, 'room status retry timeout');
+        return;
+      }
+
+      state.roomStatusRetryTimer = setTimeout(attempt, ROOM_STATUS_RETRY_INTERVAL_MS);
+    };
+
+    state.roomStatusRetryTimer = setTimeout(attempt, 100);
   };
 
   /**
@@ -574,6 +652,7 @@ export const createWebSocketMiddleware = (): Middleware<
     if (state.client) {
       console.log('WebSocket middleware: Disconnecting');
       stopReconnectionLoop();
+      clearRoomStatusRetry();
       state.client.close(4100, 'Client requested disconnect');
       state.client = null;
     }
@@ -725,7 +804,7 @@ export const createWebSocketMiddleware = (): Middleware<
               console.log(
                 '[WebSocket Middleware] Connection established, requesting room status...',
               );
-              setTimeout(() => requestRoomStatus(store.getState), 100);
+              scheduleRoomStatusRequest(store.dispatch, store.getState);
             }
           } else if (action.type === runtimeConfigActions.setRoomData.type) {
             // When room data (including clientId) becomes available, request room status if connected
@@ -740,7 +819,7 @@ export const createWebSocketMiddleware = (): Middleware<
               console.log(
                 '[WebSocket Middleware] Room data received, requesting room status...',
               );
-              setTimeout(() => requestRoomStatus(store.getState), 100);
+              scheduleRoomStatusRequest(store.dispatch, store.getState);
             }
           } else if (
             action.type === runtimeConfigActions.setCurrentRoomKey.type
@@ -753,7 +832,7 @@ export const createWebSocketMiddleware = (): Middleware<
                 roomKey,
                 ', requesting room status...',
               );
-              setTimeout(() => requestRoomStatus(store.getState, roomKey), 100);
+              scheduleRoomStatusRequest(store.dispatch, store.getState, roomKey);
             }
           }
           break;
