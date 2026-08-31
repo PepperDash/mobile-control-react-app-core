@@ -222,18 +222,23 @@ const registerEventListeners = (): void => {
 };
 
 /**
- * Initializes WebXPanel using config read from the launch URL. Only runs when
- * `isWebXPanelRequested()` is true — i.e. the URL has `?zoomRoom=true` or
- * `?xPanel=true` (case-insensitive keys) — otherwise this is a no-op.
+ * Initializes WebXPanel using config read from the launch URL.
+ *
+ * Runs when any of the following is true:
+ * - `?zoomRoom=true` is in the URL (Zoom Room Controller mode)
+ * - `?xPanel=true` is in the URL (plain WebXPanel mode)
+ * - `runsInContainerApp()` is true with neither param present — in this case
+ *   the app is hosted inside a container webview whose CIP connection is
+ *   already live, so CrComLib serial join 1 still delivers the MC token via
+ *   that connection without needing to force the device panel.
  *
  * In Zoom Room mode (`?zoomRoom=true`) the Zoom websocket-token handshake is
  * attempted first: the ZRC host answers and supplies the token; anywhere else
  * the handshake simply times out and WebXPanel is initialized anyway
  * (falling back to its default `tokenUrl`). In plain WebXPanel mode
- * (`?xPanel=true`, no `zoomRoom`) the Zoom cross-frame handshake is skipped
- * entirely and WebXPanel is initialized directly — everything else (forcing
- * the active panel, config from the URL, MC token via serial join 1) is the
- * same as Zoom Room mode.
+ * (`?xPanel=true`, no `zoomRoom`) or plain container mode (no URL params),
+ * the Zoom cross-frame handshake is skipped entirely and WebXPanel is
+ * initialized directly.
  *
  * Registers connection-lifecycle listeners that mirror status/errors into the
  * `webXPanel` Redux slice for diagnostics (see `registerEventListeners`), but
@@ -247,7 +252,11 @@ export const initWebXPanel = (): void => {
     return;
   }
 
-  if (!isWebXPanelRequested()) {
+  // Skip entirely only when there is no URL-based WebXPanel request AND the
+  // app is not running inside a container app. If the container flag is set
+  // (even without ?zoomRoom / ?xPanel), the container's CIP connection is
+  // already live and CrComLib serial join 1 delivers the MC token through it.
+  if (!isWebXPanelRequested() && !runsInContainerApp()) {
     return;
   }
 
@@ -255,12 +264,13 @@ export const initWebXPanel = (): void => {
 
   const config = getConfigFromQuery();
   console.log('WebXPanel config', config);
-  
+
   window.CrComLib = CrComLib;
 
-  // Since `forceDeviceXPanel` is derived from the same `isWebXPanelRequested()`
-  // check that gated this function, `WebXPanel` here is always the real panel
-  // — not the container stub — so `WebXPanel.initialize` actually runs.
+  // When `forceDeviceXPanel` is true (i.e. `isWebXPanelRequested()`) `WebXPanel`
+  // is the real device panel. When only `runsInContainerApp()` is true (no URL
+  // params), `WebXPanel` is the container stub — initialize still runs, but the
+  // container handles the actual CIP connection.
   enableDebugging();
   setLogLevel(LogLevel.DEBUG);
 
