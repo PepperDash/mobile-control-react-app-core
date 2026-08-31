@@ -124,6 +124,7 @@ function RoomPanel({ roomKey }: { roomKey: string }) {
 
 - Sends `fullStatus` requests once per mount (guarded by a `useRef`).
 - Pass `requestStatus={false}` to suppress the requests when you only need to observe state.
+- Need "once per session" instead of once per mount (e.g. a screen behind app routing that unmounts/remounts)? See [render-props-pattern-explanation.md](./render-props-pattern-explanation.md) for the Wrapper/Render pattern built on `useStateIsSynced` and the Redux `syncState` guard.
 
 ---
 
