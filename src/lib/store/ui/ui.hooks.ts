@@ -1,5 +1,6 @@
 import { useAppSelector } from '../hooks';
 import {
+  selectConnectionStage,
   selectCurrentPopoverIdForGroup,
   selectError,
   selectIsSyncStateValuePresent,
@@ -25,6 +26,8 @@ export const useShowPopoverById = (popoverGroup: string, popoverId: string) =>
   useAppSelector(selectShowPopoverById(popoverGroup, popoverId));
 
 export const useError = () => useAppSelector(selectError);
+
+export const useConnectionStage = () => useAppSelector(selectConnectionStage);
 
 export const useShowReconnect = () => useAppSelector(selectShowReconnect);
 

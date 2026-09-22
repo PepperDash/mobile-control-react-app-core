@@ -1,8 +1,25 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
+/**
+ * Coarse-grained stage of the startup/connection sequence, surfaced to the
+ * user on the "Connecting..." screen so a hang can be diagnosed without
+ * digging through the console.
+ */
+export type ConnectionStage =
+  | 'idle'
+  | 'loading-config'
+  | 'loading-version'
+  | 'waiting-for-token'
+  | 'loading-room'
+  | 'connecting-websocket'
+  | 'connected'
+  | 'retrying'
+  | 'error';
+
 const initialState: UiConfigState = {
   showReconnect: false,
   error: '',
+  connectionStage: 'idle',
   modalVisibility: {
     showShutdownModal: false,
     showIncomingCallModal: false,
@@ -58,6 +75,9 @@ const uiSlice = createSlice({
     setErrorMessage(state, action: PayloadAction<string>) {
       state.error = action.payload;
     },
+    setConnectionStage(state, action: PayloadAction<ConnectionStage>) {
+      state.connectionStage = action.payload;
+    },
     setShowReconnect(state, action: PayloadAction<boolean>) {
       state.showReconnect = action.payload;
     },
@@ -83,6 +103,8 @@ const uiSlice = createSlice({
 export interface UiConfigState {
   showReconnect: boolean;
   error: string;
+  /** Current stage of the startup/connection sequence. See {@link ConnectionStage}. */
+  connectionStage: ConnectionStage;
   modalVisibility: Record<modalType | string, boolean>;
   popoverVisibility: Record<popoverGroup | string, Record<string, boolean>>;
   theme?: string;

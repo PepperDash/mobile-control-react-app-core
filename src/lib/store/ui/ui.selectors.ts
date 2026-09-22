@@ -28,6 +28,11 @@ export const selectShowPopoverById = (
 
 export const selectError = createSelector(uiState, (ui) => ui.error);
 
+export const selectConnectionStage = createSelector(
+  uiState,
+  (ui) => ui.connectionStage
+);
+
 export const selectShowReconnect = createSelector(
   uiState,
   (ui) => ui.showReconnect
