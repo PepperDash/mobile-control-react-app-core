@@ -18,6 +18,15 @@ import { uiActions, UiConfigState } from '../ui/ui.slice';
 
 const httpClient = axios.create();
 
+// Add a random query parameter to every request to bust processor/browser caches
+httpClient.interceptors.request.use((config) => {
+  config.params = {
+    ...config.params,
+    _: Date.now().toString(36) + Math.random().toString(36).slice(2),
+  };
+  return config;
+});
+
 // Define RootState locally to avoid circular dependency
 type LocalRootState = {
   appConfig: AppConfigState;
