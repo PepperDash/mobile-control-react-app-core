@@ -18,6 +18,25 @@ import { uiActions, UiConfigState } from '../ui/ui.slice';
 
 const httpClient = axios.create();
 
+// Essentials only appends a `cb=` cache buster to the app URL for touchpanels with
+// ForceAppRefresh enabled (e.g. DGE/CH5 panels), so its presence is a reliable signal that this
+// client needs the aggressive-cache workaround too. Everyone else (Navigators, plain browsers)
+// sees no `cb` param and this interceptor becomes a no-op, leaving their requests untouched.
+httpClient.interceptors.request.use((config) => {
+  const isForceRefreshClient = new URLSearchParams(window.location.search).has(
+    'cb',
+  );
+
+  if (isForceRefreshClient) {
+    config.params = {
+      ...config.params,
+      _: Date.now().toString(36) + Math.random().toString(36).slice(2),
+    };
+  }
+
+  return config;
+});
+
 // Define RootState locally to avoid circular dependency
 type LocalRootState = {
   appConfig: AppConfigState;
@@ -50,7 +69,7 @@ export const wsSendMessage = (messageType: string, content: unknown) => ({
 export const wsAddEventHandler = (
   eventType: string,
   key: string,
-  callback: (data: Message) => void
+  callback: (data: Message) => void,
 ) => ({
   type: WS_ADD_EVENT_HANDLER,
   payload: { eventType, key, callback },
@@ -113,6 +132,26 @@ const isXPanel = (): boolean => {
  * than the app's base path.
  */
 const isDevicePanel = (): boolean => isZoomRoom() || isXPanel();
+
+/**
+ * Computes the app's base URL the same way the router basename and config loader do, so a
+ * reload lands on the app root instead of whatever deep route the panel is currently on.
+ * A blind reload of a deep path (e.g. /mc/app/tech) can strand DGE panels after a
+ * combine/divide; the current query string (token / cache buster) is preserved.
+ */
+const getAppBaseUrl = (): string => {
+  const segments = window.location.pathname
+    .split('/')
+    .filter((path) => path.length > 0 && !path.includes('.'));
+
+  if (segments.length >= 5) {
+    segments.length = 5;
+  } else {
+    segments.length = 2;
+  }
+
+  return `/${segments.join('/')}${window.location.search}`;
+};
 
 /**
  * Builds a user-facing error message for a failed HTTP request. Axios (and
@@ -222,7 +261,7 @@ export const createWebSocketMiddleware = (): Middleware<
       try {
         const configRes = await httpClient.get<AppConfig>(
           '/_local-config/_config.local.json',
-          { baseURL }
+          { baseURL },
         );
 
         if (configRes.status === 200 && configRes.data) {
@@ -233,7 +272,7 @@ export const createWebSocketMiddleware = (): Middleware<
         console.error('Error getting config', error);
         dispatch(uiActions.setConnectionStage('error'));
         dispatch(
-          uiActions.setErrorMessage(describeRequestError(error, configUrl))
+          uiActions.setErrorMessage(describeRequestError(error, configUrl)),
         );
         return true;
       }
@@ -244,7 +283,7 @@ export const createWebSocketMiddleware = (): Middleware<
         try {
           // Get the runtime version info and set it in the store
           const versionRes = await httpClient.get<RuntimeConfigState>(
-            `${apiPath}/version`
+            `${apiPath}/version`,
           );
           if (versionRes.status === 200 && versionRes.data) {
             dispatch(runtimeConfigActions.setRuntimeConfig(versionRes.data));
@@ -254,8 +293,8 @@ export const createWebSocketMiddleware = (): Middleware<
           dispatch(uiActions.setConnectionStage('error'));
           dispatch(
             uiActions.setErrorMessage(
-              describeRequestError(error, `${apiPath}/version`)
-            )
+              describeRequestError(error, `${apiPath}/version`),
+            ),
           );
         }
       }
@@ -274,11 +313,11 @@ export const createWebSocketMiddleware = (): Middleware<
   const getRoomData = async (
     apiPath: string,
     token: string,
-    dispatch: Dispatch
+    dispatch: Dispatch,
   ): Promise<RoomData | null> => {
     try {
       const res = await httpClient.get<RoomData>(
-        `${apiPath}/ui/joinroom?token=${token}`
+        `${apiPath}/ui/joinroom?token=${token}`,
       );
 
       if (res.status === 200 && res.data) {
@@ -299,8 +338,8 @@ export const createWebSocketMiddleware = (): Middleware<
         dispatch(uiActions.setConnectionStage('error'));
         dispatch(
           uiActions.setErrorMessage(
-            `Token ${token} is invalid. Unable to join room`
-          )
+            `Token ${token} is invalid. Unable to join room`,
+          ),
         );
         return null;
       }
@@ -309,8 +348,8 @@ export const createWebSocketMiddleware = (): Middleware<
       dispatch(uiActions.setConnectionStage('error'));
       dispatch(
         uiActions.setErrorMessage(
-          describeRequestError(err, `${apiPath}/ui/joinroom`)
-        )
+          describeRequestError(err, `${apiPath}/ui/joinroom`),
+        ),
       );
       return null;
     }
@@ -364,7 +403,7 @@ export const createWebSocketMiddleware = (): Middleware<
    */
   const requestRoomStatus = (
     getState: () => LocalRootState,
-    roomKey?: string
+    roomKey?: string,
   ) => {
     const rootState = getState();
     const currentRoomKey = roomKey ?? rootState.runtimeConfig.roomData.roomKey;
@@ -388,7 +427,7 @@ export const createWebSocketMiddleware = (): Middleware<
           type: `/room/${currentRoomKey}/status`,
           clientId,
           content: null,
-        })
+        }),
       );
     }
   };
@@ -398,7 +437,7 @@ export const createWebSocketMiddleware = (): Middleware<
    */
   const connect = async (
     dispatch: Dispatch,
-    getState: () => LocalRootState
+    getState: () => LocalRootState,
   ) => {
     console.log('WebSocket middleware: Attempting to connect...');
 
@@ -412,7 +451,7 @@ export const createWebSocketMiddleware = (): Middleware<
         {
           hasApiPath: !!apiPath,
           hasToken: !!state.token,
-        }
+        },
       );
 
       // Without an apiPath or token there is nothing further this middleware
@@ -423,15 +462,15 @@ export const createWebSocketMiddleware = (): Middleware<
         dispatch(uiActions.setConnectionStage('error'));
         dispatch(
           uiActions.setErrorMessage(
-            'Unable to connect: app configuration failed to load (no apiPath). Check that _local-config/_config.local.json is reachable and valid.'
-          )
+            'Unable to connect: app configuration failed to load (no apiPath). Check that _local-config/_config.local.json is reachable and valid.',
+          ),
         );
       } else {
         dispatch(uiActions.setConnectionStage('waiting-for-token'));
         dispatch(
           uiActions.setErrorMessage(
-            'No connection token found. Reopen this app using a valid Mobile Control link (with a ?token= parameter).'
-          )
+            'No connection token found. Reopen this app using a valid Mobile Control link (with a ?token= parameter).',
+          ),
         );
       }
       return;
@@ -444,7 +483,7 @@ export const createWebSocketMiddleware = (): Middleware<
         {
           hasClient: !!state.client,
           waitingToReconnect: state.waitingToReconnect,
-        }
+        },
       );
       return;
     }
@@ -458,7 +497,7 @@ export const createWebSocketMiddleware = (): Middleware<
 
       if (!roomData) {
         console.log(
-          'WebSocket middleware: Failed to get room data, will retry...'
+          'WebSocket middleware: Failed to get room data, will retry...',
         );
         dispatch(uiActions.setConnectionStage('retrying'));
         startReconnectionLoop(dispatch);
@@ -500,7 +539,7 @@ export const createWebSocketMiddleware = (): Middleware<
         console.log(
           'WebSocket middleware: Disconnected',
           closeEvent.reason,
-          closeEvent.code
+          closeEvent.code,
         );
 
         // Handle explicit client-side close
@@ -523,13 +562,13 @@ export const createWebSocketMiddleware = (): Middleware<
           console.log('WebSocket middleware: User code changed');
           stopReconnectionLoop();
           dispatch(
-            runtimeConfigActions.setUserCode({ userCode: '', qrUrl: '' })
+            runtimeConfigActions.setUserCode({ userCode: '', qrUrl: '' }),
           );
           dispatch(uiActions.setConnectionStage('error'));
           dispatch(
             uiActions.setErrorMessage(
-              'User code changed. Click reconnect to enter the new code'
-            )
+              'User code changed. Click reconnect to enter the new code',
+            ),
           );
           clearStateDataOnDisconnect(dispatch);
           return;
@@ -541,8 +580,8 @@ export const createWebSocketMiddleware = (): Middleware<
           dispatch(uiActions.setConnectionStage('error'));
           dispatch(
             uiActions.setErrorMessage(
-              'Room combination changed. Click Reconnect to re-join the room'
-            )
+              'Room combination changed. Click Reconnect to re-join the room',
+            ),
           );
           clearStateDataOnDisconnect(dispatch);
           return;
@@ -555,25 +594,25 @@ export const createWebSocketMiddleware = (): Middleware<
 
           if (hasTouchpanelKey) {
             console.log(
-              'WebSocket middleware: Code 4001 received with touchpanel key present, will auto-reconnect'
+              'WebSocket middleware: Code 4001 received with touchpanel key present, will auto-reconnect',
             );
             // Will fall through to auto-reconnect logic below
           } else if (!serverIsRunningOnProcessorHardware) {
             console.log(
-              'WebSocket middleware: Processor disconnected (no touchpanel key, not on processor hardware)'
+              'WebSocket middleware: Processor disconnected (no touchpanel key, not on processor hardware)',
             );
             stopReconnectionLoop();
             dispatch(uiActions.setConnectionStage('error'));
             dispatch(
               uiActions.setErrorMessage(
-                'Processor has disconnected. Click Reconnect to continue.'
-              )
+                'Processor has disconnected. Click Reconnect to continue.',
+              ),
             );
             clearStateDataOnDisconnect(dispatch);
             return;
           } else {
             console.log(
-              'WebSocket middleware: Code 4001 on processor hardware (no touchpanel key), will auto-reconnect'
+              'WebSocket middleware: Code 4001 on processor hardware (no touchpanel key), will auto-reconnect',
             );
             // Will fall through to auto-reconnect logic below
           }
@@ -582,7 +621,7 @@ export const createWebSocketMiddleware = (): Middleware<
         // All other close codes (including 1000 and 4001 on processor hardware) will auto-reconnect
         if (state.client) {
           console.log(
-            'WebSocket middleware: Closed by server, will auto-reconnect'
+            'WebSocket middleware: Closed by server, will auto-reconnect',
           );
         } else {
           console.log('WebSocket middleware: Closed by client');
@@ -596,8 +635,8 @@ export const createWebSocketMiddleware = (): Middleware<
         dispatch(uiActions.setConnectionStage('retrying'));
         dispatch(
           uiActions.setErrorMessage(
-            'Connection lost. Attempting to reconnect...'
-          )
+            'Connection lost. Attempting to reconnect...',
+          ),
         );
         dispatch(runtimeConfigActions.setWebsocketIsConnected(false));
         dispatch(devicesActions.clearDevices());
@@ -627,8 +666,8 @@ export const createWebSocketMiddleware = (): Middleware<
               case '/system/touchpanelKey':
                 dispatch(
                   runtimeConfigActions.setTouchpanelKey(
-                    message.content as string
-                  )
+                    message.content as string,
+                  ),
                 );
                 break;
               case '/system/roomKey':
@@ -637,17 +676,19 @@ export const createWebSocketMiddleware = (): Middleware<
                 dispatch(uiActions.clearSyncState());
                 dispatch(
                   runtimeConfigActions.setCurrentRoomKey(
-                    message.content as string
-                  )
+                    message.content as string,
+                  ),
                 );
                 break;
               case '/system/userCodeChanged':
                 dispatch(
-                  runtimeConfigActions.setUserCode(message.content as UserCode)
+                  runtimeConfigActions.setUserCode(message.content as UserCode),
                 );
                 break;
               case '/system/roomCombinationChanged':
-                window.location.reload();
+                // Reload to the app base URL, not the current deep route, so a combine/divide
+                // re-runs routing cleanly (like a fresh app push) instead of stranding the panel.
+                window.location.replace(getAppBaseUrl());
                 break;
               case '/system/deviceInterfaces': {
                 const interfaces: {
@@ -658,15 +699,15 @@ export const createWebSocketMiddleware = (): Middleware<
 
                 dispatch(
                   runtimeConfigActions.setDeviceInterfaces(
-                    interfaces.deviceInterfaces
-                  )
+                    interfaces.deviceInterfaces,
+                  ),
                 );
                 break;
               }
               default:
                 console.log(
                   'WebSocket middleware: Unhandled system message',
-                  message
+                  message,
                 );
                 break;
             }
@@ -675,7 +716,7 @@ export const createWebSocketMiddleware = (): Middleware<
             if (import.meta.env.DEV) {
               console.log(
                 'WebSocket middleware: Event message received',
-                message
+                message,
               );
             }
             const handlers = state.eventHandlers[message.type];
@@ -683,7 +724,7 @@ export const createWebSocketMiddleware = (): Middleware<
             if (!handlers) {
               console.log(
                 'WebSocket middleware: No handlers found for event type',
-                message.type
+                message.type,
               );
             }
 
@@ -694,7 +735,7 @@ export const createWebSocketMiddleware = (): Middleware<
                 } catch (err) {
                   console.error(
                     'WebSocket middleware: Event handler error',
-                    err
+                    err,
                   );
                 }
               });
@@ -738,7 +779,7 @@ export const createWebSocketMiddleware = (): Middleware<
   const sendMessage = (
     messageType: string,
     content: unknown,
-    getState: () => LocalRootState
+    getState: () => LocalRootState,
   ) => {
     const rootState = getState();
     const isConnected = rootState.runtimeConfig.websocket.isConnected;
@@ -746,7 +787,7 @@ export const createWebSocketMiddleware = (): Middleware<
 
     if (state.client && isConnected) {
       state.client.send(
-        JSON.stringify({ type: messageType, clientId, content })
+        JSON.stringify({ type: messageType, clientId, content }),
       );
     } else {
       console.warn('WebSocket middleware: Cannot send message - not connected');
@@ -759,7 +800,7 @@ export const createWebSocketMiddleware = (): Middleware<
   const addEventHandler = (
     eventType: string,
     key: string,
-    callback: (data: Message) => void
+    callback: (data: Message) => void,
   ) => {
     if (!state.eventHandlers[eventType]) {
       state.eventHandlers[eventType] = {};
@@ -778,7 +819,7 @@ export const createWebSocketMiddleware = (): Middleware<
       console.log(
         'WebSocket middleware: Event handler removed',
         eventType,
-        key
+        key,
       );
     }
   };
@@ -826,7 +867,7 @@ export const createWebSocketMiddleware = (): Middleware<
 
             if (!joinToken) {
               console.log(
-                'WebSocket middleware: Device panel mode - no token available yet from mcAppUrl, waiting for join 1 update'
+                'WebSocket middleware: Device panel mode - no token available yet from mcAppUrl, waiting for join 1 update',
               );
               state.token = null;
               store.dispatch(uiActions.setConnectionStage('waiting-for-token'));
@@ -834,7 +875,7 @@ export const createWebSocketMiddleware = (): Middleware<
             }
 
             console.log(
-              'WebSocket middleware: Using token parsed from mcAppUrl (device panel mode)'
+              'WebSocket middleware: Using token parsed from mcAppUrl (device panel mode)',
             );
             state.token = joinToken;
             // sessionStorage isn't available on Crestron panels, not sure on other devices that run Zoom Room Controller and allow loading Zoom Room Control Applications
@@ -867,7 +908,7 @@ export const createWebSocketMiddleware = (): Middleware<
           sendMessage(
             typedAction.payload.messageType,
             typedAction.payload.content,
-            store.getState
+            store.getState,
           );
           break;
 
@@ -875,14 +916,14 @@ export const createWebSocketMiddleware = (): Middleware<
           addEventHandler(
             typedAction.payload.eventType,
             typedAction.payload.key,
-            typedAction.payload.callback
+            typedAction.payload.callback,
           );
           break;
 
         case WS_REMOVE_EVENT_HANDLER:
           removeEventHandler(
             typedAction.payload.eventType,
-            typedAction.payload.key
+            typedAction.payload.key,
           );
           break;
 
@@ -899,7 +940,7 @@ export const createWebSocketMiddleware = (): Middleware<
             const isConnected = (action as AnyAction).payload;
             if (isConnected === true) {
               console.log(
-                '[WebSocket Middleware] Connection established, requesting room status...'
+                '[WebSocket Middleware] Connection established, requesting room status...',
               );
               setTimeout(() => requestRoomStatus(store.getState), 100);
             }
@@ -914,7 +955,7 @@ export const createWebSocketMiddleware = (): Middleware<
               roomData?.clientId
             ) {
               console.log(
-                '[WebSocket Middleware] Room data received, requesting room status...'
+                '[WebSocket Middleware] Room data received, requesting room status...',
               );
               setTimeout(() => requestRoomStatus(store.getState), 100);
             }
@@ -927,7 +968,7 @@ export const createWebSocketMiddleware = (): Middleware<
               console.log(
                 '[WebSocket Middleware] Room changed to:',
                 roomKey,
-                ', requesting room status...'
+                ', requesting room status...',
               );
               setTimeout(() => requestRoomStatus(store.getState, roomKey), 100);
             }
@@ -946,12 +987,12 @@ export const createWebSocketMiddleware = (): Middleware<
               if (joinToken && joinToken !== state.token) {
                 if (state.client) {
                   console.log(
-                    '[WebSocket Middleware] Token rotated in mcAppUrl, reconnecting with new token...'
+                    '[WebSocket Middleware] Token rotated in mcAppUrl, reconnecting with new token...',
                   );
                   disconnect();
                 } else {
                   console.log(
-                    '[WebSocket Middleware] Token now available from mcAppUrl, connecting...'
+                    '[WebSocket Middleware] Token now available from mcAppUrl, connecting...',
                   );
                 }
 
