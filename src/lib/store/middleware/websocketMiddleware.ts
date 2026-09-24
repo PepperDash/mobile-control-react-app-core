@@ -134,6 +134,26 @@ const isXPanel = (): boolean => {
 const isDevicePanel = (): boolean => isZoomRoom() || isXPanel();
 
 /**
+ * Computes the app's base URL the same way the router basename and config loader do, so a
+ * reload lands on the app root instead of whatever deep route the panel is currently on.
+ * A blind reload of a deep path (e.g. /mc/app/tech) can strand DGE panels after a
+ * combine/divide; the current query string (token / cache buster) is preserved.
+ */
+const getAppBaseUrl = (): string => {
+  const segments = window.location.pathname
+    .split('/')
+    .filter((path) => path.length > 0 && !path.includes('.'));
+
+  if (segments.length >= 5) {
+    segments.length = 5;
+  } else {
+    segments.length = 2;
+  }
+
+  return `/${segments.join('/')}${window.location.search}`;
+};
+
+/**
  * Builds a user-facing error message for a failed HTTP request. Axios (and
  * the browser XHR/fetch APIs underneath it) do not expose SSL/TLS
  * certificate error details to JS, so a request that fails with no response
@@ -666,7 +686,9 @@ export const createWebSocketMiddleware = (): Middleware<
                 );
                 break;
               case '/system/roomCombinationChanged':
-                window.location.reload();
+                // Reload to the app base URL, not the current deep route, so a combine/divide
+                // re-runs routing cleanly (like a fresh app push) instead of stranding the panel.
+                window.location.replace(getAppBaseUrl());
                 break;
               case '/system/deviceInterfaces': {
                 const interfaces: {
