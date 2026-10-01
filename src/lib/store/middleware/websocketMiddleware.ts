@@ -5,6 +5,15 @@ import sessionStorageKeys from '../../types/classes/session-storage-keys';
 import { RoomState } from '../../types/state/state';
 import { DeviceState } from '../../types/state/state/DeviceState';
 import { loadValue, saveValue } from '../../utils/joinParamsService';
+import {
+  perfCount,
+  perfEvent,
+  perfGetCounts,
+  perfMark,
+  perfMeasure,
+  perfNames,
+  perfResetCounts,
+} from '../../utils/perf';
 import { appConfigActions, AppConfigState } from '../appConfig/appConfig.slice';
 import { devicesActions } from '../devices/devices.slice';
 import { roomsActions } from '../rooms/rooms.slice';
@@ -71,7 +80,35 @@ interface WebSocketMiddlewareState {
   roomStatusRetryTimer: NodeJS.Timeout | null;
   roomStatusRetryDeadline: number | null;
   roomStatusRetryRoomKey: string | undefined;
+  /** Perf: whether the current socket has received its first room message yet. */
+  perfRoomMessageSeen: boolean;
+  /** Perf: whether this page has reported its first completed sync yet. */
+  perfInitialSyncReported: boolean;
+  /** Perf: size of the most recent batch request, reported with its completion. */
+  perfBatch: { devices: number; paths: number } | null;
 }
+
+const BATCH_FULL_STATUS = '/system/batchDeviceFullStatus';
+
+/** Counts the devices and action paths in a batch request's content, for perf context. */
+const describeBatch = (content: unknown): { devices: number; paths: number } => {
+  const c = content as {
+    devices?: Record<string, unknown[]>;
+    deviceKeys?: unknown[];
+  } | null;
+  if (c?.devices) {
+    const lists = Object.values(c.devices);
+    return {
+      devices: lists.length,
+      paths: lists.reduce<number>(
+        (sum, paths) => sum + (Array.isArray(paths) ? paths.length : 0),
+        0,
+      ),
+    };
+  }
+  const keys = c?.deviceKeys?.length ?? 0;
+  return { devices: keys, paths: keys };
+};
 
 // Bounded retry window for the initial room-status request (see scheduleRoomStatusRequest).
 const ROOM_STATUS_RETRY_INTERVAL_MS = 1500;
@@ -93,7 +130,12 @@ export const createWebSocketMiddleware = (): Middleware<
     roomStatusRetryTimer: null,
     roomStatusRetryDeadline: null,
     roomStatusRetryRoomKey: undefined,
+    perfRoomMessageSeen: false,
+    perfInitialSyncReported: false,
+    perfBatch: null,
   };
+
+  const { marks: m, measures: pm, counters: pc } = perfNames;
 
   /**
    * Initialize the app configuration
@@ -113,19 +155,25 @@ export const createWebSocketMiddleware = (): Middleware<
       const baseURL = `/${basePath.join('/')}`;
 
       // Get the local config and set it in the store
+      perfMark(m.configStart);
       const configRes = await httpClient.get<AppConfig>(
         '/_local-config/_config.local.json',
         { baseURL },
       );
+      perfMark(m.configEnd);
+      perfMeasure(pm.config, m.configStart, m.configEnd);
 
       if (configRes.status === 200 && configRes.data) {
         const apiPath = configRes.data.apiPath;
         dispatch(appConfigActions.setAppConfig(configRes.data));
 
         // Get the runtime version info and set it in the store
+        perfMark(m.versionStart);
         const versionRes = await httpClient.get<RuntimeConfigState>(
           `${apiPath}/version`,
         );
+        perfMark(m.versionEnd);
+        perfMeasure(pm.version, m.versionStart, m.versionEnd);
         if (versionRes.status === 200 && versionRes.data) {
           dispatch(runtimeConfigActions.setRuntimeConfig(versionRes.data));
         }
@@ -146,9 +194,12 @@ export const createWebSocketMiddleware = (): Middleware<
     dispatch: Dispatch,
   ): Promise<RoomData | null> => {
     try {
+      perfMark(m.joinStart);
       const res = await httpClient.get<RoomData>(
         `${apiPath}/ui/joinroom?token=${token}`,
       );
+      perfMark(m.joinEnd);
+      perfMeasure(pm.join, m.joinStart, m.joinEnd);
 
       if (res.status === 200 && res.data) {
         dispatch(runtimeConfigActions.setRoomData(res.data));
@@ -423,11 +474,17 @@ export const createWebSocketMiddleware = (): Middleware<
       const wsPath = apiPath.replace('http', 'ws');
       const url = `${wsPath}/ui/join/${state.token}?clientId=${roomData.clientId}`;
 
+      perfMark(m.wsCreated);
       const newWs = new WebSocket(url);
       state.client = newWs;
 
       newWs.onopen = (ev: Event) => {
         console.log('WebSocket middleware: Connected', ev.type, ev.target);
+        perfMark(m.wsOpen);
+        perfMeasure(pm.wsOpen, m.wsCreated, m.wsOpen);
+        // Counters describe this socket only.
+        perfResetCounts('ws.');
+        state.perfRoomMessageSeen = false;
         state.waitingToReconnect = false;
         stopReconnectionLoop();
 
@@ -552,6 +609,12 @@ export const createWebSocketMiddleware = (): Middleware<
 
       newWs.onmessage = (e) => {
         try {
+          const size = typeof e.data === 'string' ? e.data.length : 0;
+          perfCount(pc.messages);
+          perfCount(pc.bytes, size);
+          perfCount(pc.batchMessages);
+          perfCount(pc.batchBytes, size);
+
           const message: Message = JSON.parse(e.data);
 
           // only print message in dev mode
@@ -604,9 +667,23 @@ export const createWebSocketMiddleware = (): Middleware<
                 );
                 break;
               }
-              case '/system/initialSyncComplete':
+              case '/system/initialSyncComplete': {
                 dispatch(uiActions.addSyncState('initialSyncComplete'));
+
+                const initial = !state.perfInitialSyncReported;
+                state.perfInitialSyncReported = true;
+                if (initial) perfMark(m.initialSyncComplete);
+
+                const context = {
+                  initial,
+                  ...state.perfBatch,
+                  ...perfGetCounts('batch.'),
+                  ...perfGetCounts('ws.'),
+                };
+                perfMeasure(pm.batch, m.batchSent, undefined, context);
+                perfEvent(perfNames.events.batchComplete, context);
                 break;
+              }
               default:
                 console.log(
                   'WebSocket middleware: Unhandled system message',
@@ -644,8 +721,16 @@ export const createWebSocketMiddleware = (): Middleware<
               });
             }
           } else if (message.type.startsWith('/room/')) {
+            if (!state.perfRoomMessageSeen) {
+              state.perfRoomMessageSeen = true;
+              perfMark(m.firstRoomMessage);
+              perfMeasure(pm.roomState, m.wsOpen, m.firstRoomMessage);
+            }
+            perfCount(pc.roomDispatches);
             dispatch(roomsActions.setRoomState(message));
           } else if (message.type.startsWith('/device/')) {
+            perfCount(pc.deviceDispatches);
+            perfCount(pc.batchDeviceDispatches);
             dispatch(devicesActions.setDeviceState(message));
           }
         } catch (err) {
@@ -688,6 +773,14 @@ export const createWebSocketMiddleware = (): Middleware<
     const clientId = rootState.runtimeConfig.roomData.clientId;
 
     if (state.client && isConnected) {
+      if (messageType === BATCH_FULL_STATUS) {
+        // Time and count each batch from the moment it is sent. The server's reply
+        // (initialSyncComplete) carries no request id, so overlapping batches are attributed to
+        // the most recent one.
+        state.perfBatch = describeBatch(content);
+        perfResetCounts('batch.');
+        perfMark(m.batchSent);
+      }
       state.client.send(
         JSON.stringify({ type: messageType, clientId, content }),
       );
