@@ -85,17 +85,35 @@ interface WebSocketMiddlewareState {
   /** Perf: whether this page has reported its first completed sync yet. */
   perfInitialSyncReported: boolean;
   /** Perf: size of the most recent batch request, reported with its completion. */
-  perfBatch: { devices: number; paths: number } | null;
+  perfBatch: {
+    devices: number;
+    paths: number;
+    aggregate: boolean;
+    requestId?: string;
+  } | null;
+}
+
+/** Content of `/system/batchDeviceStatus`: every reply to an aggregated batch request, in one message. */
+interface AggregatedBatchContent {
+  requestId?: string;
+  messages?: Message[];
+  syncComplete?: boolean;
 }
 
 const BATCH_FULL_STATUS = '/system/batchDeviceFullStatus';
 
 /** Counts the devices and action paths in a batch request's content, for perf context. */
-const describeBatch = (content: unknown): { devices: number; paths: number } => {
+const describeBatch = (
+  content: unknown,
+): { devices: number; paths: number; aggregate: boolean; requestId?: string } => {
   const c = content as {
     devices?: Record<string, unknown[]>;
     deviceKeys?: unknown[];
+    aggregate?: boolean;
+    requestId?: string;
   } | null;
+  const aggregate = c?.aggregate === true;
+  const requestId = c?.requestId;
   if (c?.devices) {
     const lists = Object.values(c.devices);
     return {
@@ -104,10 +122,12 @@ const describeBatch = (content: unknown): { devices: number; paths: number } => 
         (sum, paths) => sum + (Array.isArray(paths) ? paths.length : 0),
         0,
       ),
+      aggregate,
+      requestId,
     };
   }
   const keys = c?.deviceKeys?.length ?? 0;
-  return { devices: keys, paths: keys };
+  return { devices: keys, paths: keys, aggregate, requestId };
 };
 
 // Bounded retry window for the initial room-status request (see scheduleRoomStatusRequest).
@@ -607,6 +627,28 @@ export const createWebSocketMiddleware = (): Middleware<
         startReconnectionLoop(dispatch);
       };
 
+      /**
+       * Marks a batch status request complete - from `/system/initialSyncComplete`, or the end of an
+       * aggregated `/system/batchDeviceStatus` - and reports its timing and message counts.
+       */
+      const completeSync = (extraContext?: Record<string, unknown>) => {
+        dispatch(uiActions.addSyncState('initialSyncComplete'));
+
+        const initial = !state.perfInitialSyncReported;
+        state.perfInitialSyncReported = true;
+        if (initial) perfMark(m.initialSyncComplete);
+
+        const context = {
+          initial,
+          ...state.perfBatch,
+          ...perfGetCounts('batch.'),
+          ...perfGetCounts('ws.'),
+          ...extraContext,
+        };
+        perfMeasure(pm.batch, m.batchSent, undefined, context);
+        perfEvent(perfNames.events.batchComplete, context);
+      };
+
       newWs.onmessage = (e) => {
         try {
           const size = typeof e.data === 'string' ? e.data.length : 0;
@@ -667,21 +709,45 @@ export const createWebSocketMiddleware = (): Middleware<
                 );
                 break;
               }
-              case '/system/initialSyncComplete': {
-                dispatch(uiActions.addSyncState('initialSyncComplete'));
+              case '/system/initialSyncComplete':
+                completeSync();
+                break;
+              case '/system/batchDeviceStatus': {
+                // An aggregated reply to a batch status request: every device and room status in
+                // one message. Apply each slice's updates as one dispatch, so the store - and the
+                // UI - update once instead of once per message.
+                const batch = (message.content ?? {}) as AggregatedBatchContent;
+                const replies = batch.messages ?? [];
+                const roomReplies = replies.filter((r) => r.type?.startsWith('/room/'));
+                const deviceReplies = replies.filter((r) => r.type?.startsWith('/device/'));
+                const otherReplies = replies.length - roomReplies.length - deviceReplies.length;
 
-                const initial = !state.perfInitialSyncReported;
-                state.perfInitialSyncReported = true;
-                if (initial) perfMark(m.initialSyncComplete);
+                if (roomReplies.length > 0) {
+                  if (!state.perfRoomMessageSeen) {
+                    state.perfRoomMessageSeen = true;
+                    perfMark(m.firstRoomMessage);
+                    perfMeasure(pm.roomState, m.wsOpen, m.firstRoomMessage);
+                  }
+                  perfCount(pc.roomDispatches);
+                  dispatch(roomsActions.setManyRoomStates(roomReplies));
+                }
+                if (deviceReplies.length > 0) {
+                  perfCount(pc.deviceDispatches);
+                  perfCount(pc.batchDeviceDispatches);
+                  dispatch(devicesActions.setManyDeviceStates(deviceReplies));
+                }
+                if (otherReplies > 0 && import.meta.env.DEV) {
+                  console.log(
+                    'WebSocket middleware: Aggregated batch contained replies that are neither room nor device status',
+                    replies.filter(
+                      (r) => !r.type?.startsWith('/room/') && !r.type?.startsWith('/device/'),
+                    ),
+                  );
+                }
 
-                const context = {
-                  initial,
-                  ...state.perfBatch,
-                  ...perfGetCounts('batch.'),
-                  ...perfGetCounts('ws.'),
-                };
-                perfMeasure(pm.batch, m.batchSent, undefined, context);
-                perfEvent(perfNames.events.batchComplete, context);
+                if (batch.syncComplete) {
+                  completeSync({ aggregatedReplies: replies.length });
+                }
                 break;
               }
               default:
