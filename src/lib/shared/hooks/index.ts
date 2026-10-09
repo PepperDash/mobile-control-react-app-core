@@ -1,4 +1,5 @@
 export * from './interfaces';
+export * from './useBatchDeviceStatus';
 export * from './useButtonHeldHeartbeat';
 export * from './useDeviceIBasicVolume';
 export * from './useDeviceIBasicVolumeWithFeedback';
