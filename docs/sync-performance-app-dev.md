@@ -71,7 +71,7 @@ Request and reply, side by side:
 
 **Choose each device's paths; don't default to `/fullStatus`.** The `devices` map lists, per device key, the status paths its messengers handle: `/fullStatus`, and per-messenger paths such as `/powerStatus`, `/inputStatus`, `/volumeStatus`, `/commStatus` and `/deviceInfo`. The processor runs every handler registered for each path and puts all their replies in the one aggregated message. Ask for the narrowest paths that cover what the UI renders: a volume fader needs `/volumeStatus`, not the whole device. A path no messenger handles for that device is skipped, so it costs nothing but sends no data either; check a device's messengers in Essentials Dev Tools (or its plugin) before relying on a path.
 
-Import the hooks from the library (`1.25.0-feat-essentials-v3.30` or later; earlier drafts of this guide had apps copy them). They send `aggregate: true` and a `requestId` by default, and record each device and path pair they request so step 3 can skip repeats. Source: `src/lib/shared/hooks/useBatchDeviceStatus.ts`.
+Import the hooks from the library (`1.25.0-feat-essentials-v3.30` or later) rather than copying them into the app. They send `aggregate: true` and a `requestId` by default, and record each device and path pair they request so step 3 can skip repeats. Source: `src/lib/shared/hooks/useBatchDeviceStatus.ts`.
 
 ```ts
 import {
