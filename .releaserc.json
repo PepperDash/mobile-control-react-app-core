@@ -1,5 +1,10 @@
 {
   "branches": [
+    {
+      "name": "1.22.x",
+      "range": "1.22.x",
+      "channel": "1.22.x"
+    },
     "main",
     {
       "name": "release",
