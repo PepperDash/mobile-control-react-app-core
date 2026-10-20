@@ -24,17 +24,15 @@ jobs:
           echo "prerelease=${branch//\//-}" >> $GITHUB_OUTPUT
         env:
           GITHUB_REF: ${{ github.ref }}
-      # Maintenance branches (N.N.x) are declared in .releaserc.json; turning one into a prerelease
-      # entry as well would list it twice and semantic-release would refuse to run
       - name: Replace branch name in .releaserc.json
-        if: steps.get_branch.outputs.branch != 'main' && !endsWith(steps.get_branch.outputs.branch, '.x')
+        if: steps.get_branch.outputs.branch != 'main'
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "replace-me-feature-branch"
           replace: "${{ steps.get_branch.outputs.branch }}"
           include: ".releaserc.json"
       - name: Replace prerelease name in .releaserc.json
-        if: steps.get_branch.outputs.branch != 'main' && !endsWith(steps.get_branch.outputs.branch, '.x')
+        if: steps.get_branch.outputs.branch != 'main'
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "replace-me-prerelease"
