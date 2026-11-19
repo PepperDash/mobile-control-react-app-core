@@ -36,6 +36,27 @@ const resetListeners = new Set<() => void>();
 
 const isFramed = () => window.parent !== window;
 
+/**
+ * Whether this page is drawn light or dark. The browser gives an iframe a
+ * solid backdrop, which would hide the video, unless the iframe element in the
+ * parent page uses the same colour scheme as the page inside it. The parent
+ * page is told which one this is so that it can match it.
+ */
+const usedColorScheme = () => {
+  const declared = window.getComputedStyle(
+    document.documentElement
+  ).colorScheme;
+  if (!declared?.includes('dark')) {
+    return 'light';
+  }
+  if (!declared.includes('light')) {
+    return 'dark';
+  }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
+};
+
 const handleMessage = (event: MessageEvent) => {
   // Only the page hosting this one may act as the relay
   if (event.source !== window.parent) {
@@ -111,7 +132,7 @@ export const publishVideoRequest = (request: object) => {
   // A page loaded from a file has the origin "null", which cannot be used as a
   // target, so the wildcard is the only option there.
   window.parent.postMessage(
-    { type: RELAY_REQUEST, request },
+    { type: RELAY_REQUEST, request, colorScheme: usedColorScheme() },
     relayOrigin === 'null' ? '*' : relayOrigin
   );
 };
