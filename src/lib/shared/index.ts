@@ -6,3 +6,4 @@ export * from "./Buttons"
 export * from "./Icons"
 export * from "./layout/habanero"
 
+export * from "./VideoWindow"

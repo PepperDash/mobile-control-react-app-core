@@ -1,0 +1,10 @@
+.videowindow {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+/* The video is drawn underneath the page, so the window has to be see-through */
+.showthrough {
+  background: transparent;
+}
