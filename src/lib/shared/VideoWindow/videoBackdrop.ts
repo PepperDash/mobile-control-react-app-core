@@ -7,7 +7,7 @@
  * a rectangle for each running video. This module does the same job without a
  * canvas:
  *
- *   1. the background of `<html>` and `<body>` is copied onto a fixed,
+ *   1. the backgrounds of `<html>` and `<body>` are copied onto a fixed,
  *      full-viewport backdrop element that sits behind all page content
  *   2. `<html>` and `<body>` are made transparent
  *   3. the backdrop is clipped so that it has a hole over each running video
@@ -39,6 +39,11 @@ const hasBackground = (style: CSSStyleDeclaration) =>
   style.backgroundImage !== 'none' ||
   !['transparent', 'rgba(0, 0, 0, 0)'].includes(style.backgroundColor);
 
+const copyBackground = (from: CSSStyleDeclaration, to: HTMLElement) =>
+  BACKGROUND_PROPERTIES.forEach((property) =>
+    to.style.setProperty(property, from.getPropertyValue(property))
+  );
+
 const SEE_THROUGH_ATTRIBUTE = 'data-video-see-through';
 
 /**
@@ -67,16 +72,20 @@ const createBackdrop = () => {
   backdrop.style.cssText =
     'position:fixed;top:0;right:0;bottom:0;left:0;z-index:-1;pointer-events:none;';
 
-  // When both are set, the body background is the one copied: it is the one
-  // drawn on top, behind the app's content.
-  const pageStyle = [body, html]
+  // When both have a background the browser draws the body's on top of the
+  // html's, and the body's may be partly see-through, so each gets a layer.
+  const [lower, upper] = [html, body]
     .map((element) => window.getComputedStyle(element))
-    .find(hasBackground);
+    .filter(hasBackground);
 
-  if (pageStyle) {
-    BACKGROUND_PROPERTIES.forEach((property) =>
-      backdrop?.style.setProperty(property, pageStyle.getPropertyValue(property))
-    );
+  if (lower) {
+    copyBackground(lower, backdrop);
+  }
+  if (upper) {
+    const layer = document.createElement('div');
+    layer.style.cssText = 'position:absolute;top:0;right:0;bottom:0;left:0;';
+    copyBackground(upper, layer);
+    backdrop.appendChild(layer);
   }
 
   const restoreHtml = makeTransparent(html);

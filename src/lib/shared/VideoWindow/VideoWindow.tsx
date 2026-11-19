@@ -25,6 +25,12 @@ import {
 const START_DELAY_MS = 300;
 
 /**
+ * How often the position of a running video is checked. Something else on the
+ * page changing size can move the window without any event that says so.
+ */
+const POSITION_CHECK_MS = 250;
+
+/**
  * The panel rejects a location that is partly off screen, so the video only
  * runs while (nearly) all of the window is visible.
  */
@@ -286,6 +292,19 @@ export const VideoWindow = ({
     []
   );
 
+  // A page brought back by the browser's back or forward button can be shown
+  // again as it was, still mounted, after `pagehide` stopped its video.
+  useEffect(() => {
+    const restart = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setRestarts((count) => count + 1);
+      }
+    };
+    window.addEventListener('pageshow', restart);
+
+    return () => window.removeEventListener('pageshow', restart);
+  }, []);
+
   // Starts the video, and restarts it when the source changes. A start request
   // with the same id replaces the video that is running.
   useEffect(() => {
@@ -345,9 +364,11 @@ export const VideoWindow = ({
     window.addEventListener('resize', sync);
     // Capture phase, so scrolling inside any container is seen
     document.addEventListener('scroll', sync, true);
+    const positionCheck = setInterval(sync, POSITION_CHECK_MS);
     sync();
 
     return () => {
+      clearInterval(positionCheck);
       cancelAnimationFrame(frame);
       resizeObserver?.disconnect();
       window.removeEventListener('resize', sync);
