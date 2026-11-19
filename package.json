@@ -18,6 +18,9 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "dependencies": {
+    "@pepperdash/ch5-crcomlib-lite": "^1.0.0"
+  },
   "devDependencies": {
     "@reduxjs/toolkit": "^2.0.1",
     "@types/lodash": "^4.14.202",
