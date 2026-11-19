@@ -70,13 +70,17 @@ let nextVideoId = 1;
 const isStreamUrl = (url: string) => /^(rtsp|https?):\/\//.test(url);
 
 // Whole numbers only: the panel can return an error for fractional values.
+// Every edge is rounded inward, so a window that ends at the edge of the
+// screen is never reported as going past it.
 const measure = (element: HTMLElement): VideoRect => {
-  const { top, left, width, height } = element.getBoundingClientRect();
+  const rect = element.getBoundingClientRect();
+  const top = Math.ceil(rect.top);
+  const left = Math.ceil(rect.left);
   return {
-    top: Math.ceil(top),
-    left: Math.ceil(left),
-    width: Math.ceil(width),
-    height: Math.ceil(height),
+    top,
+    left,
+    width: Math.max(0, Math.floor(rect.right) - left),
+    height: Math.max(0, Math.floor(rect.bottom) - top),
   };
 };
 
